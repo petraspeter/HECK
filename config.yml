@@ -1,0 +1,35 @@
+# Consumer login
+login: root
+# Consumer password
+password: toor
+
+#Nastavenia servra
+server:
+    applicationConnectors:
+        - type: http
+          port: 8076
+        - type: https
+          port: 8077
+          keyStorePath: heck.keystore
+          keyStorePassword: crimson
+          validateCerts: false
+          validatePeers: false
+
+# Nastavenia databazy
+database:
+    # DBC driver
+    driverClass: com.mysql.jdbc.Driver
+    # Username DB
+    user: root
+    # Heslo DB
+    password: toor
+    # Adresa DB
+    url: jdbc:mysql://localhost:3306/heck
+
+# Nastavenia Jersey
+jerseyClient:
+    # Cas, do ktoreho sa musi nadviazat spojenie
+    timeout: 1s
+    # Pocet asynchronnych requestov
+    workQueueSize: 25
+
