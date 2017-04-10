@@ -32,7 +32,6 @@ import sk.upjs.ics.pro1a.heck.db.UserDao;
 
 @Path("/heck")
 @Produces(MediaType.APPLICATION_JSON)
-@Consumes(MediaType.APPLICATION_JSON)
 public class HeckResources {
     
     private AccessTokenDao accessTokenDao;
@@ -50,9 +49,10 @@ public class HeckResources {
     /**
      *              USER resource part
      */
-    
-    @Path("/login/user")
+     
     @POST
+    @Path("/login/user")
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     public Response loginUser(
             @FormParam("login") String login,
             @FormParam("password") String password
@@ -105,7 +105,6 @@ public class HeckResources {
     @POST
     @Path("/register/user")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    @UnitOfWork
     public Response registerDoctor(
             @FormParam("emailUser") String emailUser,
             @FormParam("loginUser") String loginUser,
@@ -137,9 +136,9 @@ public class HeckResources {
     /**
      *              DOCTOR resource part
      */
-    
-    @Path("/login/doctor")
     @POST
+    @Path("/login/doctor")
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     public Response loginDcotor(
             @FormParam("login") String login,
             @FormParam("password") String password
@@ -192,7 +191,6 @@ public class HeckResources {
     @POST
     @Path("/doctor/register")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    @UnitOfWork
     public Response registerDoctor(
             @FormParam("emailDoctor") String emailDoctor,
             @FormParam("loginDoctor") String loginDoctor,
