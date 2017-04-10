@@ -3,6 +3,9 @@ login: root
 # Consumer password
 password: toor
 
+# Bearer realm
+bearerRealm: oauth2-provider
+
 #Nastavenia servra
 server:
     applicationConnectors:

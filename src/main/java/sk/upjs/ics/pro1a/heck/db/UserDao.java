@@ -33,9 +33,9 @@ public class UserDao extends AbstractDAO<User>{
                 setParameter("id", id).uniqueResult();
     }
     
-    public User registerUser(User user) {
+    public User registerUser(User user, String password) {
         PasswordManager passwordManager = new PasswordManager();
-        User newUser = passwordManager.createUserPassword(user, user.getPasswordUser());
+        User newUser = passwordManager.createUserPassword(user, password);
         super.currentSession().saveOrUpdate(newUser);
         return newUser;
     }

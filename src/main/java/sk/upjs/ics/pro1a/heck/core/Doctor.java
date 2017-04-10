@@ -52,7 +52,7 @@ public class Doctor implements Serializable {
     @Column(name = "salt_doctor")
     private String saltDoctor;
     
-    @JsonProperty("SpecializationDoctor")  
+    @JsonProperty("SpecializationDoctor")
     @ManyToOne(cascade=CascadeType.ALL)
     @JoinColumn(name = "specialization_doctor")
     private  Specialization specializationDoctor;
@@ -135,6 +135,24 @@ public class Doctor implements Serializable {
         this.cityDoctor = cityDoctor;
         this.addressDoctor = addressDoctor;
         this.activeDoctor = activeDoctor;
+    }
+    
+    public Doctor(String emailDoctor, String loginDoctor, Specialization specializationDoctor,
+            String businessNameDoctor, String firstNameDoctor, String lastNameDoctor,
+            String phoneNumberDoctor, Integer postalCodeDoctor, String cityDoctor, String addressDoctor,
+            Timestamp activationTimeDoctor) {
+        this.emailDoctor = emailDoctor;
+        this.loginDoctor = loginDoctor;
+        this.specializationDoctor = specializationDoctor;
+        this.businessNameDoctor = businessNameDoctor;
+        this.firstNameDoctor = firstNameDoctor;
+        this.lastNameDoctor = lastNameDoctor;
+        this.phoneNumberDoctor = phoneNumberDoctor;
+        this.postalCodeDoctor = postalCodeDoctor;
+        this.cityDoctor = cityDoctor;
+        this.addressDoctor = addressDoctor;
+        this.activationTimeDoctor = activationTimeDoctor;
+        this.activeDoctor = true;
     }
     
     public Long getIdDoctor() {

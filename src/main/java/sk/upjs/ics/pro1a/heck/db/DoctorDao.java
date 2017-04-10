@@ -45,9 +45,9 @@ public class DoctorDao extends AbstractDAO<Doctor> {
         return allDoctors;
     }
     
-    public Doctor registerDoctor(Doctor doctor) {
+    public Doctor registerDoctor(Doctor doctor, String password) {
         PasswordManager passwordManager = new PasswordManager();
-        Doctor doc = passwordManager.createDoctorPassword(doctor, doctor.getPasswordDoctor());
+        Doctor doc = passwordManager.createDoctorPassword(doctor, password);
         super.currentSession().saveOrUpdate(doc);
         return doc;
     }

@@ -187,7 +187,7 @@ public class User implements Serializable {
     public void setIsAdmin(Boolean isAdmin) {
         this.isAdmin = isAdmin;
     }
-
+    
     public User(Long idUser, String emailUser, String loginUser, String passwordUser, String saltUser,
             String firstNameUser, String lastNameUser, String phoneUser, Integer postalCodeUser,
             String cityUser, String addressUser, Boolean activeUser, Boolean isAdmin) {
@@ -215,6 +215,20 @@ public class User implements Serializable {
         this.loginUser = loginUser;
         this.passwordUser = passwordUser;
         this.saltUser = saltUser;
+        this.firstNameUser = firstNameUser;
+        this.lastNameUser = lastNameUser;
+        this.phoneUser = phoneUser;
+        this.postalCodeUser = postalCodeUser;
+        this.cityUser = cityUser;
+        this.addressUser = addressUser;
+        this.activeUser = true;
+        this.isAdmin = false;
+    }
+    
+    public User(String emailUser, String loginUser, String firstNameUser, String lastNameUser,
+            String phoneUser, Integer postalCodeUser, String cityUser, String addressUser) {
+        this.emailUser = emailUser;
+        this.loginUser = loginUser;
         this.firstNameUser = firstNameUser;
         this.lastNameUser = lastNameUser;
         this.phoneUser = phoneUser;

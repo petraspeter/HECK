@@ -15,6 +15,9 @@ import org.hibernate.validator.constraints.NotEmpty;
 public class HeckConfiguration extends Configuration {
     
     @NotEmpty
+    private String bearerRealm;
+    
+    @NotEmpty
     private String login;
     
     @NotEmpty
@@ -27,7 +30,7 @@ public class HeckConfiguration extends Configuration {
     @Valid
     @NotNull
     private final JerseyClientConfiguration jerseyClientConfiguration = new JerseyClientConfiguration();
-        
+    
     @JsonProperty
     public String getLogin() {
         return login;
@@ -36,6 +39,10 @@ public class HeckConfiguration extends Configuration {
     @JsonProperty
     public String getPassword() {
         return password;
+    }
+    
+    public String getBearerRealm() {
+        return bearerRealm;
     }
     
     @JsonProperty("database")
