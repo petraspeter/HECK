@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import sk.upjs.ics.pro1a.heck.auth.PasswordManager;
 
@@ -15,6 +16,8 @@ import sk.upjs.ics.pro1a.heck.auth.PasswordManager;
  * @author raven
  */
 public class DoctorDao extends AbstractDAO<Doctor> {
+    
+    private final PasswordManager passwordManager = new PasswordManager();
     
     public DoctorDao(SessionFactory sessionFactory) {
         super(sessionFactory);
@@ -46,22 +49,21 @@ public class DoctorDao extends AbstractDAO<Doctor> {
     }
     
     public Doctor registerDoctor(Doctor doctor, String password) {
-        PasswordManager passwordManager = new PasswordManager();
         Doctor doc = passwordManager.createDoctorPassword(doctor, password);
         super.currentSession().saveOrUpdate(doc);
         return doc;
     }
     
     
-    public Doctor findUserByLoginAndPassword(String login, String password) {
-        PasswordManager passwordManager = new PasswordManager();
-        Doctor doctor = (Doctor) namedQuery("findUserByLogin").setParameter("login",login).uniqueResult();
+    public Doctor findDoctorByLoginAndPassword(String login, String password) {
+        Doctor doctor = (Doctor) namedQuery("findDoctorByLogin").setParameter("login",login).
+                uniqueResult();
         try {
             if(passwordManager.checkDoctorsLoginAndPassword(password, doctor)) {
                 return doctor;
             }
         } catch (NoSuchAlgorithmException ex) {
-            Logger.getLogger(UserDao.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(DoctorDao.class.getName()).log(Level.SEVERE, null, ex);
         }
         return null;
     }

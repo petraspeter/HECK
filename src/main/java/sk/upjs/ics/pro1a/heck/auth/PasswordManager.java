@@ -62,20 +62,6 @@ public class PasswordManager {
         }
     }
     
-    /**
-     *
-     * @param login prihlasovacie meno
-     * @param password prihlasovacie heslo
-     * @return nacitaneho pouzivatela z DB
-     */
-    public User loadUser(String login, String password) {
-        User user = null;
-        
-        
-        
-        return user;
-    }
-    
     public boolean checkDoctorsLoginAndPassword(String password, Doctor doctor) throws NoSuchAlgorithmException  {
         password = password + doctor.getSaltDoctor();
         MessageDigest md = MessageDigest.getInstance("SHA-256");
@@ -85,7 +71,9 @@ public class PasswordManager {
     }
     
     public boolean checkUsersLoginAndPassword(String password, User user) throws NoSuchAlgorithmException  {
+        System.out.println(password);
         password = password + user.getSaltUser();
+        System.out.println(password);
         MessageDigest md = MessageDigest.getInstance("SHA-256");
         md.update((password).getBytes());
         byte[] byteHash = md.digest();
@@ -109,11 +97,12 @@ public class PasswordManager {
         }
         return smallLetter && capitalLetter && number && specialLetter;
     }
+
+    public PasswordManager() {
+    }
     
     
-    
-    
-    
+        
     
     
     

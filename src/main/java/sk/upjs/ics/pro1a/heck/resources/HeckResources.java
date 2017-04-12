@@ -1,11 +1,10 @@
 package sk.upjs.ics.pro1a.heck.resources;
 
 import io.dropwizard.hibernate.UnitOfWork;
-import java.sql.Timestamp;
+import java.security.NoSuchAlgorithmException;
 import java.util.List;
 import java.util.Optional;
 import javax.ws.rs.Consumes;
-import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -14,15 +13,13 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import org.joda.time.DateTime;
-import sk.upjs.ics.pro1a.heck.core.AccessToken;
 import sk.upjs.ics.pro1a.heck.core.Doctor;
 import sk.upjs.ics.pro1a.heck.core.Specialization;
 import sk.upjs.ics.pro1a.heck.core.User;
-import sk.upjs.ics.pro1a.heck.db.AccessTokenDao;
 import sk.upjs.ics.pro1a.heck.db.DoctorDao;
 import sk.upjs.ics.pro1a.heck.db.SpecializationDao;
 import sk.upjs.ics.pro1a.heck.db.UserDao;
+import sk.upjs.ics.pro1a.heck.LoginParser;
 
 /**
  *
@@ -34,13 +31,13 @@ import sk.upjs.ics.pro1a.heck.db.UserDao;
 @Produces(MediaType.APPLICATION_JSON)
 public class HeckResources {
     
-    private AccessTokenDao accessTokenDao;
+    
     private DoctorDao doctorDao;
     private UserDao userDao;
     private SpecializationDao specializationDao;
     
-    public HeckResources(AccessTokenDao accessTokenDao, DoctorDao doctorDao, UserDao userDao, SpecializationDao specializationDao) {
-        this.accessTokenDao = accessTokenDao;
+    public HeckResources(DoctorDao doctorDao, UserDao userDao,
+            SpecializationDao specializationDao) {
         this.doctorDao = doctorDao;
         this.userDao = userDao;
         this.specializationDao = specializationDao;
@@ -49,24 +46,18 @@ public class HeckResources {
     /**
      *              USER resource part
      */
-     
+    
     @POST
     @Path("/login/user")
-    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    public Response loginUser(
-            @FormParam("login") String login,
-            @FormParam("password") String password
-    ) {
-        System.out.println("hej hou");
-        // Try to find a user with the supplied credentials.
-        User user = userDao.findUserByLoginAndPassword(login, password);
+    @Consumes(MediaType.APPLICATION_JSON)
+    @UnitOfWork
+    public Response loginUser(String input) {
+        LoginParser loginParser = new LoginParser(input);
+        User user = userDao.findUserByLoginAndPassword(loginParser.getLogin(), loginParser.getPassword());
         if (user == null) {
             throw new WebApplicationException(Response.status(Response.Status.UNAUTHORIZED).build());
         }
-        
-        // User was found, generate a token and return it.
-        AccessToken accessToken = accessTokenDao.generateNewUserAccessToken(user, new DateTime());
-        return Response.ok(accessToken.getAccessTokenId().toString()).build();
+        return Response.ok(user).build();
     }
     
     @GET
@@ -104,23 +95,11 @@ public class HeckResources {
     
     @POST
     @Path("/register/user")
-    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    public Response registerDoctor(
-            @FormParam("emailUser") String emailUser,
-            @FormParam("loginUser") String loginUser,
-            @FormParam("password") String password,
-            @FormParam("firstNameUser") String firstNameUser,
-            @FormParam("lastNameUser") String lastNameUser,
-            @FormParam("phoneUser") String phoneUser,
-            @FormParam("postalCodeUser") Integer postalCodeUser,
-            @FormParam("cityUser") String cityUser,
-            @FormParam("addressUser") String addressUser
-            
-    ) {
-        User user = new User(emailUser, loginUser, firstNameUser, lastNameUser, phoneUser,
-                postalCodeUser, cityUser, addressUser);
-        
-        User newUser = userDao.registerUser(user, password);
+    @Consumes(MediaType.APPLICATION_JSON)
+    @UnitOfWork
+    public Response registerUser(User user) {
+        user.setActiveUser(true);
+        User newUser = userDao.registerUser(user, user.getPasswordUser());
         if(newUser.getPasswordUser() == null || newUser.getPasswordUser().length() < 6) {
             return Response.status(Response.Status.EXPECTATION_FAILED).build();
         } else {
@@ -136,23 +115,20 @@ public class HeckResources {
     /**
      *              DOCTOR resource part
      */
+    
+    
     @POST
     @Path("/login/doctor")
-    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    public Response loginDcotor(
-            @FormParam("login") String login,
-            @FormParam("password") String password
-    ) {
-        System.out.println("hej hou");
-        // Try to find a user with the supplied credentials.
-        Doctor doctor = doctorDao.findUserByLoginAndPassword(login, password);
+    @Consumes(MediaType.APPLICATION_JSON)
+    @UnitOfWork
+    public Response loginDcotor(String input) throws NoSuchAlgorithmException {
+        LoginParser loginParser = new LoginParser(input);
+        Doctor doctor = doctorDao.findDoctorByLoginAndPassword(loginParser.getLogin(),
+                loginParser.getPassword());
         if (doctor == null) {
             throw new WebApplicationException(Response.status(Response.Status.UNAUTHORIZED).build());
         }
-        
-        // User was found, generate a token and return it.
-        AccessToken accessToken = accessTokenDao.generateNewDoctorAccessToken(doctor, new DateTime());
-        return Response.ok(accessToken.getAccessTokenId().toString()).build();
+        return Response.ok(doctor).build();
     }
     
     @GET
@@ -190,27 +166,11 @@ public class HeckResources {
     
     @POST
     @Path("/doctor/register")
-    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    public Response registerDoctor(
-            @FormParam("emailDoctor") String emailDoctor,
-            @FormParam("loginDoctor") String loginDoctor,
-            @FormParam("password") String password,
-            @FormParam("specializationId") Long specializationId,
-            @FormParam("specializationName") String specializationName,
-            @FormParam("businessNameDoctor") String businessNameDoctor,
-            @FormParam("firstNameDoctor") String firstNameDoctor,
-            @FormParam("lastNameDoctor") String lastNameDoctor,
-            @FormParam("phoneNumberDoctor") String phoneNumberDoctor,
-            @FormParam("postalCodeDoctor") Integer postalCodeDoctor,
-            @FormParam("cityDoctor") String cityDoctor,
-            @FormParam("addressDoctor") String addressDoctor,
-            @FormParam("activationTimeDoctor") Timestamp activationTimeDoctor
-    ) {
-        Doctor doctor = new Doctor(emailDoctor, loginDoctor, new Specialization(specializationId,
-                specializationName), businessNameDoctor, firstNameDoctor, lastNameDoctor,
-                phoneNumberDoctor, postalCodeDoctor, cityDoctor, addressDoctor, activationTimeDoctor);
-        
-        Doctor doc = doctorDao.registerDoctor(doctor, password);
+    @Consumes(MediaType.APPLICATION_JSON)
+    @UnitOfWork
+    public Response registerDoctor(Doctor doctor) {        
+        doctor.setActiveDoctor(false);        
+        Doctor doc = doctorDao.registerDoctor(doctor, doctor.getPasswordDoctor());        
         if(doc.getPasswordDoctor() == null || doc.getPasswordDoctor().length() < 6) {
             return Response.status(Response.Status.EXPECTATION_FAILED).build();
         }else {
@@ -252,4 +212,10 @@ public class HeckResources {
     /**
      *             END of Specialization resource part
      */
+    
+    /**
+     *              Toast shaman
+     */
+    
+    
 }

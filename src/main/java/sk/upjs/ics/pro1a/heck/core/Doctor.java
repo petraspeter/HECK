@@ -32,17 +32,17 @@ import org.hibernate.annotations.Type;
 })
 public class Doctor implements Serializable {
     
-    @JsonProperty("IdDoctor")
     @Id
+    @JsonProperty("idDoctor")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name="id_doctor")
     private Long idDoctor;
     
-    @JsonProperty("EmailDoctor")
+    @JsonProperty("emailDoctor")
     @Column(name = "email_doctor", unique = true)
     private String emailDoctor;
     
-    @JsonProperty("LoginDoctor")
+    @JsonProperty("loginDoctor")
     @Column(name = "login_doctor", unique = true)
     private String loginDoctor;
     
@@ -52,43 +52,42 @@ public class Doctor implements Serializable {
     @Column(name = "salt_doctor")
     private String saltDoctor;
     
-    @JsonProperty("SpecializationDoctor")
+    @JsonProperty("specializationDoctor")
     @ManyToOne(cascade=CascadeType.ALL)
     @JoinColumn(name = "specialization_doctor")
     private  Specialization specializationDoctor;
     
-    @JsonProperty("BusinessNameDoctor")
+    @JsonProperty("businessNameDoctor")
     @Column(name = "business_name_doctor")
     private String businessNameDoctor;
     
-    @JsonProperty("FirstNameDoctor")
+    @JsonProperty("firstNameDoctor")
     @Column(name = "first_name_doctor")
     private String firstNameDoctor;
     
-    @JsonProperty("LastNameDoctor")
+    @JsonProperty("lastNameDoctor")
     @Column(name = "last_name_doctor")
     private String lastNameDoctor;
     
-    @JsonProperty("PhoneNumberDoctor")
+    @JsonProperty("phoneNumberDoctor")
     @Column(name = "phone_number_doctor")
     private String phoneNumberDoctor;
     
-    @JsonProperty("PostalCodeDoctor")
+    @JsonProperty("postalCodeDoctor")
     @Column(name = "postal_code_doctor")
     private Integer postalCodeDoctor;
     
-    @JsonProperty("CityDoctor")
+    @JsonProperty("cityDoctor")
     @Column(name = "city_doctor")
     private String cityDoctor;
     
-    @JsonProperty("AddressDoctor")
+    @JsonProperty("addressDoctor")
     @Column(name = "address_doctor")
     private String addressDoctor;
     
     @Column(name = "activation_time_doctor")
     private Timestamp activationTimeDoctor;
     
-    @JsonProperty("ActivateDoctor")
     @Type(type = "org.hibernate.type.NumericBooleanType")
     @Column(name = "active_doctor")
     private Boolean activeDoctor;
@@ -185,6 +184,7 @@ public class Doctor implements Serializable {
         return passwordDoctor;
     }
     
+    @JsonProperty("passwordDoctor")
     public void setPasswordDoctor(String passwordDoctor) {
         this.passwordDoctor = passwordDoctor;
     }
@@ -268,14 +268,17 @@ public class Doctor implements Serializable {
         return activationTimeDoctor;
     }
     
+    @JsonIgnore
     public void setActivationTimeDoctor(Timestamp activationTimeDoctor) {
         this.activationTimeDoctor = activationTimeDoctor;
     }
     
+    @JsonIgnore
     public Boolean getActiveDoctor() {
         return activeDoctor;
     }
     
+    @JsonIgnore
     public void setActiveDoctor(Boolean activeDoctor) {
         this.activeDoctor = activeDoctor;
     }

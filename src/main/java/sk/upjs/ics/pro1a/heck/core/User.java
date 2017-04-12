@@ -5,6 +5,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import java.io.Serializable;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
@@ -27,54 +29,55 @@ import org.hibernate.annotations.Type;
 public class User implements Serializable {
     
     @Id
-    @JsonProperty("IdUser")
+    @JsonProperty("idUser")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name="id_user")
     private Long idUser;
     
-    @JsonProperty("EmailIUser")
+    @JsonProperty("emailIUser")
     @Column(name = "email_user", unique = true)
     private String emailUser;
     
-    @JsonProperty("LoginUser")
+    @JsonProperty("loginUser")
     @Column(name = "login_user", unique = true)
     private String loginUser;
     
+    @JsonProperty("passwordUser")
     @Column(name = "password_user")
     private String passwordUser;
     
     @Column(name = "salt_user")
     private String saltUser;
     
-    @JsonProperty("FirstNameUser")
+    @JsonProperty("firstNameUser")
     @Column(name = "first_name_user")
     private String firstNameUser;
     
-    @JsonProperty("LastNameUser")
+    @JsonProperty("lastNameUser")
     @Column(name = "last_name_user")
     private String lastNameUser;
     
-    @JsonProperty("PhoneUser")
+    @JsonProperty("phoneUser")
     @Column(name = "phone_user")
     private String phoneUser;
     
-    @JsonProperty("PostalCodeUser")
+    @JsonProperty("postalCodeUser")
     @Column(name = "postal_code_user")
     private Integer postalCodeUser;
     
-    @JsonProperty("CityUser")
+    @JsonProperty("cityUser")
     @Column(name = "city_user")
     private String cityUser;
     
-    @JsonProperty("AddressUser")
+    @JsonProperty("addressUser")
     @Column(name = "address_user")
     private String addressUser;
     
-    @JsonProperty("ActiveUser")
     @Type(type = "org.hibernate.type.NumericBooleanType")
     @Column(name = "active_user")
     private Boolean activeUser;
     
-    @JsonProperty("IsAdmin")
+    @JsonProperty("isAdmin")
     @Type(type = "org.hibernate.type.NumericBooleanType")
     @Column(name = "is_admin")
     private Boolean isAdmin;
@@ -171,10 +174,12 @@ public class User implements Serializable {
         this.addressUser = addressUser;
     }
     
+    @JsonIgnore
     public Boolean getActiveUser() {
         return activeUser;
     }
     
+    @JsonIgnore
     public void setActiveUser(Boolean activeUser) {
         this.activeUser = activeUser;
     }

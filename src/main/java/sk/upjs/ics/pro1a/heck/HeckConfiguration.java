@@ -4,6 +4,9 @@ import io.dropwizard.Configuration;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.dropwizard.client.JerseyClientConfiguration;
 import io.dropwizard.db.DataSourceFactory;
+import java.io.UnsupportedEncodingException;
+import java.math.BigInteger;
+import java.security.SecureRandom;
 import javax.validation.Valid;
 import javax.validation.constraints.*;
 import org.hibernate.validator.constraints.NotEmpty;
@@ -13,6 +16,10 @@ import org.hibernate.validator.constraints.NotEmpty;
  * @author raven
  */
 public class HeckConfiguration extends Configuration {
+    
+    
+    @NotEmpty
+    private String jwtTokenSecret = new BigInteger (130, new SecureRandom ()).toString(35);
     
     @NotEmpty
     private String bearerRealm;
@@ -53,6 +60,10 @@ public class HeckConfiguration extends Configuration {
     @JsonProperty("jerseyClient")
     public JerseyClientConfiguration getJerseyClientConfiguration() {
         return jerseyClientConfiguration;
+    }
+    
+    public byte[] getJwtTokenSecret() throws UnsupportedEncodingException {
+        return jwtTokenSecret.getBytes("UTF-8");
     }
     
 }
