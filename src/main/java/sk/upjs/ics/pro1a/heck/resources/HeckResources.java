@@ -20,6 +20,7 @@ import sk.upjs.ics.pro1a.heck.db.DoctorDao;
 import sk.upjs.ics.pro1a.heck.db.SpecializationDao;
 import sk.upjs.ics.pro1a.heck.db.UserDao;
 import sk.upjs.ics.pro1a.heck.LoginParser;
+import sk.upjs.ics.pro1a.heck.core.Token;
 
 /**
  *
@@ -54,10 +55,17 @@ public class HeckResources {
     public Response loginUser(String input) {
         LoginParser loginParser = new LoginParser(input);
         User user = userDao.findUserByLoginAndPassword(loginParser.getLogin(), loginParser.getPassword());
-        if (user == null) {
+        if(user == null) {
+            System.err.println("Wrong password or login name!");
             throw new WebApplicationException(Response.status(Response.Status.UNAUTHORIZED).build());
         }
-        return Response.ok(user).build();
+        Token token = null;
+        if(user.getIsAdmin()) {
+            token = new Token(user.getIdUser(), user.getLoginUser(), "Admin");
+        } else {
+            token = new Token(user.getIdUser(), user.getLoginUser(), "User");
+        }
+        return Response.ok(token).build();
     }
     
     @GET
@@ -66,9 +74,11 @@ public class HeckResources {
     public Response findUserByLogin(@PathParam("login") Optional<String> login) {
         User user = userDao.findUserByLogin(login.get());
         if(user == null) {
-            return Response.status(Response.Status.NOT_FOUND).build();
+            System.err.println("Can not find user!");
+            throw new WebApplicationException(Response.status(Response.Status.NOT_FOUND).build());
         }
         return Response.ok(user).build();
+        
     }
     
     @GET
@@ -76,8 +86,10 @@ public class HeckResources {
     @UnitOfWork
     public Response findUserById(@PathParam("id") Long id) {
         User user = userDao.findUserById(id);
+        
         if(user == null) {
-            return Response.status(Response.Status.NOT_FOUND).build();
+            System.err.println("Can not find user!");
+            throw new WebApplicationException(Response.status(Response.Status.NOT_FOUND).build());
         }
         return Response.ok(user).build();
     }
@@ -87,8 +99,10 @@ public class HeckResources {
     @UnitOfWork
     public Response findAllUsers() {
         List<User> users = userDao.findAllUsers();
+        
         if(users == null) {
-            return Response.status(Response.Status.NOT_FOUND).build();
+            System.err.println("Can not find any user!");
+            throw new WebApplicationException(Response.status(Response.Status.NOT_FOUND).build());
         }
         return Response.ok(users).build();
     }
@@ -99,13 +113,19 @@ public class HeckResources {
     @UnitOfWork
     public Response registerUser(User user) {
         user.setActiveUser(true);
-        User newUser = userDao.registerUser(user, user.getPasswordUser());
-        if(newUser.getPasswordUser() == null || newUser.getPasswordUser().length() < 6) {
-            return Response.status(Response.Status.EXPECTATION_FAILED).build();
-        } else {
-            newUser = userDao.findUserByLogin(newUser.getLoginUser());
+        try {
+            User newUser = userDao.registerUser(user, user.getPasswordUser());
+            Token token = null;
+            if(newUser.getIsAdmin()) {
+                token = new Token(newUser.getIdUser(), newUser.getLoginUser(), "Admin");
+            } else {
+                token = new Token(newUser.getIdUser(), newUser.getLoginUser(), "User");
+            }
+            return Response.status(Response.Status.CREATED).entity(token).build();
+        } catch(Exception e) {
+            System.err.println("User can not be created!");
+            throw new WebApplicationException(Response.status(Response.Status.RESET_CONTENT).build());
         }
-        return Response.status(Response.Status.CREATED).entity(newUser).build();
     }
     
     /**
@@ -125,10 +145,12 @@ public class HeckResources {
         LoginParser loginParser = new LoginParser(input);
         Doctor doctor = doctorDao.findDoctorByLoginAndPassword(loginParser.getLogin(),
                 loginParser.getPassword());
-        if (doctor == null) {
+        if(doctor == null) {
+            System.err.println("Wrong password or login name!");
             throw new WebApplicationException(Response.status(Response.Status.UNAUTHORIZED).build());
         }
-        return Response.ok(doctor).build();
+        Token token = new Token(doctor.getIdDoctor(), doctor.getLoginDoctor(), "Doctor");
+        return Response.ok(token).build();
     }
     
     @GET
@@ -137,7 +159,8 @@ public class HeckResources {
     public Response findDoctorByName(@PathParam("login") Optional<String> login) {
         Doctor doctor= doctorDao.findDoctorByLogin(login.get());
         if(doctor == null) {
-            return Response.status(Response.Status.NOT_FOUND).build();
+            System.err.println("Can not find doctor!");
+            throw new WebApplicationException(Response.status(Response.Status.NOT_FOUND).build());
         }
         return Response.ok(doctor).build();
     }
@@ -148,9 +171,11 @@ public class HeckResources {
     public Response findDoctorById(@PathParam("id") Long id) {
         Doctor doctor= doctorDao.findDoctorById(id);
         if(doctor == null) {
-            return Response.status(Response.Status.NOT_FOUND).build();
+            System.err.println("Can not find doctor!");
+            throw new WebApplicationException(Response.status(Response.Status.NOT_FOUND).build());
         }
-        return Response.ok(doctor).build();
+        Token token = new Token(doctor.getIdDoctor(), doctor.getLoginDoctor(), "Doctor");
+        return Response.ok(token).build();
     }
     
     @GET
@@ -158,25 +183,28 @@ public class HeckResources {
     @UnitOfWork
     public Response findAllDoctors() {
         List<Doctor> doctors = doctorDao.findAllDoctors();
-        if(doctors== null) {
-            return Response.status(Response.Status.NOT_FOUND).build();
+        if(doctors == null) {
+            System.err.println("Can not find any doctor!");
+            throw new WebApplicationException(Response.status(Response.Status.NOT_FOUND).build());
         }
         return Response.ok(doctors).build();
+        
     }
     
     @POST
     @Path("/doctor/register")
     @Consumes(MediaType.APPLICATION_JSON)
     @UnitOfWork
-    public Response registerDoctor(Doctor doctor) {        
-        doctor.setActiveDoctor(false);        
-        Doctor doc = doctorDao.registerDoctor(doctor, doctor.getPasswordDoctor());        
-        if(doc.getPasswordDoctor() == null || doc.getPasswordDoctor().length() < 6) {
-            return Response.status(Response.Status.EXPECTATION_FAILED).build();
-        }else {
-            doc = doctorDao.findDoctorByLogin(doc.getLoginDoctor());
+    public Response registerDoctor(Doctor doctor) {
+        doctor.setActiveDoctor(false);
+        try {
+            Doctor doc = doctorDao.registerDoctor(doctor, doctor.getPasswordDoctor());
+            Token token = new Token(doc.getIdDoctor(), doc.getLoginDoctor(), "Dcotor");
+            return Response.status(Response.Status.CREATED).entity(token).build();
+        } catch(Exception e) {
+            System.err.println("Docotr can not be created!");
+            throw new WebApplicationException(Response.status(Response.Status.RESET_CONTENT).build());
         }
-        return Response.status(Response.Status.CREATED).entity(doc).build();
     }
     
     /**
@@ -193,7 +221,8 @@ public class HeckResources {
     public Response findSpecializationById(@PathParam("id") Long id) {
         Specialization specialization = specializationDao.findSpecializationById(id);
         if(specialization == null) {
-            return Response.status(Response.Status.NOT_FOUND).build();
+            System.err.println("Can not find any specialization!");
+            throw new WebApplicationException(Response.status(Response.Status.NOT_FOUND).build());
         }
         return Response.ok(specialization).build();
     }
@@ -204,7 +233,8 @@ public class HeckResources {
     public Response findAllSpecialization() {
         List<Specialization> specializations = specializationDao.findAllSpecializations();
         if(specializations == null) {
-            return Response.status(Response.Status.NOT_FOUND).build();
+            System.err.println("Can not find any specialization!");
+            throw new WebApplicationException(Response.status(Response.Status.NOT_FOUND).build());
         }
         return Response.ok(specializations).build();
     }
@@ -213,9 +243,6 @@ public class HeckResources {
      *             END of Specialization resource part
      */
     
-    /**
-     *              Toast shaman
-     */
     
     
 }

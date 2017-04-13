@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import sk.upjs.ics.pro1a.heck.auth.PasswordManager;
 
@@ -48,10 +47,14 @@ public class DoctorDao extends AbstractDAO<Doctor> {
         return allDoctors;
     }
     
-    public Doctor registerDoctor(Doctor doctor, String password) {
+    public Doctor registerDoctor(Doctor doctor, String password) throws Exception {
         Doctor doc = passwordManager.createDoctorPassword(doctor, password);
-        super.currentSession().saveOrUpdate(doc);
-        return doc;
+        try {
+            super.currentSession().saveOrUpdate(doc);
+            return doc;
+        } catch(Exception e) {
+            throw new Exception("Docotr can not be created!");
+        }
     }
     
     

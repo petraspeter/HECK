@@ -15,6 +15,9 @@ import sk.upjs.ics.pro1a.heck.core.User;
  */
 public class UserDao extends AbstractDAO<User>{
     
+    
+    private final PasswordManager passwordManager = new PasswordManager();
+    
     public UserDao(SessionFactory sessionFactory) {
         super(sessionFactory);
     }
@@ -33,11 +36,14 @@ public class UserDao extends AbstractDAO<User>{
                 setParameter("id", id).uniqueResult();
     }
     
-    public User registerUser(User user, String password) {
-        PasswordManager passwordManager = new PasswordManager();
-        User newUser = passwordManager.createUserPassword(user, password);
-        super.currentSession().saveOrUpdate(newUser);
-        return newUser;
+    public User registerUser(User user, String password) throws Exception {
+        User newUser = passwordManager.createUserPassword(user, password);        
+        try {
+            super.currentSession().saveOrUpdate(newUser);
+            return newUser;
+        } catch(Exception e) {
+            throw new Exception("User can not be created!");
+        }
     }
     
     public User findUserByLoginAndPassword(String login, String password) {
