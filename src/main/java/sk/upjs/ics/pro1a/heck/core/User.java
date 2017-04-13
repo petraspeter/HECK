@@ -29,7 +29,6 @@ import org.hibernate.annotations.Type;
 public class User implements Serializable {
     
     @Id
-    @JsonProperty("idUser")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name="id_user")
     private Long idUser;
@@ -42,7 +41,6 @@ public class User implements Serializable {
     @Column(name = "login_user", unique = true)
     private String loginUser;
     
-    @JsonProperty("passwordUser")
     @Column(name = "password_user")
     private String passwordUser;
     
@@ -77,11 +75,13 @@ public class User implements Serializable {
     @Column(name = "active_user")
     private Boolean activeUser;
     
-    @JsonProperty("isAdmin")
     @Type(type = "org.hibernate.type.NumericBooleanType")
     @Column(name = "is_admin")
     private Boolean isAdmin;
     
+    
+    
+    @JsonProperty("idUser")
     public Long getIdUser() {
         return idUser;
     }
@@ -112,6 +112,7 @@ public class User implements Serializable {
         return passwordUser;
     }
     
+    @JsonProperty("passwordUser")
     public void setPasswordUser(String passwordUser) {
         this.passwordUser = passwordUser;
     }
@@ -184,6 +185,7 @@ public class User implements Serializable {
         this.activeUser = activeUser;
     }
     
+    @JsonProperty("isAdmin")
     public Boolean getIsAdmin() {
         return isAdmin;
     }
