@@ -33,7 +33,6 @@ import org.hibernate.annotations.Type;
 public class Doctor implements Serializable {
     
     @Id
-    @JsonProperty("idDoctor")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name="id_doctor")
     private Long idDoctor;
@@ -154,6 +153,7 @@ public class Doctor implements Serializable {
         this.activeDoctor = true;
     }
     
+    @JsonProperty("idDoctor")
     public Long getIdDoctor() {
         return idDoctor;
     }
