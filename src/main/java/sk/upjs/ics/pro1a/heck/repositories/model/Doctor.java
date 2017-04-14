@@ -72,14 +72,14 @@ public class Doctor implements Serializable {
     public Doctor() {
     }
 
-    public Doctor(String emailDoctor, String loginDoctor, String passwordDoctor, Specialization specializationDoctor,
+    public Doctor(String emailDoctor, String loginDoctor, String passwordDoctor, String salt, Specialization specializationDoctor,
                   String businessNameDoctor, String firstNameDoctor, String lastNameDoctor,
                   String phoneNumberDoctor, String postalCodeDoctor, String cityDoctor, String addressDoctor,
                   Timestamp activationTimeDoctor) {
         this.emailDoctor = emailDoctor;
         this.loginDoctor = loginDoctor;
         this.passwordDoctor = passwordDoctor;
-        this.saltDoctor = "123"; //TODO: implement salt
+        this.saltDoctor = salt;
         this.specializationDoctor = specializationDoctor;
         this.businessNameDoctor = businessNameDoctor;
         this.firstNameDoctor = firstNameDoctor;

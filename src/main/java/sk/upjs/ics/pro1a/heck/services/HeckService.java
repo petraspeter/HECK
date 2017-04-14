@@ -1,6 +1,8 @@
 package sk.upjs.ics.pro1a.heck.services;
 
 import com.google.common.base.Throwables;
+import java.math.BigInteger;
+import java.security.SecureRandom;
 import org.jose4j.jws.JsonWebSignature;
 import org.jose4j.jwt.JwtClaims;
 import org.jose4j.keys.HmacKey;
@@ -22,6 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.jose4j.jws.AlgorithmIdentifiers.HMAC_SHA256;
+import sk.upjs.ics.pro1a.heck.utils.PasswordManager;
 
 public class HeckService {
 
@@ -41,12 +44,15 @@ public class HeckService {
         if (doctorDto.getPassword() == null || doctorDto.getPassword().length() < 6) {
             throw new IllegalStateException("Password does not match criteria.");
         }
-        
+
+        String salt = new BigInteger(130, new SecureRandom()).toString(32);
+        String password = PasswordManager.encryptPassword(salt, doctorDto.getPassword());
         Specialization specialization = specializationDao.findById(doctorDto.getSpecialization());
         Doctor doctor = new Doctor(
                 doctorDto.getEmail(),
                 doctorDto.getLogin(),
-                doctorDto.getPassword(),
+                password,
+                salt,
                 specialization,
                 doctorDto.getOffice(),
                 doctorDto.getFirstName(),
@@ -148,14 +154,16 @@ public class HeckService {
     }
 
     public LoginResponseDto loginAsDoctor(String login, String password) {
-        Doctor doctor = doctorDao.findByLoginAndPassword(login, password);
+        Doctor doctor = doctorDao.findByLogin(login);
         if (doctor != null) {
-            LoginResponseDto loginResponse = new LoginResponseDto();
-            loginResponse.setId(doctor.getIdDoctor());
-            loginResponse.setLogin(doctor.getLoginDoctor());
-            loginResponse.setRole("doctor");
-            loginResponse.setToken(generateToken(login, password, "doctor"));
-            return loginResponse;
+            if (doctor.getPasswordDoctor().equals(PasswordManager.encryptPassword(doctor.getSaltDoctor(), password))) {
+                LoginResponseDto loginResponse = new LoginResponseDto();
+                loginResponse.setId(doctor.getIdDoctor());
+                loginResponse.setLogin(doctor.getLoginDoctor());
+                loginResponse.setRole("doctor");
+                loginResponse.setToken(generateToken(login, doctor.getPasswordDoctor(), "doctor"));
+                return loginResponse;
+            }
         }
         return null;
     }
@@ -163,12 +171,14 @@ public class HeckService {
     public LoginResponseDto loginAsUser(String login, String password) {
         User user = userDao.findByLoginAndPassword(login, password);
         if (user != null) {
-            LoginResponseDto loginResponse = new LoginResponseDto();
-            loginResponse.setId(user.getIdUser());
-            loginResponse.setLogin(user.getLoginUser());
-            loginResponse.setRole("user");
-            loginResponse.setToken(generateToken(login, password, "user"));
-            return loginResponse;
+            if (user.getPasswordUser().equals(PasswordManager.encryptPassword(user.getSaltUser(), password))) {
+                LoginResponseDto loginResponse = new LoginResponseDto();
+                loginResponse.setId(user.getIdUser());
+                loginResponse.setLogin(user.getLoginUser());
+                loginResponse.setRole("user");
+                loginResponse.setToken(generateToken(login, user.getPasswordUser(), "user"));
+                return loginResponse;
+            }
         }
         return null;
     }
@@ -234,10 +244,14 @@ public class HeckService {
         if (userDto.getPassword() == null || userDto.getPassword().length() < 6) {
             throw new IllegalStateException("Password does not match criteria.");
         }
+
+        String salt = new BigInteger(130, new SecureRandom()).toString(32);
+        String password = PasswordManager.encryptPassword(salt, userDto.getPassword());
         User user = new User(
                 userDto.getEmail(),
                 userDto.getLogin(),
-                userDto.getPassword(),
+                password,
+                salt,
                 userDto.getFirstName(),
                 userDto.getLastName(),
                 userDto.getPhoneNumber(),

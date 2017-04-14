@@ -172,12 +172,12 @@ public class User implements Serializable {
     public User() {
     }
 
-    public User(String emailUser, String loginUser, String passwordUser, String firstNameUser, String lastNameUser,
+    public User(String emailUser, String loginUser, String passwordUser, String salt, String firstNameUser, String lastNameUser,
                 String phoneUser, String postalCodeUser, String cityUser, String addressUser) {
         this.emailUser = emailUser;
         this.loginUser = loginUser;
         this.passwordUser = passwordUser;
-        this.saltUser = "132"; //TODO: apply salt here
+        this.saltUser = salt;
         this.firstNameUser = firstNameUser;
         this.lastNameUser = lastNameUser;
         this.phoneUser = phoneUser;
