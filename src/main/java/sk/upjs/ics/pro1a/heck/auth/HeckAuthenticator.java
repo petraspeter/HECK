@@ -38,10 +38,10 @@ public class HeckAuthenticator implements Authenticator<JwtContext, AuthorizedUs
             final String role = context.getJwtClaims().getClaimValue("role").toString();
             final String password = context.getJwtClaims().getClaimValue("password").toString();
             final String login = context.getJwtClaims().getSubject();
-            if ("user".equals(role)) {
+            if ("doctor".equals(role)) {
                 Doctor doctor = doctorDao.findByLoginAndPassword(login, password);
                 if (doctor != null) {
-                    return Optional.of(new AuthorizedUserDto(doctor.getIdDoctor(), login, "user"));
+                    return Optional.of(new AuthorizedUserDto(doctor.getIdDoctor(), login, "doctor"));
                 }
             }
             if ("user".equals(role)) {

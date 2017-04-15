@@ -85,7 +85,7 @@ public class HeckResources {
     }
 
     @GET
-    @Path("/user/{id}")
+    @Path("/users/{id}")
     @UnitOfWork
     public Response getUserById(@Auth Principal user, @PathParam("id") Long id) {
         UserDto userDto = heckService.getUserById(id);
