@@ -117,4 +117,35 @@ public class UserDto {
     public void setPhoneNumber(String phoneNumber) {
         this.phoneNumber = phoneNumber;
     }
+
+    public UserDto() {
+    }
+
+    public UserDto(long id, String login, String password, String firstName, String lastName, String email, 
+            String address, String postalCode, String city, String phoneNumber) {
+        this.id = id;
+        this.login = login;
+        this.password = password;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.email = email;
+        this.address = address;
+        this.postalCode = postalCode;
+        this.city = city;
+        this.phoneNumber = phoneNumber;
+    }
+
+    public UserDto(long id, String login, String firstName, String lastName, String email, String address, 
+            String postalCode, String city, String phoneNumber) {
+        this.id = id;
+        this.login = login;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.email = email;
+        this.address = address;
+        this.postalCode = postalCode;
+        this.city = city;
+        this.phoneNumber = phoneNumber;
+    }
+        
 }

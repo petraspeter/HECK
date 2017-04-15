@@ -92,6 +92,24 @@ public class Doctor implements Serializable {
         this.activeDoctor = true;
     }
 
+    public Doctor(String emailDoctor, String loginDoctor, String passwordDoctor, String saltDoctor
+            , Specialization specializationDoctor, String businessNameDoctor, String firstNameDoctor, 
+            String lastNameDoctor, String phoneNumberDoctor, String postalCodeDoctor, String cityDoctor, 
+            String addressDoctor) {
+        this.emailDoctor = emailDoctor;
+        this.loginDoctor = loginDoctor;
+        this.passwordDoctor = passwordDoctor;
+        this.saltDoctor = saltDoctor;
+        this.specializationDoctor = specializationDoctor;
+        this.businessNameDoctor = businessNameDoctor;
+        this.firstNameDoctor = firstNameDoctor;
+        this.lastNameDoctor = lastNameDoctor;
+        this.phoneNumberDoctor = phoneNumberDoctor;
+        this.postalCodeDoctor = postalCodeDoctor;
+        this.cityDoctor = cityDoctor;
+        this.addressDoctor = addressDoctor;
+    }
+    
     public Long getIdDoctor() {
         return idDoctor;
     }

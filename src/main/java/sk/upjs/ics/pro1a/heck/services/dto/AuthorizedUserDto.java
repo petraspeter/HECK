@@ -24,11 +24,6 @@ public class AuthorizedUserDto implements Principal {
         this.role = role;
     }
 
-    @Override
-    public String getName() {
-        return login;
-    }
-
     public long getId() {
         return id;
     }
@@ -36,11 +31,11 @@ public class AuthorizedUserDto implements Principal {
     public void setId(long id) {
         this.id = id;
     }
-
+       
     public String getLogin() {
         return login;
     }
-
+    
     public void setLogin(String login) {
         this.login = login;
     }
@@ -52,4 +47,10 @@ public class AuthorizedUserDto implements Principal {
     public void setRole(String role) {
         this.role = role;
     }
+
+    @Override
+    public String getName() {
+        return login;
+    }
+    
 }

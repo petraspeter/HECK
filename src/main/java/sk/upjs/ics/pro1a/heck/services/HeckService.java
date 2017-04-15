@@ -18,8 +18,6 @@ import sk.upjs.ics.pro1a.heck.services.dto.LoginResponseDto;
 import sk.upjs.ics.pro1a.heck.services.dto.SpecializationDto;
 import sk.upjs.ics.pro1a.heck.services.dto.UserDto;
 
-import java.sql.Timestamp;
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,44 +25,28 @@ import static org.jose4j.jws.AlgorithmIdentifiers.HMAC_SHA256;
 import sk.upjs.ics.pro1a.heck.utils.PasswordManager;
 
 public class HeckService {
-
+    
     private final DoctorDao doctorDao;
     private final SpecializationDao specializationDao;
     private final UserDao userDao;
     private final byte[] tokenSecret;
-
+    
     public HeckService(DoctorDao doctorDao, SpecializationDao specializationDao, UserDao userDao, byte[] tokenSecret) {
         this.doctorDao = doctorDao;
         this.specializationDao = specializationDao;
         this.userDao = userDao;
         this.tokenSecret = tokenSecret;
     }
-
+    
     public LoginResponseDto registerDoctor(DoctorDto doctorDto) {
         if (doctorDto.getPassword() == null || doctorDto.getPassword().length() < 6) {
             throw new IllegalStateException("Password does not match criteria.");
         }
-
         String salt = new BigInteger(130, new SecureRandom()).toString(32);
         String password = PasswordManager.encryptPassword(salt, doctorDto.getPassword());
         Specialization specialization = specializationDao.findById(doctorDto.getSpecialization());
-        Doctor doctor = new Doctor(
-                doctorDto.getEmail(),
-                doctorDto.getLogin(),
-                password,
-                salt,
-                specialization,
-                doctorDto.getOffice(),
-                doctorDto.getFirstName(),
-                doctorDto.getLastName(),
-                doctorDto.getPhoneNumber(),
-                doctorDto.getPostalCode(),
-                doctorDto.getCity(),
-                doctorDto.getAddress(),
-                Timestamp.from(Instant.now())
-        );
+        Doctor doctor = createDoctorDaoFromDoctorDto(doctorDto, password, salt, specialization);
         doctor = doctorDao.createDoctor(doctor);
-
         LoginResponseDto loginResponse = new LoginResponseDto();
         loginResponse.setId(doctor.getIdDoctor());
         loginResponse.setLogin(doctor.getLoginDoctor());
@@ -72,7 +54,7 @@ public class HeckService {
         loginResponse.setToken(generateToken(doctor.getLoginDoctor(), doctor.getPasswordDoctor(), "doctor"));
         return loginResponse;
     }
-
+    
     public List<SpecializationDto> getAllSpecializations() {
         List<SpecializationDto> specializations = new ArrayList<>();
         for (Specialization s : specializationDao.findAll()) {
@@ -81,7 +63,7 @@ public class HeckService {
         }
         return specializations;
     }
-
+    
     public SpecializationDto getSpecializationById(long id) {
         Specialization specialization = specializationDao.findById(id);
         if (specialization != null) {
@@ -89,70 +71,34 @@ public class HeckService {
         }
         return null;
     }
-
+    
     public List<DoctorDto> getAllDoctors() {
         List<DoctorDto> doctors = new ArrayList<>();
-        for (Doctor d : doctorDao.findAll()) {
-            DoctorDto doctorDto = new DoctorDto();
-            doctorDto.setId(d.getIdDoctor());
-            doctorDto.setAddress(d.getAddressDoctor());
-            doctorDto.setCity(d.getCityDoctor());
-            doctorDto.setEmail(d.getEmailDoctor());
-            doctorDto.setFirstName(d.getFirstNameDoctor());
-            doctorDto.setLastName(d.getLastNameDoctor());
-            doctorDto.setLogin(d.getLoginDoctor());
-            doctorDto.setOffice(d.getBusinessNameDoctor());
-            doctorDto.setPhoneNumber(d.getPhoneNumberDoctor());
-            doctorDto.setPostalCode(d.getPostalCodeDoctor());
-            doctorDto.setSpecialization(d.getSpecializationDoctor().getId());
-            //we don't want to get password here
+        for (Doctor doctor : doctorDao.findAll()) {
+            DoctorDto doctorDto = createDoctorDtoFromDoctorDaoWithoutPassword(doctor);
             doctors.add(doctorDto);
         }
         return doctors;
     }
-
+    
     public DoctorDto getDoctorById(long id) {
         Doctor doctor = doctorDao.findById(id);
         if (doctor != null) {
-            DoctorDto doctorDto = new DoctorDto();
-            doctorDto.setId(doctor.getIdDoctor());
-            doctorDto.setAddress(doctor.getAddressDoctor());
-            doctorDto.setCity(doctor.getCityDoctor());
-            doctorDto.setEmail(doctor.getEmailDoctor());
-            doctorDto.setFirstName(doctor.getFirstNameDoctor());
-            doctorDto.setLastName(doctor.getLastNameDoctor());
-            doctorDto.setLogin(doctor.getLoginDoctor());
-            doctorDto.setOffice(doctor.getBusinessNameDoctor());
-            doctorDto.setPhoneNumber(doctor.getPhoneNumberDoctor());
-            doctorDto.setPostalCode(doctor.getPostalCodeDoctor());
-            doctorDto.setSpecialization(doctor.getSpecializationDoctor().getId());
-            doctorDto.setPassword(doctor.getPasswordDoctor());
+            DoctorDto doctorDto = createDoctorDtoFromDoctorDaoWithPassword(doctor);
             return doctorDto;
         }
         return null;
     }
-
+    
     public DoctorDto getDoctorByLogin(String login) {
         Doctor doctor = doctorDao.findByLogin(login);
         if (doctor != null) {
-            DoctorDto doctorDto = new DoctorDto();
-            doctorDto.setId(doctor.getIdDoctor());
-            doctorDto.setAddress(doctor.getAddressDoctor());
-            doctorDto.setCity(doctor.getCityDoctor());
-            doctorDto.setEmail(doctor.getEmailDoctor());
-            doctorDto.setFirstName(doctor.getFirstNameDoctor());
-            doctorDto.setLastName(doctor.getLastNameDoctor());
-            doctorDto.setLogin(doctor.getLoginDoctor());
-            doctorDto.setOffice(doctor.getBusinessNameDoctor());
-            doctorDto.setPhoneNumber(doctor.getPhoneNumberDoctor());
-            doctorDto.setPostalCode(doctor.getPostalCodeDoctor());
-            doctorDto.setSpecialization(doctor.getSpecializationDoctor().getId());
-            doctorDto.setPassword(doctor.getPasswordDoctor());
+            DoctorDto doctorDto = createDoctorDtoFromDoctorDaoWithPassword(doctor);
             return doctorDto;
         }
         return null;
     }
-
+    
     public LoginResponseDto loginAsDoctor(String login, String password) {
         Doctor doctor = doctorDao.findByLogin(login);
         if (doctor != null) {
@@ -167,7 +113,7 @@ public class HeckService {
         }
         return null;
     }
-
+    
     public LoginResponseDto loginAsUser(String login, String password) {
         User user = userDao.findByLoginAndPassword(login, password);
         if (user != null) {
@@ -182,72 +128,148 @@ public class HeckService {
         }
         return null;
     }
-
+    
     public UserDto getUserById(long id) {
         User user = userDao.findById(id);
         if (user != null) {
-            UserDto userDto = new UserDto();
-            userDto.setId(user.getIdUser());
-            userDto.setAddress(user.getAddressUser());
-            userDto.setCity(user.getCityUser());
-            userDto.setEmail(user.getEmailUser());
-            userDto.setFirstName(user.getFirstNameUser());
-            userDto.setLastName(user.getLastNameUser());
-            userDto.setLogin(user.getLoginUser());
-            userDto.setPhoneNumber(user.getPhoneUser());
-            userDto.setPostalCode(user.getPostalCodeUser());
-            userDto.setPassword(user.getPasswordUser());
+            UserDto userDto = createUserDtoFromUserDaoWithPassword(user);
             return userDto;
         }
         return null;
     }
-
+    
     public UserDto getUserByLogin(String login) {
         User user = userDao.findByLogin(login);
         if (user != null) {
-            UserDto userDto = new UserDto();
-            userDto.setId(user.getIdUser());
-            userDto.setAddress(user.getAddressUser());
-            userDto.setCity(user.getCityUser());
-            userDto.setEmail(user.getEmailUser());
-            userDto.setFirstName(user.getFirstNameUser());
-            userDto.setLastName(user.getLastNameUser());
-            userDto.setLogin(user.getLoginUser());
-            userDto.setPhoneNumber(user.getPhoneUser());
-            userDto.setPostalCode(user.getPostalCodeUser());
-            userDto.setPassword(user.getPasswordUser());
+            UserDto userDto = createUserDtoFromUserDaoWithPassword(user);
             return userDto;
         }
         return null;
     }
-
+    
     public List<UserDto> getAllUsers() {
         List<UserDto> users = new ArrayList<>();
         for (User user : userDao.findAll()) {
-            UserDto userDto = new UserDto();
-            userDto.setId(user.getIdUser());
-            userDto.setAddress(user.getAddressUser());
-            userDto.setCity(user.getCityUser());
-            userDto.setEmail(user.getEmailUser());
-            userDto.setFirstName(user.getFirstNameUser());
-            userDto.setLastName(user.getLastNameUser());
-            userDto.setLogin(user.getLoginUser());
-            userDto.setPhoneNumber(user.getPhoneUser());
-            userDto.setPostalCode(user.getPostalCodeUser());
-            //we don't want to get password here
+            UserDto userDto = createUserDtoFromUserDaoWithoutPassword(user);
             users.add(userDto);
         }
         return users;
     }
-
+    
+    
     public LoginResponseDto registerUser(UserDto userDto) {
         if (userDto.getPassword() == null || userDto.getPassword().length() < 6) {
             throw new IllegalStateException("Password does not match criteria.");
         }
-
         String salt = new BigInteger(130, new SecureRandom()).toString(32);
         String password = PasswordManager.encryptPassword(salt, userDto.getPassword());
-        User user = new User(
+        User user = createUserDaoFromUserDto(userDto, password, salt);
+        user = userDao.createUser(user);
+        LoginResponseDto loginResponse = new LoginResponseDto();
+        loginResponse.setId(user.getIdUser());
+        loginResponse.setLogin(user.getLoginUser());
+        loginResponse.setRole("user");
+        loginResponse.setToken(generateToken(user.getLoginUser(), user.getPasswordUser(), "user"));
+        return loginResponse;
+    }
+    
+    /**
+     *      UPDATE Tokens
+     */
+    
+    /**
+     *
+     * @param id AuthorizedUserDto ID
+     * @param name AuthorizedUserDto name
+     * @param role AuthorizedUserDto role
+     * @return new Token(for extended expiration password time)
+     */
+    public LoginResponseDto updateDoctorsToken(Long id, String name, String role) {
+        Doctor doctor = doctorDao.findByLogin(name);
+        LoginResponseDto loginResponse = new LoginResponseDto();
+        loginResponse.setId(id);
+        loginResponse.setLogin(name);
+        loginResponse.setRole(role);
+        loginResponse.setToken(generateToken(name, doctor.getPasswordDoctor(), role));
+        return loginResponse;
+    }
+    
+    /**
+     *
+     * @param id AuthorizedUserDto ID
+     * @param name AuthorizedUserDto name
+     * @param role AuthorizedUserDto role
+     * @return
+     */
+    public LoginResponseDto updateUsersToken(Long id, String name, String role) {
+        User user= userDao.findByLogin(name);
+        LoginResponseDto loginResponse = new LoginResponseDto();
+        loginResponse.setId(id);
+        loginResponse.setLogin(name);
+        loginResponse.setRole(role);
+        loginResponse.setToken(generateToken(name, user.getPasswordUser(), role));
+        return loginResponse;
+    }
+    
+    
+    /**
+     *      Private methods
+     */
+    
+    private String generateToken(String login, String password, String role) {
+        final JwtClaims claims = new JwtClaims();
+        claims.setStringClaim("password", password);
+        claims.setStringClaim("role", role);
+        claims.setSubject(login);
+        claims.setExpirationTimeMinutesInTheFuture(30);
+        
+        final JsonWebSignature jws = new JsonWebSignature();
+        jws.setPayload(claims.toJson());
+        jws.setAlgorithmHeaderValue(HMAC_SHA256);
+        jws.setKey(new HmacKey(tokenSecret));
+        
+        try {
+            return jws.getCompactSerialization();
+        } catch (JoseException javier) {
+            throw Throwables.propagate(javier);
+        }
+    }
+    
+    /**
+     *
+     * @param doctorDto JSON Doctor DTO representation
+     * @param password Doctor's password(encrypted)
+     * @param salt Doctor's salt
+     * @param specialization Doctor's specialization
+     * @return new Doctor object
+     */
+    private Doctor createDoctorDaoFromDoctorDto(DoctorDto doctorDto, String password, String salt,
+            Specialization specialization) {
+        return new Doctor(
+                doctorDto.getEmail(),
+                doctorDto.getLogin(),
+                password,
+                salt,
+                specialization,
+                doctorDto.getOffice(),
+                doctorDto.getFirstName(),
+                doctorDto.getLastName(),
+                doctorDto.getPhoneNumber(),
+                doctorDto.getPostalCode(),
+                doctorDto.getCity(),
+                doctorDto.getAddress()
+        );
+    }
+    
+    /**
+     *
+     * @param userDto JSON User DTO representation
+     * @param password User's password(encrypted)
+     * @param salt User's salt
+     * @return new User object
+     */
+    private User createUserDaoFromUserDto(UserDto userDto, String password, String salt) {
+        return new User(
                 userDto.getEmail(),
                 userDto.getLogin(),
                 password,
@@ -257,33 +279,70 @@ public class HeckService {
                 userDto.getPhoneNumber(),
                 userDto.getPostalCode(),
                 userDto.getCity(),
-                userDto.getAddress());
-        user = userDao.createUser(user);
-
-        LoginResponseDto loginResponse = new LoginResponseDto();
-        loginResponse.setId(user.getIdUser());
-        loginResponse.setLogin(user.getLoginUser());
-        loginResponse.setRole("user");
-        loginResponse.setToken(generateToken(user.getLoginUser(), user.getPasswordUser(), "user"));
-        return loginResponse;
+                userDto.getAddress()
+        );
     }
-
-    private String generateToken(String login, String password, String role) {
-        final JwtClaims claims = new JwtClaims();
-        claims.setStringClaim("password", password);
-        claims.setStringClaim("role", role);
-        claims.setSubject(login);
-        //claims.setExpirationTimeMinutesInTheFuture(30);
-
-        final JsonWebSignature jws = new JsonWebSignature();
-        jws.setPayload(claims.toJson());
-        jws.setAlgorithmHeaderValue(HMAC_SHA256);
-        jws.setKey(new HmacKey(tokenSecret));
-
-        try {
-            return jws.getCompactSerialization();
-        } catch (JoseException e) {
-            throw Throwables.propagate(e);
-        }
+    
+    private UserDto createUserDtoFromUserDaoWithoutPassword(User user) {
+        return new UserDto(
+                user.getIdUser(),
+                user.getLoginUser(),
+                user.getFirstNameUser(),
+                user.getLastNameUser(),
+                user.getEmailUser(),
+                user.getAddressUser(),
+                user.getPostalCodeUser(),
+                user.getCityUser(),
+                user.getPhoneUser()
+        );
     }
+    
+    private UserDto createUserDtoFromUserDaoWithPassword(User user) {
+        return new UserDto(
+                user.getIdUser(),
+                user.getLoginUser(),
+                user.getPasswordUser(),
+                user.getFirstNameUser(),
+                user.getLastNameUser(),
+                user.getEmailUser(),
+                user.getAddressUser(),
+                user.getPostalCodeUser(),
+                user.getCityUser(),
+                user.getPhoneUser()
+        );
+    }
+    
+    private DoctorDto createDoctorDtoFromDoctorDaoWithoutPassword(Doctor doctor) {
+        return new DoctorDto(
+                doctor.getIdDoctor(),
+                doctor.getLoginDoctor(),
+                doctor.getFirstNameDoctor(),
+                doctor.getLastNameDoctor(),
+                doctor.getEmailDoctor(),
+                doctor.getBusinessNameDoctor(),
+                doctor.getAddressDoctor(),
+                doctor.getPostalCodeDoctor(),
+                doctor.getCityDoctor(),
+                doctor.getPhoneNumberDoctor(),
+                doctor.getSpecializationDoctor().getId()
+        );
+    }
+    
+    private DoctorDto createDoctorDtoFromDoctorDaoWithPassword(Doctor doctor) {
+        return new DoctorDto(
+                doctor.getIdDoctor(),
+                doctor.getLoginDoctor(),
+                doctor.getPasswordDoctor(),
+                doctor.getFirstNameDoctor(),
+                doctor.getLastNameDoctor(),
+                doctor.getEmailDoctor(),
+                doctor.getBusinessNameDoctor(),
+                doctor.getAddressDoctor(),
+                doctor.getPostalCodeDoctor(),
+                doctor.getCityDoctor(),
+                doctor.getPhoneNumberDoctor(),
+                doctor.getSpecializationDoctor().getId()
+        );
+    }
+    
 }
