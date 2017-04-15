@@ -85,7 +85,7 @@ public class HeckApplication extends Application<HeckConfiguration> {
 
         final JwtConsumer consumer = new JwtConsumerBuilder()
                 .setAllowedClockSkewInSeconds(30) // allow some leeway in validating time based claims to account for clock skew
-                //.setRequireExpirationTime() // the JWT must have an expiration time
+                .setRequireExpirationTime() // the JWT must have an expiration time
                 .setRequireSubject() // the JWT must have a subject claim
                 .setVerificationKey(new HmacKey(key)) // verify the signature with the public key
                 .setRelaxVerificationKeyValidation() // relaxes key length requirement
@@ -103,7 +103,7 @@ public class HeckApplication extends Application<HeckConfiguration> {
                         .buildAuthFilter()));
 
 
-        environment.jersey().register(new AuthValueFactoryProvider.Binder<>(Principal.class));
+        environment.jersey().register(new AuthValueFactoryProvider.Binder<>(AuthorizedUserDto.class));
         environment.jersey().register(RolesAllowedDynamicFeature.class);
         environment.jersey().register(new HeckResources(doctorDao, userDao, specializationDao, key));
 

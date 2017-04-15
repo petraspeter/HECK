@@ -28,8 +28,8 @@ public class HeckResources {
     
     private final HeckService heckService;
     
-    public HeckResources(DoctorDao doctorDao, UserDao userDao, SpecializationDao specializationDao, byte[] tokenSecret) {
-        this.heckService = new HeckService(doctorDao, specializationDao, userDao, tokenSecret);
+    public HeckResources(DoctorDao doctorDao, UserDao userDao, SpecializationDao specializationDao,
+            byte[] tokenSecret) {this.heckService = new HeckService(doctorDao, specializationDao, userDao, tokenSecret);
     }
     
     /**
@@ -136,7 +136,8 @@ public class HeckResources {
     @Path("/doctors/{id}")
     @UnitOfWork
     public Response getDoctorById(@Auth AuthorizedUserDto user, @PathParam("id") Long id) {
-        updateToken(user);        
+        
+        updateToken(user);
         DoctorDto doctor = heckService.getDoctorById(id);
         if (doctor == null) {
             return Response.status(Response.Status.NOT_FOUND).build();
@@ -149,9 +150,6 @@ public class HeckResources {
     @UnitOfWork
     public Response getAllDoctors(@Auth AuthorizedUserDto user, @QueryParam("login") String login) {
         updateToken(user);
-        LoginResponseDto loginResponse = heckService.updateDoctorsToken(user.getId(), user.getName(),
-                user.getRole());
-        Response.accepted(loginResponse).build();
         if (login != null) {
             DoctorDto doctor = heckService.getDoctorByLogin(login);
             if (doctor == null) {
@@ -173,7 +171,7 @@ public class HeckResources {
         if (specialization == null) {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
-        return Response.ok(specialization).build();
+        return Response.accepted(specialization).build();
     }
     
     @GET
@@ -189,31 +187,29 @@ public class HeckResources {
      */
     
     
-    private void updateToken(AuthorizedUserDto user) {
+    private Response updateToken(AuthorizedUserDto user) {
         switch (user.getRole()) {
             case "user":
-                {
-                    LoginResponseDto loginResponse = heckService.updateUsersToken(user.getId(), user.getName(),
-                            user.getRole());
-                    Response.accepted(loginResponse).build();
-                    break;
-                }
+            {
+                LoginResponseDto loginResponse = heckService.updateUsersToken(user.getId(), user.getName(),
+                        user.getRole());
+                return  Response.accepted(loginResponse).build();
+            }
             case "doctor":
-                {
-                    LoginResponseDto loginResponse = heckService.updateDoctorsToken(user.getId(), user.getName(),
-                            user.getRole());
-                    Response.accepted(loginResponse).build();
-                    break;
-                }
+            {
+                
+                LoginResponseDto loginResponse = heckService.updateDoctorsToken(user.getId(), user.getName(),
+                        user.getRole());
+                return  Response.accepted(loginResponse).build();
+            }
             case "admin":
-                {
-                    LoginResponseDto loginResponse = heckService.updateDoctorsToken(user.getId(), user.getName(),
-                            user.getRole());
-                    Response.accepted(loginResponse).build();
-                    break;
-                }
+            {
+                LoginResponseDto loginResponse = heckService.updateDoctorsToken(user.getId(), user.getName(),
+                        user.getRole());
+                return  Response.accepted(loginResponse).build();
+            }
             default:
-                break;
+                return  Response.status(Response.Status.NOT_MODIFIED).build();
         }
     }
     

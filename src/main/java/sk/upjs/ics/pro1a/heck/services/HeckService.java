@@ -22,6 +22,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.jose4j.jws.AlgorithmIdentifiers.HMAC_SHA256;
+import org.jose4j.jwt.NumericDate;
+import org.jose4j.jwt.consumer.NumericDateValidator;
 import sk.upjs.ics.pro1a.heck.utils.PasswordManager;
 
 public class HeckService {
@@ -221,13 +223,35 @@ public class HeckService {
         claims.setStringClaim("password", password);
         claims.setStringClaim("role", role);
         claims.setSubject(login);
-        claims.setExpirationTimeMinutesInTheFuture(30);
+        claims.setExpirationTimeMinutesInTheFuture(1);
         
         final JsonWebSignature jws = new JsonWebSignature();
         jws.setPayload(claims.toJson());
         jws.setAlgorithmHeaderValue(HMAC_SHA256);
         jws.setKey(new HmacKey(tokenSecret));
         
+        try {
+            return jws.getCompactSerialization();
+        } catch (JoseException javier) {
+            throw Throwables.propagate(javier);
+        }
+    }
+    
+    private String updateToken(String login, String password, String role, NumericDate expiration) {
+        final JwtClaims claims = new JwtClaims();
+        claims.setStringClaim("password", password);
+        claims.setStringClaim("role", role);
+        claims.setSubject(login);    
+        /**
+         * increase expiration time
+         */
+        expiration.addSeconds(900);
+        claims.setExpirationTime(expiration);
+        
+        final JsonWebSignature jws = new JsonWebSignature();
+        jws.setPayload(claims.toJson());
+        jws.setAlgorithmHeaderValue(HMAC_SHA256);
+        jws.setKey(new HmacKey(tokenSecret));        
         try {
             return jws.getCompactSerialization();
         } catch (JoseException javier) {
