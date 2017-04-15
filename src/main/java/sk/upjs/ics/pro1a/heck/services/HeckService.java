@@ -169,7 +169,7 @@ public class HeckService {
     }
 
     public LoginResponseDto loginAsUser(String login, String password) {
-        User user = userDao.findByLoginAndPassword(login, password);
+        User user = userDao.findByLogin(login);
         if (user != null) {
             if (user.getPasswordUser().equals(PasswordManager.encryptPassword(user.getSaltUser(), password))) {
                 LoginResponseDto loginResponse = new LoginResponseDto();
