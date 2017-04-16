@@ -24,7 +24,6 @@ import java.util.List;
 
 import static org.jose4j.jws.AlgorithmIdentifiers.HMAC_SHA256;
 import org.jose4j.jwt.NumericDate;
-import org.jose4j.jwt.consumer.NumericDateValidator;
 import sk.upjs.ics.pro1a.heck.utils.PasswordManager;
 
 public class HeckService {
@@ -87,7 +86,7 @@ public class HeckService {
     public DoctorDto getDoctorById(long id) {
         Doctor doctor = doctorDao.findById(id);
         if (doctor != null) {
-            DoctorDto doctorDto = createDoctorDtoFromDoctorDaoWithPassword(doctor);
+            DoctorDto doctorDto = createDoctorDtoFromDoctorDaoWithoutPassword(doctor);
             return doctorDto;
         }
         return null;
@@ -263,6 +262,24 @@ public class HeckService {
             throw Throwables.propagate(javier);
         }
     }
+    
+    public void updateDoctor(Long id, DoctorDto doctorDto) {
+        Doctor doctor = doctorDao.findById(id);
+        
+        doctor.setFirstNameDoctor(doctorDto.getFirstName());
+        doctor.setLastNameDoctor(doctorDto.getLastName());
+        doctor.setEmailDoctor(doctorDto.getEmail());
+        doctor.setBusinessNameDoctor(doctorDto.getOffice());
+        doctor.setAddressDoctor(doctorDto.getAddress());
+        doctor.setCityDoctor(doctorDto.getCity());
+        doctor.setPostalCodeDoctor(doctorDto.getPostalCode());
+        doctor.setPhoneNumberDoctor(doctorDto.getPhoneNumber());
+        if(!doctor.getSpecializationDoctor().getId().equals(doctorDto.getSpecialization())){
+            doctor.setSpecializationDoctor(specializationDao.findById(doctorDto.getSpecialization()));
+        }
+        doctorDao.update(doctor);
+    }
+    
     
     /**
      *
