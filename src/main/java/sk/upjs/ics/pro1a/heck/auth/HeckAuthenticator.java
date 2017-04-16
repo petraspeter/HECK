@@ -54,7 +54,7 @@ public class HeckAuthenticator implements Authenticator<JwtContext, AuthorizedUs
                 if ("user".equals(role)) {
                     User user = userDao.findByLoginAndPassword(login, password);
                     if (user != null) {
-                        return Optional.of(new AuthorizedUserDto(user.getIdUser(), login, "doctor"));
+                        return Optional.of(new AuthorizedUserDto(user.getIdUser(), login, "user"));
                     }
                 }
                 return Optional.empty();

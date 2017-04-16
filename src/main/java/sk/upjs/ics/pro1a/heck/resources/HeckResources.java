@@ -136,7 +136,7 @@ public class HeckResources {
     }
     
     @GET
-    @Path("/user/{id}")
+    @Path("/users/{id}")
     @UnitOfWork
     public Response getUserById(@Auth AuthorizedUserDto user, @PathParam("id") Long id) {
         UserDto userDto = heckService.getUserById(id);
@@ -192,7 +192,7 @@ public class HeckResources {
     @GET
     @Path("specializations/{id}")
     @UnitOfWork
-    public Response getSpecializationById(@Auth AuthorizedUserDto user, @PathParam("id") Long id) {
+    public Response getSpecializationById(@PathParam("id") Long id) {
         SpecializationDto specialization = heckService.getSpecializationById(id);
         if (specialization == null) {
             return Response.status(Response.Status.NOT_FOUND).build();
