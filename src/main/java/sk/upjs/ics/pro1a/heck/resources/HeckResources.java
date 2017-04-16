@@ -100,14 +100,45 @@ public class HeckResources {
     /**
      *
      * @param user
+     * @param actualExpirationTime
      * @param id
      * @return
      */
+    
+    @GET
+    @Path("/updateToken/{actualTime}")
+    @UnitOfWork
+    public Response updateToken(@Auth AuthorizedUserDto user, @PathParam("actualTime") Long actualExpirationTime) {
+        switch (user.getRole()) {
+            case "user":
+            {
+                LoginResponseDto loginResponse = heckService.updateUsersToken( user.getName(), user.getRole(),
+                        actualExpirationTime);
+                return  Response.ok(loginResponse).build();
+            }
+            case "doctor":
+            {
+                LoginResponseDto loginResponse = heckService.updateDoctorsToken( user.getName(), user.getRole(),
+                        actualExpirationTime);
+                return  Response.ok(loginResponse).build();
+            }
+            case "admin":
+            {
+                LoginResponseDto loginResponse = heckService.updateDoctorsToken( user.getName(), user.getRole(),
+                        actualExpirationTime);
+                return  Response.ok(loginResponse).build();
+            }
+            default:
+                break;
+        }
+        return  Response.status(Response.Status.NOT_MODIFIED).build();
+        
+    }
+    
     @GET
     @Path("/user/{id}")
     @UnitOfWork
     public Response getUserById(@Auth AuthorizedUserDto user, @PathParam("id") Long id) {
-        updateToken(user);
         UserDto userDto = heckService.getUserById(id);
         if (userDto == null) {
             return Response.status(Response.Status.NOT_FOUND).build();
@@ -119,7 +150,6 @@ public class HeckResources {
     @Path("/users")
     @UnitOfWork
     public Response getAllUsers(@Auth AuthorizedUserDto user, @QueryParam("login") String login) {
-        updateToken(user);
         if (login != null) {
             UserDto userDto = heckService.getUserByLogin(login);
             if (userDto == null) {
@@ -136,8 +166,6 @@ public class HeckResources {
     @Path("/doctors/{id}")
     @UnitOfWork
     public Response getDoctorById(@Auth AuthorizedUserDto user, @PathParam("id") Long id) {
-        
-        updateToken(user);
         DoctorDto doctor = heckService.getDoctorById(id);
         if (doctor == null) {
             return Response.status(Response.Status.NOT_FOUND).build();
@@ -149,7 +177,6 @@ public class HeckResources {
     @Path("/doctors")
     @UnitOfWork
     public Response getAllDoctors(@Auth AuthorizedUserDto user, @QueryParam("login") String login) {
-        updateToken(user);
         if (login != null) {
             DoctorDto doctor = heckService.getDoctorByLogin(login);
             if (doctor == null) {
@@ -166,7 +193,6 @@ public class HeckResources {
     @Path("specializations/{id}")
     @UnitOfWork
     public Response getSpecializationById(@Auth AuthorizedUserDto user, @PathParam("id") Long id) {
-        updateToken(user);
         SpecializationDto specialization = heckService.getSpecializationById(id);
         if (specialization == null) {
             return Response.status(Response.Status.NOT_FOUND).build();
@@ -187,30 +213,5 @@ public class HeckResources {
      */
     
     
-    private Response updateToken(AuthorizedUserDto user) {
-        switch (user.getRole()) {
-            case "user":
-            {
-                LoginResponseDto loginResponse = heckService.updateUsersToken(user.getId(), user.getName(),
-                        user.getRole());
-                return  Response.accepted(loginResponse).build();
-            }
-            case "doctor":
-            {
-                
-                LoginResponseDto loginResponse = heckService.updateDoctorsToken(user.getId(), user.getName(),
-                        user.getRole());
-                return  Response.accepted(loginResponse).build();
-            }
-            case "admin":
-            {
-                LoginResponseDto loginResponse = heckService.updateDoctorsToken(user.getId(), user.getName(),
-                        user.getRole());
-                return  Response.accepted(loginResponse).build();
-            }
-            default:
-                return  Response.status(Response.Status.NOT_MODIFIED).build();
-        }
-    }
     
 }

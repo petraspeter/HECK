@@ -3,6 +3,7 @@ package sk.upjs.ics.pro1a.heck.services;
 import com.google.common.base.Throwables;
 import java.math.BigInteger;
 import java.security.SecureRandom;
+import java.sql.Timestamp;
 import org.jose4j.jws.JsonWebSignature;
 import org.jose4j.jwt.JwtClaims;
 import org.jose4j.keys.HmacKey;
@@ -181,35 +182,36 @@ public class HeckService {
     
     /**
      *
-     * @param id AuthorizedUserDto ID
      * @param name AuthorizedUserDto name
      * @param role AuthorizedUserDto role
      * @return new Token(for extended expiration password time)
      */
-    public LoginResponseDto updateDoctorsToken(Long id, String name, String role) {
+    public LoginResponseDto updateDoctorsToken(String name, String role, Long actualExpirationTime) {
         Doctor doctor = doctorDao.findByLogin(name);
         LoginResponseDto loginResponse = new LoginResponseDto();
-        loginResponse.setId(id);
-        loginResponse.setLogin(name);
+        loginResponse.setId(doctor.getIdDoctor());
+        loginResponse.setLogin(doctor.getLoginDoctor());
         loginResponse.setRole(role);
-        loginResponse.setToken(generateToken(name, doctor.getPasswordDoctor(), role));
+        NumericDate expiration = NumericDate.fromSeconds(actualExpirationTime);
+        loginResponse.setToken(updateToken(name, doctor.getPasswordDoctor(), role, expiration));
         return loginResponse;
     }
     
     /**
      *
-     * @param id AuthorizedUserDto ID
      * @param name AuthorizedUserDto name
      * @param role AuthorizedUserDto role
+     * @param actualExpirationTime
      * @return
      */
-    public LoginResponseDto updateUsersToken(Long id, String name, String role) {
+    public LoginResponseDto updateUsersToken(String name, String role, Long actualExpirationTime) {
         User user= userDao.findByLogin(name);
         LoginResponseDto loginResponse = new LoginResponseDto();
-        loginResponse.setId(id);
-        loginResponse.setLogin(name);
+        loginResponse.setId(user.getIdUser());
+        loginResponse.setLogin(user.getLoginUser());
         loginResponse.setRole(role);
-        loginResponse.setToken(generateToken(name, user.getPasswordUser(), role));
+        NumericDate expiration = NumericDate.fromSeconds(actualExpirationTime);
+        loginResponse.setToken(updateToken(name, user.getPasswordUser(), role, expiration));
         return loginResponse;
     }
     
@@ -223,7 +225,7 @@ public class HeckService {
         claims.setStringClaim("password", password);
         claims.setStringClaim("role", role);
         claims.setSubject(login);
-        claims.setExpirationTimeMinutesInTheFuture(1);
+        claims.setExpirationTimeMinutesInTheFuture(30);
         
         final JsonWebSignature jws = new JsonWebSignature();
         jws.setPayload(claims.toJson());
@@ -237,21 +239,24 @@ public class HeckService {
         }
     }
     
-    private String updateToken(String login, String password, String role, NumericDate expiration) {
+    private String updateToken(String login, String password, String role, NumericDate expiration) {        
         final JwtClaims claims = new JwtClaims();
         claims.setStringClaim("password", password);
         claims.setStringClaim("role", role);
-        claims.setSubject(login);    
+        claims.setSubject(login);
         /**
          * increase expiration time
          */
         expiration.addSeconds(900);
-        claims.setExpirationTime(expiration);
+        long newExpirationTime = new Timestamp(expiration.getValueInMillis()).getTime();
+        long realTime = new Timestamp(System.currentTimeMillis()).getTime();        
+        long addMinutes = (newExpirationTime - realTime) / (60 * 1000);  
         
+        claims.setExpirationTimeMinutesInTheFuture(addMinutes);        
         final JsonWebSignature jws = new JsonWebSignature();
         jws.setPayload(claims.toJson());
         jws.setAlgorithmHeaderValue(HMAC_SHA256);
-        jws.setKey(new HmacKey(tokenSecret));        
+        jws.setKey(new HmacKey(tokenSecret));
         try {
             return jws.getCompactSerialization();
         } catch (JoseException javier) {

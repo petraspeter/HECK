@@ -3,7 +3,6 @@ package sk.upjs.ics.pro1a.heck.services.dto;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.security.Principal;
-import org.jose4j.jwt.NumericDate;
 
 public class AuthorizedUserDto implements Principal {
 
