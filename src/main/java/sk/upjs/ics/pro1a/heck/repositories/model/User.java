@@ -61,10 +61,6 @@ public class User implements Serializable {
     @Column(name = "active_user")
     private Boolean activeUser;
 
-    @Type(type = "org.hibernate.type.NumericBooleanType")
-    @Column(name = "is_admin")
-    private Boolean isAdmin;
-
     public Long getIdUser() {
         return idUser;
     }
@@ -161,14 +157,6 @@ public class User implements Serializable {
         this.activeUser = activeUser;
     }
 
-    public Boolean getIsAdmin() {
-        return isAdmin;
-    }
-
-    public void setIsAdmin(Boolean isAdmin) {
-        this.isAdmin = isAdmin;
-    }
-
     public User() {
     }
 
@@ -185,6 +173,5 @@ public class User implements Serializable {
         this.cityUser = cityUser;
         this.addressUser = addressUser;
         this.activeUser = true;
-        this.isAdmin = false;
     }
 }

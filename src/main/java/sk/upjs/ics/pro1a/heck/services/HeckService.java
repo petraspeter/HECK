@@ -18,25 +18,38 @@ import sk.upjs.ics.pro1a.heck.services.dto.DoctorDto;
 import sk.upjs.ics.pro1a.heck.services.dto.LoginResponseDto;
 import sk.upjs.ics.pro1a.heck.services.dto.SpecializationDto;
 import sk.upjs.ics.pro1a.heck.services.dto.UserDto;
-
 import java.util.ArrayList;
 import java.util.List;
-
 import static org.jose4j.jws.AlgorithmIdentifiers.HMAC_SHA256;
 import org.jose4j.jwt.NumericDate;
 import sk.upjs.ics.pro1a.heck.utils.PasswordManager;
 
 public class HeckService {
     
-    private final DoctorDao doctorDao;
-    private final SpecializationDao specializationDao;
-    private final UserDao userDao;
+    private  DoctorDao doctorDao;
+    private  SpecializationDao specializationDao;
+    private  UserDao userDao;
     private final byte[] tokenSecret;
     
     public HeckService(DoctorDao doctorDao, SpecializationDao specializationDao, UserDao userDao, byte[] tokenSecret) {
         this.doctorDao = doctorDao;
         this.specializationDao = specializationDao;
         this.userDao = userDao;
+        this.tokenSecret = tokenSecret;
+    }
+    
+    public HeckService(UserDao userDao, byte[] tokenSecret) {
+        this.userDao = userDao;
+        this.tokenSecret = tokenSecret;
+    }
+    
+    public HeckService(SpecializationDao specializationDao, byte[] tokenSecret) {
+        this.specializationDao = specializationDao;
+        this.tokenSecret = tokenSecret;
+    }
+    
+    public HeckService(DoctorDao doctorDao, byte[] tokenSecret) {
+        this.doctorDao = doctorDao;
         this.tokenSecret = tokenSecret;
     }
     
@@ -53,7 +66,7 @@ public class HeckService {
         loginResponse.setId(doctor.getIdDoctor());
         loginResponse.setLogin(doctor.getLoginDoctor());
         loginResponse.setRole("doctor");
-        loginResponse.setToken(generateToken(doctor.getLoginDoctor(), doctor.getPasswordDoctor(), "doctor"));
+        loginResponse.setToken(generateToken(doctor.getLoginDoctor(), "doctor"));
         return loginResponse;
     }
     
@@ -86,7 +99,7 @@ public class HeckService {
     public DoctorDto getDoctorById(long id) {
         Doctor doctor = doctorDao.findById(id);
         if (doctor != null) {
-            DoctorDto doctorDto = createDoctorDtoFromDoctorDaoWithoutPassword(doctor);
+            DoctorDto doctorDto = createDoctorDtoFromDoctorDaoWithPassword(doctor);
             return doctorDto;
         }
         return null;
@@ -108,8 +121,12 @@ public class HeckService {
                 LoginResponseDto loginResponse = new LoginResponseDto();
                 loginResponse.setId(doctor.getIdDoctor());
                 loginResponse.setLogin(doctor.getLoginDoctor());
-                loginResponse.setRole("doctor");
-                loginResponse.setToken(generateToken(login, doctor.getPasswordDoctor(), "doctor"));
+                if(doctor.getIsAdmin()) {
+                    loginResponse.setRole("admin");
+                } else {
+                    loginResponse.setRole("doctor");
+                }
+                loginResponse.setToken(generateToken(login, loginResponse.getRole()));
                 return loginResponse;
             }
         }
@@ -124,7 +141,7 @@ public class HeckService {
                 loginResponse.setId(user.getIdUser());
                 loginResponse.setLogin(user.getLoginUser());
                 loginResponse.setRole("user");
-                loginResponse.setToken(generateToken(login, user.getPasswordUser(), "user"));
+                loginResponse.setToken(generateToken(login, "user"));
                 return loginResponse;
             }
         }
@@ -171,7 +188,7 @@ public class HeckService {
         loginResponse.setId(user.getIdUser());
         loginResponse.setLogin(user.getLoginUser());
         loginResponse.setRole("user");
-        loginResponse.setToken(generateToken(user.getLoginUser(), user.getPasswordUser(), "user"));
+        loginResponse.setToken(generateToken(user.getLoginUser(), "user"));
         return loginResponse;
     }
     
@@ -183,6 +200,7 @@ public class HeckService {
      *
      * @param name AuthorizedUserDto name
      * @param role AuthorizedUserDto role
+     * @param actualExpirationTime
      * @return new Token(for extended expiration password time)
      */
     public LoginResponseDto updateDoctorsToken(String name, String role, Long actualExpirationTime) {
@@ -192,7 +210,7 @@ public class HeckService {
         loginResponse.setLogin(doctor.getLoginDoctor());
         loginResponse.setRole(role);
         NumericDate expiration = NumericDate.fromSeconds(actualExpirationTime);
-        loginResponse.setToken(updateToken(name, doctor.getPasswordDoctor(), role, expiration));
+        loginResponse.setToken(updateToken(name, role, expiration));
         return loginResponse;
     }
     
@@ -210,7 +228,7 @@ public class HeckService {
         loginResponse.setLogin(user.getLoginUser());
         loginResponse.setRole(role);
         NumericDate expiration = NumericDate.fromSeconds(actualExpirationTime);
-        loginResponse.setToken(updateToken(name, user.getPasswordUser(), role, expiration));
+        loginResponse.setToken(updateToken(name, role, expiration));
         return loginResponse;
     }
     
@@ -219,9 +237,8 @@ public class HeckService {
      *      Private methods
      */
     
-    private String generateToken(String login, String password, String role) {
+    private String generateToken(String login, String role) {
         final JwtClaims claims = new JwtClaims();
-        claims.setStringClaim("password", password);
         claims.setStringClaim("role", role);
         claims.setSubject(login);
         claims.setExpirationTimeMinutesInTheFuture(30);
@@ -238,9 +255,8 @@ public class HeckService {
         }
     }
     
-    private String updateToken(String login, String password, String role, NumericDate expiration) {        
+    private String updateToken(String login, String role, NumericDate expiration) {
         final JwtClaims claims = new JwtClaims();
-        claims.setStringClaim("password", password);
         claims.setStringClaim("role", role);
         claims.setSubject(login);
         /**
@@ -248,10 +264,10 @@ public class HeckService {
          */
         expiration.addSeconds(900);
         long newExpirationTime = new Timestamp(expiration.getValueInMillis()).getTime();
-        long realTime = new Timestamp(System.currentTimeMillis()).getTime();        
-        long addMinutes = (newExpirationTime - realTime) / (60 * 1000);  
+        long realTime = new Timestamp(System.currentTimeMillis()).getTime();
+        long addMinutes = (newExpirationTime - realTime) / (60 * 1000);
         
-        claims.setExpirationTimeMinutesInTheFuture(addMinutes);        
+        claims.setExpirationTimeMinutesInTheFuture(addMinutes);
         final JsonWebSignature jws = new JsonWebSignature();
         jws.setPayload(claims.toJson());
         jws.setAlgorithmHeaderValue(HMAC_SHA256);
@@ -262,24 +278,6 @@ public class HeckService {
             throw Throwables.propagate(javier);
         }
     }
-    
-    public void updateDoctor(Long id, DoctorDto doctorDto) {
-        Doctor doctor = doctorDao.findById(id);
-        
-        doctor.setFirstNameDoctor(doctorDto.getFirstName());
-        doctor.setLastNameDoctor(doctorDto.getLastName());
-        doctor.setEmailDoctor(doctorDto.getEmail());
-        doctor.setBusinessNameDoctor(doctorDto.getOffice());
-        doctor.setAddressDoctor(doctorDto.getAddress());
-        doctor.setCityDoctor(doctorDto.getCity());
-        doctor.setPostalCodeDoctor(doctorDto.getPostalCode());
-        doctor.setPhoneNumberDoctor(doctorDto.getPhoneNumber());
-        if(!doctor.getSpecializationDoctor().getId().equals(doctorDto.getSpecialization())){
-            doctor.setSpecializationDoctor(specializationDao.findById(doctorDto.getSpecialization()));
-        }
-        doctorDao.update(doctor);
-    }
-    
     
     /**
      *
@@ -370,7 +368,8 @@ public class HeckService {
                 doctor.getPostalCodeDoctor(),
                 doctor.getCityDoctor(),
                 doctor.getPhoneNumberDoctor(),
-                doctor.getSpecializationDoctor().getId()
+                doctor.getSpecializationDoctor().getId(),
+                doctor.getIsAdmin()
         );
     }
     
@@ -387,7 +386,8 @@ public class HeckService {
                 doctor.getPostalCodeDoctor(),
                 doctor.getCityDoctor(),
                 doctor.getPhoneNumberDoctor(),
-                doctor.getSpecializationDoctor().getId()
+                doctor.getSpecializationDoctor().getId(),
+                doctor.getIsAdmin()
         );
     }
     

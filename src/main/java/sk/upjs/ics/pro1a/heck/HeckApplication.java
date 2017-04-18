@@ -22,21 +22,23 @@ import sk.upjs.ics.pro1a.heck.repositories.UserDao;
 import sk.upjs.ics.pro1a.heck.repositories.model.Doctor;
 import sk.upjs.ics.pro1a.heck.repositories.model.Specialization;
 import sk.upjs.ics.pro1a.heck.repositories.model.User;
-import sk.upjs.ics.pro1a.heck.resources.HeckResources;
 import sk.upjs.ics.pro1a.heck.services.dto.AuthorizedUserDto;
 
 import javax.servlet.DispatcherType;
 import javax.servlet.FilterRegistration;
 import javax.ws.rs.client.Client;
-import java.security.Principal;
 import java.util.EnumSet;
+import sk.upjs.ics.pro1a.heck.resources.DoctorResources;
+import sk.upjs.ics.pro1a.heck.resources.SpecializationResources;
+import sk.upjs.ics.pro1a.heck.resources.UserResources;
 
 /**
  * @author raven
  */
 public class HeckApplication extends Application<HeckConfiguration> {
 
-    private final HibernateBundle<HeckConfiguration> hibernateBundle = new HibernateBundle<HeckConfiguration>(Specialization.class, Doctor.class, User.class) {
+    private final HibernateBundle<HeckConfiguration> hibernateBundle =
+            new HibernateBundle<HeckConfiguration>(Specialization.class, Doctor.class, User.class) {
 
         @Override
         public DataSourceFactory getDataSourceFactory(HeckConfiguration configuration) {
@@ -105,7 +107,10 @@ public class HeckApplication extends Application<HeckConfiguration> {
 
         environment.jersey().register(new AuthValueFactoryProvider.Binder<>(AuthorizedUserDto.class));
         environment.jersey().register(RolesAllowedDynamicFeature.class);
-        environment.jersey().register(new HeckResources(doctorDao, userDao, specializationDao, key));
+      //  environment.jersey().register(new HeckResources(doctorDao, userDao, specializationDao, key));
+        environment.jersey().register(new DoctorResources(doctorDao, key));
+        environment.jersey().register(new UserResources(userDao, key));
+        environment.jersey().register(new SpecializationResources(specializationDao, key));
 
         // Enable CORS headers
         final FilterRegistration.Dynamic cors =

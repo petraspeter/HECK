@@ -32,7 +32,8 @@ public class UserDao extends AbstractDAO<User> {
     }
 
     public User findByLoginAndPassword(String login, String password) {
-        return uniqueResult(namedQuery("findUserByLoginAndPassword").setParameter("login", login).setParameter("password", password));
+        return uniqueResult(namedQuery("findUserByLoginAndPassword").setParameter("login", login).
+                setParameter("password", password));
     }
 
 }
