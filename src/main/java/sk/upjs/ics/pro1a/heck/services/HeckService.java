@@ -18,20 +18,17 @@ import sk.upjs.ics.pro1a.heck.services.dto.DoctorDto;
 import sk.upjs.ics.pro1a.heck.services.dto.LoginResponseDto;
 import sk.upjs.ics.pro1a.heck.services.dto.SpecializationDto;
 import sk.upjs.ics.pro1a.heck.services.dto.UserDto;
-
 import java.util.ArrayList;
 import java.util.List;
-
 import static org.jose4j.jws.AlgorithmIdentifiers.HMAC_SHA256;
 import org.jose4j.jwt.NumericDate;
-import org.jose4j.jwt.consumer.NumericDateValidator;
 import sk.upjs.ics.pro1a.heck.utils.PasswordManager;
 
 public class HeckService {
     
-    private final DoctorDao doctorDao;
-    private final SpecializationDao specializationDao;
-    private final UserDao userDao;
+    private  DoctorDao doctorDao;
+    private  SpecializationDao specializationDao;
+    private  UserDao userDao;
     private final byte[] tokenSecret;
     
     public HeckService(DoctorDao doctorDao, SpecializationDao specializationDao, UserDao userDao, byte[] tokenSecret) {
@@ -40,7 +37,22 @@ public class HeckService {
         this.userDao = userDao;
         this.tokenSecret = tokenSecret;
     }
-    
+
+    public HeckService(UserDao userDao, byte[] tokenSecret) {
+        this.userDao = userDao;
+        this.tokenSecret = tokenSecret;
+    }
+
+    public HeckService(SpecializationDao specializationDao, byte[] tokenSecret) {
+        this.specializationDao = specializationDao;
+        this.tokenSecret = tokenSecret;
+    }
+
+    public HeckService(DoctorDao doctorDao, byte[] tokenSecret) {
+        this.doctorDao = doctorDao;
+        this.tokenSecret = tokenSecret;
+    }
+        
     public LoginResponseDto registerDoctor(DoctorDto doctorDto) {
         if (doctorDto.getPassword() == null || doctorDto.getPassword().length() < 6) {
             throw new IllegalStateException("Password does not match criteria.");
@@ -54,7 +66,7 @@ public class HeckService {
         loginResponse.setId(doctor.getIdDoctor());
         loginResponse.setLogin(doctor.getLoginDoctor());
         loginResponse.setRole("doctor");
-        loginResponse.setToken(generateToken(doctor.getLoginDoctor(), doctor.getPasswordDoctor(), "doctor"));
+        loginResponse.setToken(generateToken(doctor.getLoginDoctor(), "doctor"));
         return loginResponse;
     }
     
@@ -110,7 +122,7 @@ public class HeckService {
                 loginResponse.setId(doctor.getIdDoctor());
                 loginResponse.setLogin(doctor.getLoginDoctor());
                 loginResponse.setRole("doctor");
-                loginResponse.setToken(generateToken(login, doctor.getPasswordDoctor(), "doctor"));
+                loginResponse.setToken(generateToken(login, "doctor"));
                 return loginResponse;
             }
         }
@@ -125,7 +137,7 @@ public class HeckService {
                 loginResponse.setId(user.getIdUser());
                 loginResponse.setLogin(user.getLoginUser());
                 loginResponse.setRole("user");
-                loginResponse.setToken(generateToken(login, user.getPasswordUser(), "user"));
+                loginResponse.setToken(generateToken(login, "user"));
                 return loginResponse;
             }
         }
@@ -172,7 +184,7 @@ public class HeckService {
         loginResponse.setId(user.getIdUser());
         loginResponse.setLogin(user.getLoginUser());
         loginResponse.setRole("user");
-        loginResponse.setToken(generateToken(user.getLoginUser(), user.getPasswordUser(), "user"));
+        loginResponse.setToken(generateToken(user.getLoginUser(), "user"));
         return loginResponse;
     }
     
@@ -184,6 +196,7 @@ public class HeckService {
      *
      * @param name AuthorizedUserDto name
      * @param role AuthorizedUserDto role
+     * @param actualExpirationTime
      * @return new Token(for extended expiration password time)
      */
     public LoginResponseDto updateDoctorsToken(String name, String role, Long actualExpirationTime) {
@@ -193,7 +206,7 @@ public class HeckService {
         loginResponse.setLogin(doctor.getLoginDoctor());
         loginResponse.setRole(role);
         NumericDate expiration = NumericDate.fromSeconds(actualExpirationTime);
-        loginResponse.setToken(updateToken(name, doctor.getPasswordDoctor(), role, expiration));
+        loginResponse.setToken(updateToken(name, role, expiration));
         return loginResponse;
     }
     
@@ -211,7 +224,7 @@ public class HeckService {
         loginResponse.setLogin(user.getLoginUser());
         loginResponse.setRole(role);
         NumericDate expiration = NumericDate.fromSeconds(actualExpirationTime);
-        loginResponse.setToken(updateToken(name, user.getPasswordUser(), role, expiration));
+        loginResponse.setToken(updateToken(name, role, expiration));
         return loginResponse;
     }
     
@@ -220,9 +233,8 @@ public class HeckService {
      *      Private methods
      */
     
-    private String generateToken(String login, String password, String role) {
+    private String generateToken(String login, String role) {
         final JwtClaims claims = new JwtClaims();
-        claims.setStringClaim("password", password);
         claims.setStringClaim("role", role);
         claims.setSubject(login);
         claims.setExpirationTimeMinutesInTheFuture(30);
@@ -239,9 +251,8 @@ public class HeckService {
         }
     }
     
-    private String updateToken(String login, String password, String role, NumericDate expiration) {        
+    private String updateToken(String login, String role, NumericDate expiration) {        
         final JwtClaims claims = new JwtClaims();
-        claims.setStringClaim("password", password);
         claims.setStringClaim("role", role);
         claims.setSubject(login);
         /**

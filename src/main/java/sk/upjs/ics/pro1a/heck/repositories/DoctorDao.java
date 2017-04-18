@@ -32,7 +32,8 @@ public class DoctorDao extends AbstractDAO<Doctor> {
     }
 
     public Doctor findByLoginAndPassword(String login, String password) {
-        return uniqueResult(namedQuery("findDoctorByLoginAndPassword").setParameter("login", login).setParameter("password", password));
+        return uniqueResult(namedQuery("findDoctorByLoginAndPassword").setParameter("login", login).
+                setParameter("password", password));
 
     }
 }

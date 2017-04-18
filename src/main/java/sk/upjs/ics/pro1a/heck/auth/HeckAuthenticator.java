@@ -9,9 +9,7 @@ import sk.upjs.ics.pro1a.heck.repositories.UserDao;
 import sk.upjs.ics.pro1a.heck.repositories.model.Doctor;
 import sk.upjs.ics.pro1a.heck.repositories.model.User;
 import sk.upjs.ics.pro1a.heck.services.dto.AuthorizedUserDto;
-
 import java.util.Optional;
-import org.jose4j.jwt.NumericDate;
 
 public class HeckAuthenticator implements Authenticator<JwtContext, AuthorizedUserDto> {
     
@@ -37,30 +35,24 @@ public class HeckAuthenticator implements Authenticator<JwtContext, AuthorizedUs
         
         try {
             final String role = context.getJwtClaims().getClaimValue("role").toString();
-            final String password = context.getJwtClaims().getClaimValue("password").toString();
+        //    final String password = context.getJwtClaims().getClaimValue("password").toString();
             final String login = context.getJwtClaims().getSubject();
-            final NumericDate expirationTime = context.getJwtClaims().getExpirationTime();
-            
-            /**
-             * check validity of token expiration time 
-             */
-            if(NumericDate.now().isBefore( expirationTime)){
-                if ("doctor".equals(role)) {
-                    Doctor doctor = doctorDao.findByLoginAndPassword(login, password);
-                    if (doctor != null) {
-                        return Optional.of(new AuthorizedUserDto(doctor.getIdDoctor(), login, "doctor"));
-                    }
+            if ("doctor".equals(role)) {
+              //  Doctor doctor = doctorDao.findByLoginAndPassword(login, password);
+              Doctor doctor = doctorDao.findByLogin(login);
+                if (doctor != null) {
+                    return Optional.of(new AuthorizedUserDto(doctor.getIdDoctor(), login, "doctor"));
                 }
-                if ("user".equals(role)) {
-                    User user = userDao.findByLoginAndPassword(login, password);
-                    if (user != null) {
-                        return Optional.of(new AuthorizedUserDto(user.getIdUser(), login, "user"));
-                    }
-                }
-                return Optional.empty();
-            } else {
-                return Optional.empty();
             }
+            if ("user".equals(role)) {
+               // User user = userDao.findByLoginAndPassword(login, password);
+               User user = userDao.findByLogin(login);
+                if (user != null) {
+                    return Optional.of(new AuthorizedUserDto(user.getIdUser(), login, "user"));
+                }
+            }
+            return Optional.empty();
+            
         } catch (MalformedClaimException e) {
             return Optional.empty();
         }
