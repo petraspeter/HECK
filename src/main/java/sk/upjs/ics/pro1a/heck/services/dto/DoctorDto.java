@@ -43,6 +43,9 @@ public class DoctorDto {
     
     @JsonProperty("specialization")
     private long specialization;
+        
+    @JsonProperty("admin")
+    private Boolean isAdmin;
     
     public long getId() {
         return id;
@@ -139,12 +142,20 @@ public class DoctorDto {
     public void setSpecialization(long specialization) {
         this.specialization = specialization;
     }
+
+    public Boolean getIsAdmin() {
+        return isAdmin;
+    }
+
+    public void setIsAdmin(Boolean isAdmin) {
+        this.isAdmin = isAdmin;
+    }
     
     public DoctorDto() {
     }
     
     public DoctorDto(long id, String login, String password, String firstName, String lastName, String email, String office,
-            String address, String postalCode, String city, String phoneNumber, long specialization) {
+            String address, String postalCode, String city, String phoneNumber, long specialization, boolean  admin) {
         this.id = id;
         this.login = login;
         this.password = password;
@@ -157,10 +168,11 @@ public class DoctorDto {
         this.city = city;
         this.phoneNumber = phoneNumber;
         this.specialization = specialization;
+        this.isAdmin = admin;
     }
     
     public DoctorDto(long id, String login, String firstName, String lastName, String email, String office, String address,
-            String postalCode, String city, String phoneNumber, long specialization) {
+            String postalCode, String city, String phoneNumber, long specialization, boolean  admin) {
         this.id = id;
         this.login = login;
         this.firstName = firstName;
@@ -172,6 +184,7 @@ public class DoctorDto {
         this.city = city;
         this.phoneNumber = phoneNumber;
         this.specialization = specialization;
+        this.isAdmin = admin;
     }
     
     

@@ -37,22 +37,22 @@ public class HeckService {
         this.userDao = userDao;
         this.tokenSecret = tokenSecret;
     }
-
+    
     public HeckService(UserDao userDao, byte[] tokenSecret) {
         this.userDao = userDao;
         this.tokenSecret = tokenSecret;
     }
-
+    
     public HeckService(SpecializationDao specializationDao, byte[] tokenSecret) {
         this.specializationDao = specializationDao;
         this.tokenSecret = tokenSecret;
     }
-
+    
     public HeckService(DoctorDao doctorDao, byte[] tokenSecret) {
         this.doctorDao = doctorDao;
         this.tokenSecret = tokenSecret;
     }
-        
+    
     public LoginResponseDto registerDoctor(DoctorDto doctorDto) {
         if (doctorDto.getPassword() == null || doctorDto.getPassword().length() < 6) {
             throw new IllegalStateException("Password does not match criteria.");
@@ -121,8 +121,12 @@ public class HeckService {
                 LoginResponseDto loginResponse = new LoginResponseDto();
                 loginResponse.setId(doctor.getIdDoctor());
                 loginResponse.setLogin(doctor.getLoginDoctor());
-                loginResponse.setRole("doctor");
-                loginResponse.setToken(generateToken(login, "doctor"));
+                if(doctor.getIsAdmin()) {
+                    loginResponse.setRole("admin");
+                } else {
+                    loginResponse.setRole("doctor");
+                }
+                loginResponse.setToken(generateToken(login, loginResponse.getRole()));
                 return loginResponse;
             }
         }
@@ -251,7 +255,7 @@ public class HeckService {
         }
     }
     
-    private String updateToken(String login, String role, NumericDate expiration) {        
+    private String updateToken(String login, String role, NumericDate expiration) {
         final JwtClaims claims = new JwtClaims();
         claims.setStringClaim("role", role);
         claims.setSubject(login);
@@ -260,10 +264,10 @@ public class HeckService {
          */
         expiration.addSeconds(900);
         long newExpirationTime = new Timestamp(expiration.getValueInMillis()).getTime();
-        long realTime = new Timestamp(System.currentTimeMillis()).getTime();        
-        long addMinutes = (newExpirationTime - realTime) / (60 * 1000);  
+        long realTime = new Timestamp(System.currentTimeMillis()).getTime();
+        long addMinutes = (newExpirationTime - realTime) / (60 * 1000);
         
-        claims.setExpirationTimeMinutesInTheFuture(addMinutes);        
+        claims.setExpirationTimeMinutesInTheFuture(addMinutes);
         final JsonWebSignature jws = new JsonWebSignature();
         jws.setPayload(claims.toJson());
         jws.setAlgorithmHeaderValue(HMAC_SHA256);
@@ -364,7 +368,8 @@ public class HeckService {
                 doctor.getPostalCodeDoctor(),
                 doctor.getCityDoctor(),
                 doctor.getPhoneNumberDoctor(),
-                doctor.getSpecializationDoctor().getId()
+                doctor.getSpecializationDoctor().getId(),
+                doctor.getIsAdmin()
         );
     }
     
@@ -381,7 +386,8 @@ public class HeckService {
                 doctor.getPostalCodeDoctor(),
                 doctor.getCityDoctor(),
                 doctor.getPhoneNumberDoctor(),
-                doctor.getSpecializationDoctor().getId()
+                doctor.getSpecializationDoctor().getId(),
+                doctor.getIsAdmin()
         );
     }
     
