@@ -12,6 +12,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import sk.upjs.ics.pro1a.heck.repositories.DoctorDao;
+import sk.upjs.ics.pro1a.heck.repositories.SpecializationDao;
 import sk.upjs.ics.pro1a.heck.services.HeckService;
 import sk.upjs.ics.pro1a.heck.services.dto.AuthorizedUserDto;
 import sk.upjs.ics.pro1a.heck.services.dto.DoctorDto;
@@ -29,8 +30,8 @@ public class DoctorResources {
     
     private final HeckService heckService;
     
-    public DoctorResources(DoctorDao doctorDao, byte[] tokenSecret) {
-        this.heckService = new HeckService(doctorDao, tokenSecret);
+    public DoctorResources(DoctorDao doctorDao, SpecializationDao specializationDao, byte[] tokenSecret) {
+        this.heckService = new HeckService(doctorDao, specializationDao, tokenSecret);
     }
     
     @POST
@@ -38,10 +39,10 @@ public class DoctorResources {
     @Consumes(MediaType.APPLICATION_JSON)
     @UnitOfWork
     public Response registerDoctor(DoctorDto doctorDto) {
-        try {
-            LoginResponseDto loginResponse = heckService.registerDoctor(doctorDto);
+        LoginResponseDto loginResponse = heckService.registerDoctor(doctorDto);
+        if(loginResponse != null) {
             return Response.status(Response.Status.CREATED).entity(loginResponse).build();
-        } catch (IllegalStateException ex) {
+        } else  {
             return Response.status(Response.Status.PRECONDITION_FAILED).build();
         }
     }

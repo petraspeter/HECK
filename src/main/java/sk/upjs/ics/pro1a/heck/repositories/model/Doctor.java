@@ -97,8 +97,8 @@ public class Doctor implements Serializable {
         this.isAdmin = false;
     }
     
-    public Doctor(String emailDoctor, String loginDoctor, String passwordDoctor, String saltDoctor
-            , Specialization specializationDoctor, String businessNameDoctor, String firstNameDoctor,
+    public Doctor(String emailDoctor, String loginDoctor, String passwordDoctor, String saltDoctor,
+            Specialization specializationDoctor, String businessNameDoctor, String firstNameDoctor,
             String lastNameDoctor, String phoneNumberDoctor, String postalCodeDoctor, String cityDoctor,
             String addressDoctor) {
         this.emailDoctor = emailDoctor;
@@ -113,6 +113,7 @@ public class Doctor implements Serializable {
         this.postalCodeDoctor = postalCodeDoctor;
         this.cityDoctor = cityDoctor;
         this.addressDoctor = addressDoctor;
+        this.activeDoctor = false;
         this.isAdmin = false;
     }
     

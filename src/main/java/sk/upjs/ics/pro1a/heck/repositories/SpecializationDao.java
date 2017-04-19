@@ -19,8 +19,8 @@ public class SpecializationDao extends AbstractDAO<Specialization> {
         return list(namedQuery("findAllSpecializations"));
     }
 
-    public Specialization findById(Long id) {
-        return get(id);
+    public Specialization findById(Long id) {     
+        return uniqueResult(namedQuery("findSpecializationById").setParameter("id", id));        
     }
 
 }

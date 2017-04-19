@@ -108,7 +108,7 @@ public class HeckApplication extends Application<HeckConfiguration> {
         environment.jersey().register(new AuthValueFactoryProvider.Binder<>(AuthorizedUserDto.class));
         environment.jersey().register(RolesAllowedDynamicFeature.class);
       //  environment.jersey().register(new HeckResources(doctorDao, userDao, specializationDao, key));
-        environment.jersey().register(new DoctorResources(doctorDao, key));
+        environment.jersey().register(new DoctorResources(doctorDao, specializationDao, key));
         environment.jersey().register(new UserResources(userDao, key));
         environment.jersey().register(new SpecializationResources(specializationDao, key));
 

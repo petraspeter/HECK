@@ -48,8 +48,9 @@ public class HeckService {
         this.tokenSecret = tokenSecret;
     }
     
-    public HeckService(DoctorDao doctorDao, byte[] tokenSecret) {
+    public HeckService(DoctorDao doctorDao, SpecializationDao specializationDao, byte[] tokenSecret) {
         this.doctorDao = doctorDao;
+        this.specializationDao = specializationDao;
         this.tokenSecret = tokenSecret;
     }
     
@@ -236,7 +237,6 @@ public class HeckService {
     /**
      *      Private methods
      */
-    
     private String generateToken(String login, String role) {
         final JwtClaims claims = new JwtClaims();
         claims.setStringClaim("role", role);
