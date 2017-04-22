@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>About admin</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script> 
+
+    <script src="handlebars-v4.0.5.js"></script>
+
+    <script src="myScript.js"></script>
+
+    <script type="text/javascript">
+        getDoctorDetail();
+        $(document).ready(function(){
+            document.getElementById('logged-user').innerHTML = JSON.parse(sessionStorage.getItem('user')).login;
+        }
+
+        );
+
+    </script>
+
+    <script id="detailTableTemplate" type="text/x-handlebars-template">
+
+        <tr >
+            <tr><td>First name: <td contentEditable="false" id="firstName">{{firstName}}</td></td></tr>
+            <tr><td>Last name: <td contentEditable="false" id="lastName">{{lastName}}</td></td></tr>
+            <tr><td>Email: <td contentEditable="false" id="email">{{email}}</td></td></tr>
+            <tr><td>Login: <td>{{login}} </td></td></tr>
+            <tr>
+                <td>City: 
+                    <td contentEditable="false" id="postalCode">{{postalCode}}</td>
+                    <td contentEditable="false" id="city">{{city}}</td>
+                </td>
+            </tr>
+            <tr><td>Adress: <td contentEditable="false" id="address">{{address}}</td></td></tr>
+            <tr><td>Phone: <td contentEditable="false" id="phone">{{phone}}</td></td></tr>
+        </tr>  
+    </script>
+
+
+    <style type="text/css">
+        body{
+            padding-top: 70px;
+        }
+
+        #saveButton, #cancelButton
+        {
+            visibility: hidden;
+        }
+
+        .btn
+        {
+            font-size:12px;
+        }
+    </style>
+
+</head> 
+<body> 
+    <nav class="navbar navbar-default navbar-fixed-top">
+        <div class="container">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>                        
+                </button>
+                <a class="navbar-brand" href="#">HECK</a>
+            </div>
+            <div class="collapse navbar-collapse" id="myNavbar">
+                <ul class="nav navbar-nav">
+                    <li><a href="AdminMainPage.html">Dashboard</a></li>
+                    <li><a href="Doctors.html">Doctors</a></li>
+                    <li><a href="Users.html">Users</a></li>
+                    <li role="presentation" class="active"><a href="AdminDetail.html">My profile</a></li>
+                </ul>
+                <ul class="nav navbar-nav navbar-right">
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                            <span class="glyphicon glyphicon-user"></span> 
+                            <strong id="logged-user">Login????</strong>
+                            <span class="glyphicon glyphicon-chevron-down"></span>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li>
+                                <div class="navbar-login">
+                                    <p class="text-left">
+                                        <li><a href="#" onclick="changePassword()"> Change password</a></li>
+                                        <li><a href="SignIn.html" onclick="logout()">Logout</a></li>
+                                    </p>
+                                </div>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <table id="detailTable">
+            <tbody id="detailTableContainer"></tbody>
+        </table>
+        <button type="button" class="btn btn-primary" id="editButton" onclick="editable()">Edit</button>
+        <button type="button" class="btn btn-success" id="saveButton" onclick="save()">Save</button>
+        <button type="button" class="btn btn-danger" id="cancelButton" onclick="cancel()">Cancel</button>
+    </div>
+</body>
+</html>                                 		

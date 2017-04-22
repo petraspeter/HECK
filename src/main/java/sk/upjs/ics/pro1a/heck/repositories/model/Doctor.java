@@ -69,9 +69,9 @@ public class Doctor implements Serializable {
     @Column(name = "active_doctor")
     private Boolean activeDoctor;
     
-    @Type(type = "org.hibernate.type.NumericBooleanType")
-    @Column(name = "is_admin")
-    private Boolean isAdmin;
+//    @Type(type = "org.hibernate.type.NumericBooleanType")
+//    @Column(name = "is_admin")
+//    private Boolean isAdmin;
     
     public Doctor() {
     }
@@ -94,7 +94,7 @@ public class Doctor implements Serializable {
         this.addressDoctor = addressDoctor;
         this.activationTimeDoctor = activationTimeDoctor;
         this.activeDoctor = true;
-        this.isAdmin = false;
+//        this.isAdmin = false;
     }
     
     public Doctor(String emailDoctor, String loginDoctor, String passwordDoctor, String saltDoctor,
@@ -114,7 +114,7 @@ public class Doctor implements Serializable {
         this.cityDoctor = cityDoctor;
         this.addressDoctor = addressDoctor;
         this.activeDoctor = false;
-        this.isAdmin = false;
+     //   this.isAdmin = false;
     }
     
     public Long getIdDoctor() {
@@ -237,12 +237,12 @@ public class Doctor implements Serializable {
         this.activeDoctor = activeDoctor;
     }
     
-    public Boolean getIsAdmin() {
-        return isAdmin;
-    }
-    
-    public void setIsAdmin(Boolean isAdmin) {
-        this.isAdmin = isAdmin;
-    }
+//    public Boolean getIsAdmin() {
+//        return isAdmin;
+//    }
+//    
+//    public void setIsAdmin(Boolean isAdmin) {
+//        this.isAdmin = isAdmin;
+//    }
     
 }

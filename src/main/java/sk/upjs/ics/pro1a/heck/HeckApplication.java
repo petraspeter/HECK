@@ -1,5 +1,6 @@
 package sk.upjs.ics.pro1a.heck;
 
+import com.bazaarvoice.dropwizard.assets.ConfiguredAssetsBundle;
 import com.github.toastshaman.dropwizard.auth.jwt.JwtAuthFilter;
 import io.dropwizard.Application;
 import io.dropwizard.auth.AuthDynamicFeature;
@@ -59,6 +60,7 @@ public class HeckApplication extends Application<HeckConfiguration> {
     @Override
     public void initialize(final Bootstrap<HeckConfiguration> bootstrap) {
         bootstrap.addBundle(hibernateBundle);
+        bootstrap.addBundle(new ConfiguredAssetsBundle("/assets/", "/pages"));
         // DateTimeZone.setDefault(DateTimeZone.UTC);
     }
 

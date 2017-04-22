@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Office hours</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script> 
+
+    <script src="handlebars-v4.0.5.js"></script>
+
+    <script src="http://code.jquery.com/jquery-1.3.2.js"></script>
+
+    <script type="text/javascript">
+        $(document).ready(function(){
+            document.getElementById('logged-user').innerHTML = JSON.parse(sessionStorage.getItem('user')).login;
+        });
+
+        function logout(){
+            sessionStorage.removeItem('user');
+        }
+
+        function addButton(day){
+            var newTextBoxDiv = $(document.createElement('div'));
+
+            newTextBoxDiv.after().html(
+                '<input class="text-field-from" type="text" placeholder="from">' +
+                '<input class="text-field-to" type="text" placeholder="to">');
+
+            newTextBoxDiv.appendTo("#TextBoxesGroup"+day);
+        }
+
+        function removeButton(day){
+            var node_list = document.getElementById("TextBoxesGroup" + day).children;
+            if(node_list.length==1){
+                alert("No more textbox to remove");
+                return false;
+            }
+            node_list[node_list.length-1].remove();
+        }
+
+        function sendValues(){
+            var data = getDaysValues();    
+
+            var ourRequest = new XMLHttpRequest();
+            console.log("data: " + data);
+            console.log("ourRequest: " + ourRequest);
+
+            //ourRequest.open('POST', 'http://requestb.in/1i3j6k91');
+            //ourRequest.setRequestHeader("Content-Type", "application/json");
+
+            ourRequest.onload = function() {
+                if (ourRequest.status == 200) {
+                    console.log("Success.");
+                } else {
+                    console.log("We connected to the server, but it returned an error.");
+                }
+            };
+
+            ourRequest.onerror = function() {
+                console.log("Connection error");
+            };
+
+            ourRequest.send(JSON.stringify(data));
+        }
+
+        function getDaysValues(){
+            var result = {};            
+            result["Monday"] = processDayValues("M");
+            result["Tuesday"] = processDayValues("T");
+            result["Wednesday"] = processDayValues("W");
+            result["Thursday"] = processDayValues("Th");
+            result["Friday"] = processDayValues("F");
+            result["Saturday"] = processDayValues("Sa");
+            result["Sunday"] = processDayValues("Su");
+            console.log(result);
+            return result;
+        }
+
+        function processDayValues(day){
+            var node_list = document.getElementById("TextBoxesGroup" + day).children;
+            var rowResult = [];
+            for (i = 1; i < node_list.length; i++) { 
+                rowResult.push({"start": node_list[i].children[0].value,
+                    "end": node_list[i].children[1].value});
+            }
+            return rowResult;
+        }
+    </script>
+
+
+    <style type="text/css">
+        body{
+            margin: 0;
+            padding: 0;
+            padding-top: 70px;
+        }
+
+
+        .text-field-from{
+            margin-bottom: 4px;
+            width: 40%;
+            text-align: center;
+            margin-left:5%;
+            margin-right: 10px;
+        }
+
+        .text-field-to{
+            margin-bottom: 4px;
+            width: 40%;
+            text-align: center;
+
+
+        }
+        .label-day{
+            width: 65%;
+            margin-left: 5px;
+        }
+
+        #inputTimeInterval
+        {
+           max-width: 50px;   
+        }
+
+
+
+
+        @media screen and (min-width: 480px) {
+            body{
+                margin: 0;
+                padding: 0;
+                padding-top: 70px;
+            }
+
+            #main_container {
+                margin: auto;
+                
+            }
+
+            .my-add-button{
+                padding: 0px 6px;
+                margin-right: 10px;
+            }
+
+            .my-remove-button{
+                padding: 0px 6px;
+
+            }
+
+            
+
+            p {
+                margin: 0 0 0px;
+            }
+
+            .text-field-from{
+                margin-bottom: 4px;
+                width: 90px;
+                text-align: center;
+                margin-left:70px;
+                margin-right: 20px;
+            }
+
+            .text-field-to{
+                margin-bottom: 4px;
+                width: 90px;
+                text-align: center;
+            }
+
+            .label-day{
+                width: 215px;
+                font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
+
+                margin-top: 10px;
+            }
+
+            #main_container{
+                
+                max-width: 550px;
+
+            }
+        }
+
+    </style>
+
+
+</head> 
+<body>
+
+    <nav class="navbar navbar-default navbar-fixed-top">
+        <div class="container">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>                        
+                </button>
+                <a class="navbar-brand" href="#">HECK</a>
+            </div>
+            <div class="collapse navbar-collapse" id="myNavbar">
+                <ul class="nav navbar-nav">
+                    <li><a href="DoctorMainPage.html">Dashboard</a></li>
+                    <li><a href="DoctorTerms.html">Terms</a></li>
+                    <li role="presentation" class="active"><a href="DoctorOfficeHour.html">Office hours</a></li>
+                    <li><a href="DoctorDetail.html">My profile</a></li>
+                </ul>
+                <ul class="nav navbar-nav navbar-right">
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                            <span class="glyphicon glyphicon-user"></span> 
+                            <strong id="logged-user">Login????</strong>
+                            <span class="glyphicon glyphicon-chevron-down"></span>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li>
+                                <div class="navbar-login">
+                                    <p class="text-left">
+                                        <li><a href="#"> Change password</a></li>
+                                        <li><a href="SignIn.html" onclick="logout()">Logout</a></li>
+                                    </p>
+                                </div>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container" id="main_container">
+    <div id="timeInterval">Time interval: <input id="inputTimeInterval"type="text"> min</div>
+    <div id="allTimes">
+       <div id='TextBoxesGroupM'>
+            <div class="row">
+                <div id="TextBoxDivM">
+                    <label class="label-day">Monday</label>
+                    <button class="btn btn-success btn-xs my-add-button" data-title="Add" onclick="addButton('M')">
+                        <span class="glyphicon glyphicon glyphicon-plus"></span>
+                    </button>
+
+                    <button class="btn btn-danger btn-xs my-remove-button" data-title="Delete" onclick="removeButton('M')">
+                        <span class="glyphicon glyphicon-remove-circle"></span>
+                    </button>
+                </div>
+            </div>        
+        </div>
+
+        <div id='TextBoxesGroupT'>
+            <div class="row">
+                <div id="TextBoxDivT">
+                    <label class="label-day">Tuesday</label>
+                    <button class="btn btn-success btn-xs my-add-button" data-title="Add" onclick="addButton('T')">
+                        <span class="glyphicon glyphicon glyphicon-plus"></span>
+                    </button>
+
+                    <button class="btn btn-danger btn-xs my-remove-button" data-title="Delete" onclick="removeButton('T')">
+                        <span class="glyphicon glyphicon-remove-circle"></span>
+                    </button>
+                </div>
+            </div>        
+        </div>
+
+        <div id='TextBoxesGroupW'>
+            <div class="row">
+                <div id="TextBoxDivW">
+                    <label class="label-day">Wednesday</label>
+                    <button class="btn btn-success btn-xs my-add-button" data-title="Add" onclick="addButton('W')">
+                        <span class="glyphicon glyphicon glyphicon-plus"></span>
+                    </button>
+
+                    <button class="btn btn-danger btn-xs my-remove-button" data-title="Delete" onclick="removeButton('W')">
+                        <span class="glyphicon glyphicon-remove-circle"></span>
+                    </button>
+                </div>
+            </div>        
+        </div>
+
+        <div id='TextBoxesGroupTh'>
+            <div class="row">
+                <div id="TextBoxDivTh">
+                    <label class="label-day">Thuesday</label>
+                    <button class="btn btn-success btn-xs my-add-button" data-title="Add" onclick="addButton('Th')">
+                        <span class="glyphicon glyphicon glyphicon-plus"></span>
+                    </button>
+
+                    <button class="btn btn-danger btn-xs my-remove-button" data-title="Delete" onclick="removeButton('Th')">
+                        <span class="glyphicon glyphicon-remove-circle"></span>
+                    </button>
+                </div>
+            </div>        
+        </div>
+
+        <div id='TextBoxesGroupF'>
+            <div class="row">
+                <div id="TextBoxDivF">
+                    <label class="label-day">Friday</label>
+                    <button class="btn btn-success btn-xs my-add-button" data-title="Add" onclick="addButton('F')">
+                        <span class="glyphicon glyphicon glyphicon-plus"></span>
+                    </button>
+
+                    <button class="btn btn-danger btn-xs my-remove-button" data-title="Delete" onclick="removeButton('F')">
+                        <span class="glyphicon glyphicon-remove-circle"></span>
+                    </button>
+                </div>
+            </div>        
+        </div>
+
+        <div id='TextBoxesGroupSa'>
+            <div class="row">
+                <div id="TextBoxDivSa">
+                    <label class="label-day">Saturday</label>
+                    <button class="btn btn-success btn-xs my-add-button" data-title="Add" onclick="addButton('Sa')">
+                        <span class="glyphicon glyphicon glyphicon-plus"></span>
+                    </button>
+
+                    <button class="btn btn-danger btn-xs my-remove-button" data-title="Delete" onclick="removeButton('Sa')">
+                        <span class="glyphicon glyphicon-remove-circle"></span>
+                    </button>
+                </div>
+            </div>        
+        </div>
+
+        <div id='TextBoxesGroupSu'>
+            <div class="row">
+                <div id="TextBoxDivSu">
+                    <label class="label-day">Sunday</label>
+                    <button class="btn btn-success btn-xs my-add-button" data-title="Add" onclick="addButton('Su')">
+                        <span class="glyphicon glyphicon glyphicon-plus"></span>
+                    </button>
+
+                    <button class="btn btn-danger btn-xs my-remove-button" data-title="Delete" onclick="removeButton('Su')">
+                        <span class="glyphicon glyphicon-remove-circle"></span>
+                    </button>
+                </div>
+            </div>       
+        </div>
+
+        <div id="my-save-button">
+        <button class="btn btn-success btn-xs " data-title="Save" onclick="sendValues()">
+        <p>
+            Save&nbsp&nbsp<span class="glyphicon glyphicon glyphicon-ok"></span></p>
+        </button>
+        </div> 
+        </div>
+    </body>
+    </html>                                 		

@@ -10,10 +10,24 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.io.UnsupportedEncodingException;
 
+import com.bazaarvoice.dropwizard.assets.AssetsBundleConfiguration;
+import com.bazaarvoice.dropwizard.assets.AssetsConfiguration;
+
 /**
  * @author raven
  */
-public class HeckConfiguration extends Configuration {
+public class HeckConfiguration extends Configuration implements AssetsBundleConfiguration {
+
+
+    @Valid
+    @NotNull
+    @JsonProperty
+    private final AssetsConfiguration assets = new AssetsConfiguration();
+
+    @Override
+    public AssetsConfiguration getAssetsConfiguration() {
+        return assets;
+    }
 
     @NotEmpty
     private String bearerRealm;

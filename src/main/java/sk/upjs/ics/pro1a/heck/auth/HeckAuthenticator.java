@@ -42,12 +42,12 @@ public class HeckAuthenticator implements Authenticator<JwtContext, AuthorizedUs
                     return Optional.of(new AuthorizedUserDto(doctor.getIdDoctor(), login, "doctor"));
                 }
             }
-            if ("admin".equals(role)) {
-                Doctor doctor = doctorDao.findByLogin(login);
-                if (doctor.getIsAdmin()) {
-                    return Optional.of(new AuthorizedUserDto(doctor.getIdDoctor(), login, "admin"));
-                }
-            }
+//            if ("admin".equals(role)) {
+//                Doctor doctor = doctorDao.findByLogin(login);
+//                if (doctor.getIsAdmin()) {
+//                    return Optional.of(new AuthorizedUserDto(doctor.getIdDoctor(), login, "admin"));
+//                }
+//            }
             if ("user".equals(role)) {
                 User user = userDao.findByLogin(login);
                 if (user != null) {

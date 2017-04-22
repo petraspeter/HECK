@@ -122,11 +122,12 @@ public class HeckService {
                 LoginResponseDto loginResponse = new LoginResponseDto();
                 loginResponse.setId(doctor.getIdDoctor());
                 loginResponse.setLogin(doctor.getLoginDoctor());
-                if(doctor.getIsAdmin()) {
-                    loginResponse.setRole("admin");
-                } else {
-                    loginResponse.setRole("doctor");
-                }
+                loginResponse.setRole("doctor");
+//                if(doctor.getIsAdmin()) {
+//                    loginResponse.setRole("admin");
+//                } else {
+//                    loginResponse.setRole("doctor");
+//                }
                 loginResponse.setToken(generateToken(login, loginResponse.getRole()));
                 return loginResponse;
             }
@@ -231,6 +232,23 @@ public class HeckService {
         NumericDate expiration = NumericDate.fromSeconds(actualExpirationTime);
         loginResponse.setToken(updateToken(name, role, expiration));
         return loginResponse;
+    }
+    
+     public void updateDoctor(Long id, DoctorDto doctorDto) {
+        Doctor doctor = doctorDao.findById(id);
+         
+        doctor.setFirstNameDoctor(doctorDto.getFirstName());
+        doctor.setLastNameDoctor(doctorDto.getLastName());
+        doctor.setEmailDoctor(doctorDto.getEmail());
+        doctor.setBusinessNameDoctor(doctorDto.getOffice());
+        doctor.setAddressDoctor(doctorDto.getAddress());
+        doctor.setCityDoctor(doctorDto.getCity());
+        doctor.setPostalCodeDoctor(doctorDto.getPostalCode());
+        doctor.setPhoneNumberDoctor(doctorDto.getPhoneNumber());
+        if(!doctor.getSpecializationDoctor().getId().equals(doctorDto.getSpecialization())){
+            doctor.setSpecializationDoctor(specializationDao.findById(doctorDto.getSpecialization()));
+        }
+        doctorDao.update(doctor);
     }
     
     
@@ -369,7 +387,7 @@ public class HeckService {
                 doctor.getCityDoctor(),
                 doctor.getPhoneNumberDoctor(),
                 doctor.getSpecializationDoctor().getId(),
-                doctor.getIsAdmin()
+                false
         );
     }
     
@@ -387,7 +405,7 @@ public class HeckService {
                 doctor.getCityDoctor(),
                 doctor.getPhoneNumberDoctor(),
                 doctor.getSpecializationDoctor().getId(),
-                doctor.getIsAdmin()
+                false
         );
     }
     
