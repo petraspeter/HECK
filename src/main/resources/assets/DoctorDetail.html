@@ -1,365 +1,342 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="utf-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>About doctor</title>
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
-  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script> 
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>About doctor</title>
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
+              integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css"
+              integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa"
+        crossorigin="anonymous"></script>
 
 
-  <script src="handlebars-v4.0.5.js"></script>
-  <!-- validacia poli-->
 
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.bootstrapvalidator/0.5.3/js/bootstrapValidator.js"></script>
-  <script src="myScript.js"></script>
+        <script src="handlebars-v4.0.5.js"></script>
+        <!-- validacia poli-->
+
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.bootstrapvalidator/0.5.3/js/bootstrapValidator.js"></script>
+        <script src="myScript.js"></script>
+        <script src="validacia.js"></script>
+
+        <script type="text/javascript">
+            $(document).ready(function () {
+            getDoctorDetail();
+            document.getElementById('logged-user').innerHTML = JSON.parse(sessionStorage.getItem('user')).login;
+
+            $('#detailDoctorForm').bootstrapValidator(validator).on('success.form.bv', function (e) {
+            $('#success_message').slideDown({opacity: "show"}, "slow");
+            $('#detailDoctorForm').data('bootstrapValidator').resetForm();
+
+            // Prevent form submission
+            //e.preventDefault();
+
+            // Get the form instance
+            var $form = $(e.target);
+
+            // Get the BootstrapValidator instance
+            var bv = $form.data('bootstrapValidator');
+
+            // Use Ajax to submit form data
+            $.post($form.attr('action'), $form.serialize(), function (result) {
+            console.log("validacia" + result);
+            }, 'json');
+            });
+            $("#saveButton").click(function () {
+            $('#detailDoctorForm').bootstrapValidator('validate');
+            });
+
+            });
+        </script>
 
 
-  <script type="text/javascript" name="validacia">
-    $(document).ready(function() {
-      $('#detailDoctorForm').bootstrapValidator({
-        framework: 'bootstrap',
-        button: {
-          selector: '#editButton',
-          disabled: 'disabled'
-        },
-        feedbackIcons: {
-          valid: 'glyphicon glyphicon-ok',
-          invalid: 'glyphicon glyphicon-remove',
-          validating: 'glyphicon glyphicon-refresh'
-        },
-        fields: {
-          login: {
-            validators: {
-              regexp: {
-                regexp: /^[0-9a-z]+$/i,
-                message: 'The login can consist of alphabetical characters and digits'
-              },
-              stringLength: {
-                min: 5,
-              },
-              notEmpty: {
-                message: 'Please supply your login'
-              }
+        <script id="specializationTemplate" type="text/x-handlebars-template">
+            <select disabled="true" id="specialization" name="specialization" class="form-control input-md" contentEditable="false">
+            {{#each this}}
+            <option value="{{id}}">{{name}}</option>
+            {{/each}}
+            </select>
+        </script>
 
+        <script id="detailTableTemplate" type="text/x-handlebars-template">
+            <form id="myForm" class="form-horizontal">
+
+            <fieldset id="fieldset">
+            <div class="form-group">
+            <label class="col-md-2 control-label nameLabel" for="login">Login name: </label>
+            <div class="col-md-3">
+            <input id="login" name="login" type="text" placeholder="login" class="form-control input-md" value="{{login}}" disabled>
+            </div>
+            </div>
+
+            <!-- Text input-->
+            <div class="form-group">
+            <label class="col-md-2 control-label nameLabel" for="firstName">First name: </label>
+            <div class="col-md-3">
+            <input id="firstName" name="firstName" type="text" placeholder="first name" class="form-control input-md myInputs" value="{{firstName}}" disabled>
+            </div>
+            </div>
+
+
+            <!-- Text input-->
+            <div class="form-group">
+            <label class="col-md-2 control-label nameLabel" for="lastName">Last name: </label>
+            <div class="col-md-3">
+            <input id="lastName" name="lastName" type="text" placeholder="last name" class="form-control input-md myInputs" value="{{lastName}}" disabled>
+            </div>
+            </div>
+
+            <div class="form-group">
+            <label class="col-md-2 control-label nameLabel" for="email">Email: </label>
+            <div class="col-md-3">
+            <input id="email" name="email" type="text" placeholder="email" class="form-control input-md myInputs" value="{{email}}" disabled required>
+            </div>
+            </div>
+
+            <div class="form-group">
+            <label class="col-md-2 control-label nameLabel" for="specialization">Specialization: </label>
+            <div class="col-md-3" id="specializationContainer">
+            </div>
+            </div>
+
+            <div class="form-group">
+            <label class="col-md-2 control-label nameLabel" for="office">Business name: </label>
+            <div class="col-md-3">
+            <input id="office" name="office" type="text" placeholder="office" class="form-control input-md myInputs" value="{{office}}" disabled required>
+            </div>
+            </div>
+
+
+            <div class="form-group">
+            <label class="col-md-2 control-label nameLabel" for="address">Address: </label>
+            <div class="col-md-3">
+            <input id="address" name="address" type="text" placeholder="address" class="form-control input-md myInputs" value="{{address}}" disabled required>
+            </div>
+            </div>
+
+            <div class="form-group">
+            <label class="col-md-2 control-label nameLabel" for="city">City: </label>
+            <div class="col-md-3">
+            <input id="city" name="city" type="text" placeholder="city" class="form-control input-md myInputs" value="{{city}}" disabled required>
+            </div>
+            </div>
+
+            <div class="form-group">
+            <label class="col-md-2 control-label nameLabel" for="city">Postal code: </label>
+            <div class="col-md-3">
+            <input id="postalCode" name="postalCode" type="text" placeholder="postal code" class="form-control input-md myInputs" value="{{postalCode}}" disabled
+            required>
+            </div>
+            </div>
+
+            <div class="form-group">
+            <label class="col-md-2 control-label nameLabel" for="phoneNumber">Phone number: </label>
+            <div class="col-md-3">
+            <input id="phoneNumber" name="phoneNumber" type="text" placeholder="Phone" class="form-control input-md myInputs" value="{{phoneNumber}}" disabled required>
+            </div>
+            </div>
+
+            <!-- Button -->
+            <div class="form-group">
+            <div class="col-md-4" id="buttons">
+            <input type="button" class="btn btn-primary" id="editButton" onclick="startEditableDoctorInputs()" value="Edit"></input>
+            <input type="button" class="btn btn-success" id="saveButton" onclick="saveEditableDoctorInputs();  updateDoctor();" value="Save"></input>
+            <input type="button" class="btn btn-danger" id="cancelButton" onclick="cancelEditableDoctorInputs()" value="Cancel"></input>
+            </div>
+            </div>
+            </fieldset>
+            </form>
+        </script>
+
+        <style type="text/css">
+
+            fieldset * {
+                -webkit-box-sizing: content-box !important;
+                -moz-box-sizing: content-box !important;
+                box-sizing: content-box !important;
             }
-          },
-          firstName: {
-            validators: {
-              regexp: {
-                regexp: /^[a-z]+$/i,
-                message: 'The first name can consist of alphabetical characters only'
-              },
-              stringLength: {
-                min: 3,
-              },
-              notEmpty: {
-                message: 'Please supply your first name'
-              }
 
+            body {
+                padding-top: 70px;
             }
-          },
-          lastName: {
-            validators: {
-              regexp: {
-                regexp: /^[a-z]+$/i,
-                message: 'The last name can consist of alphabetical characters only'
-              },
-              stringLength: {
-                min: 3,
-              },
-              notEmpty: {
-                message: 'Please supply your last name'
-              }
 
+            input#login {
+                font-weight: bold;
+                margin-left: 3px;
             }
-          },  
-          password: {
-            validators:{
-              regexp:{
-                regexp: /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[^\w\s]).{6,}$/,
-                message: 'The password must consist one uppercase, one lowercas, one digit, one special character.'
-              },
+
+            #saveButton, #cancelButton {
+                visibility: hidden;
             }
-          },
 
-          email: {
-            validators: {
-              notEmpty: {
-                message: 'Please supply your email address'
-              },
-              emailAddress: {
-                message: 'Please supply a valid email address'
-              }
+            .myInputs:disabled {
+                height: 24px;
+                background-color: #fff;
+                border: none;
+                box-shadow: none;
+                margin-left: 4px;
+                width: initial;
             }
-          },
-          phoneNumber: {
-            validators: {
-              notEmpty: {
-                message: 'Please supply your phone number'
-              },
-              phone: {
-                country: 'US',
-                message: 'Please supply a vaild phone number with area code'
-              }
+
+            .myInputs:not([disabled]), #specialization:not([disabled]) {
+                height: 24px;
+                padding: 3px 0px 3px 0px;
+                margin: 4px 0px 4px 0px;
+                border: 1px solid #ccc;
+                width: initial;
             }
-          },
-          address: {
-            validators: {
-              stringLength: {
-                min: 8,
-              },
-              notEmpty: {
-                message: 'Please supply your street address'
-              }
+
+            #specialization, input#login {
+                background-color: #fff;
+                border: none;
+                box-shadow: none;
+                height: 20px;
             }
-          },
-          city: {
-            validators: {
-              stringLength: {
-                min: 3,
-              },
-              notEmpty: {
-                message: 'Please supply your city'
-              }
+
+            .control-label.nameLabel {
+                margin: 0px;
+                padding: 7px 15px 7px 15px;
             }
-          },
-          office: {
-            validators: {
-              stringLength: {
-                min: 3,
-              },
-              notEmpty: {
-                message: 'Please supply your office'
-              }
+
+            .modal-body input {
+                padding: 3px 3px 3px 3px;
+                border-radius: 4px;
+                border: 1px solid #ccc;
             }
-          }
 
-        }
-      })
-      .on('success.form.bv', function(e) {
-        $('#success_message').slideDown({ opacity: "show" }, "slow")
-        $('#detailDoctorForm').data('bootstrapValidator').resetForm();
+            .form-horizontal .control-label{
+                text-align: left;
+            }
+            select {
+                overflow:hidden;
+                width: 120%;
+            }
 
-// Prevent form submission
-e.preventDefault();
+        </style>
 
-// Get the form instance
-var $form = $(e.target);
-
-// Get the BootstrapValidator instance
-var bv = $form.data('bootstrapValidator');
-
-// Use Ajax to submit form data
-$.post($form.attr('action'), $form.serialize(), function(result) {
-  console.log(result);
-}, 'json');
-});
-    });
-  </script>
-
-  <script type="text/javascript">
-    $(document).ready(function(){
-      getDoctorDetail();
-      document.getElementById('logged-user').innerHTML = JSON.parse(sessionStorage.getItem('user')).login;
-    });
-
-  </script>
-
-
-  <script id="specializationTemplate" type="text/x-handlebars-template">
-    <select disabled="true" id="specialization" name="specialization" class="form-control input-md"  contentEditable="false">
-      {{#each this}}
-      <option value="{{id}}">{{name}}</option>
-      {{/each}}
-    </select>
-  </script>
-
-
-  <script id="detailTableTemplate" type="text/x-handlebars-template">
-    <div id="detailDoctorForm">      
-        <tr><td class="tableTitle">Login name: </td><td id="login">{{login}} </td></tr>
-        <tr><td class="tableTitle">First name: </td><td><input type="text" class="myInputs" id="firstName" value="{{firstName}}" disabled></td></tr>
-        <tr><td class="tableTitle">Last name: </td><td><input type="text" class="myInputs" id="lastName" value="{{lastName}}" disabled></td></tr>
-        <tr><td class="tableTitle">Email: </td><td><input type="text" class="myInputs" id="email" value="{{email}}" disabled></td></tr>
-        <tr><td class="tableTitle">Specialization: </td><td id="specializationContainer"></td></tr>
-        <tr><td class="tableTitle">City: </td><td><input type="text" class="myInputs" id ="city" value="{{city}}" disabled></td></tr>
-        <tr><td class="tableTitle">Postal code: </td><td> <input type="text" class="myInputs" id ="postalCode" value="{{postalCode}}" disabled></td></tr>
-        <tr><td class="tableTitle">Adress: </td><td><input type="text" class="myInputs" id ="address" value="{{address}}" disabled></td></tr>
-        <tr><td class="tableTitle">Phone: </td><td><input type="text" class="myInputs" id="phoneNumber" value="{{phoneNumber}}" disabled></td></tr>
-        <tr><td class="tableTitle">Office: </td><td><input type="text" class="myInputs" id="office" value="{{office}}" disabled></td></tr>
-    </div>
-  </script>
-
-
-
-  <style type="text/css">
-    body{
-      padding-top: 70px;
-    }
-
-    #saveButton, #cancelButton
-    {
-      visibility: hidden;
-    }
-
-    .editable
-    {
-      background-color : #c9cece;
-    }
-
-    .noEditable, .form-control[disabled]
-    {
-      background-color: #fff;
-    }       
-
-
-    .btn
-    {
-      font-size:12px;
-    }
-
-    .myInputs
-    {
-      margin-left: 50px;
-      padding: 3px 3px 3px 3px;
-      border-radius: 4px;
-      border: 1px solid #ccc;
-    }
-
-    .myInputs:disabled
-    {
-      background-color: #fff;
-      border: none;
-    }
-
-    .form-control[disabled]
-    {
-      border-color: #fff;
-
-      -webkit-box-shadow: inset 0 0px 0px rgba(0,0,0);
-    }  
-
-    #myModal
-    {
-      background-color: #fff;
-    }
-
-    #specialization
-    {
-      margin-left: 50px;
-      box-shadow: none;
-      border-radius: 4px;
-      width: 182px;
-      font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
-      color: black;
-      padding: 5px 0px 5px 0px;
-      height: 30px;
-    }
-
-    #login
-    {
-      padding-left: 57px;
-    }
-
-    .tableTitle
-    {
-      font-weight: bold;
-    }
-
-   td
-    {
-      padding: 0px 0px 10px 0px;
-    }
-
-  </style>
-
-</head> 
-<body> 
-  <nav class="navbar navbar-default navbar-fixed-top">
-    <div class="container">
-      <div class="navbar-header">
-        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
-          <span class="icon-bar"></span>
-          <span class="icon-bar"></span>
-          <span class="icon-bar"></span>                        
-        </button>
-        <a class="navbar-brand" href="#">HECK</a>
-      </div>
-      <div class="collapse navbar-collapse" id="myNavbar">
-        <ul class="nav navbar-nav">
-          <li><a href="DoctorMainPage.html">Dashboard</a></li>
-          <li><a href="DoctorTerms.html">Terms</a></li>
-          <li><a href="DoctorOfficeHour.html">Office hours</a></li>
-          <li role="presentation" class="active"><a href="DoctorDetail.html">My profile</a></li>
-        </ul>
-        <ul class="nav navbar-nav navbar-right">
-          <li class="dropdown">
-            <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-              <span class="glyphicon glyphicon-user"></span> 
-              <strong id="logged-user">Login????</strong>
-              <span class="glyphicon glyphicon-chevron-down"></span>
-            </a>
-            <ul class="dropdown-menu">
-              <li>
-                <div class="navbar-login">
-                  <p class="text-left">
-                    <li><a data-toggle="modal" href="#myModal"> Change password</a></li>
-                    <li><a href="SignIn.html" onclick="logout()">Logout</a></li>
-                  </p>
+    </head>
+    <body>
+        <nav class="navbar navbar-default navbar-fixed-top">
+            <div class="container">
+                <div class="navbar-header">
+                    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                    <a class="navbar-brand" href="#">HECK</a>
                 </div>
-              </li>
-            </ul>
-          </li>
-        </ul>
-      </div>
-    </div>
-  </nav>
+                <div class="collapse navbar-collapse" id="myNavbar">
+                    <ul class="nav navbar-nav">
+                        <li><a href="DoctorMainPage.html">Dashboard</a></li>
+                        <li><a href="DoctorTerms.html">Terms</a></li>
+                        <li><a href="DoctorOfficeHour.html">Office hours</a></li>
+                        <li role="presentation" class="active"><a href="DoctorDetail.html">My profile</a></li>
+                    </ul>
+                    <ul class="nav navbar-nav navbar-right">
+                        <li class="dropdown">
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                                <span class="glyphicon glyphicon-user"></span>
+                                <strong id="logged-user">Login????</strong>
+                                <span class="glyphicon glyphicon-chevron-down"></span>
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li>
+                                    <div class="navbar-login">
+                                        <p class="text-left">
+                                        <li><a data-toggle="modal" href="#myModal"> Change password</a></li>
+                                        <li><a href="SignIn.html" onclick="logout()">Logout</a></li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
 
-  <div class="container">
+        <div class="container">
 
-    <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="edit" aria-hidden="true">
 
-      <div class="modal-header">
-        <h3>Change Password <span class="extra-title muted"></span></h3>
-      </div>
-      <div class="modal-body form-horizontal">
-        <div class="control-group">
-          <label for="current_password" class="control-label">Current Password</label>
-          <div class="controls">
-            <input type="password" name="current_password">
-          </div>
+            <!--modal window-->
+            <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="Login" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                            <h5 class="modal-title">Change password</h5>
+                        </div>
+
+                        <div class="modal-body">
+                            <!-- The form is placed inside the body of modal -->
+                            <form id="changePasswordForm" class="form-horizontal">
+                                <div class="form-group">
+                                    <label class="col-xs-3 control-label">Current password</label>
+                                    <div class="col-xs-5">
+                                        <input type="password" class="form-control" name="currentModalPassword" id="currentModalPassword"/>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="col-xs-3 control-label">New password</label>
+                                    <div class="col-xs-5">
+                                        <input type="password" class="form-control" name="newModalPassword" id="newModalPassword"/>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="col-xs-3 control-label">Confirm password</label>
+                                    <div class="col-xs-5">
+                                        <input type="password" class="form-control" name="newModalConfirmPassword" id="newModalConfirmPassword"/>
+                                    </div>
+                                </div>
+
+                                <div class="modal-footer">
+                                    <button href="#" class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
+                                    <button href="#" class="btn btn-primary" id="myModal_save" onclick="changePassword()">Save changes</button>
+
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!--END modal window-->
+
+            <div id="detailTableContainer">
+            </div>
         </div>
-        <div class="control-group">
-          <label for="new_password" class="control-label">New Password</label>
-          <div class="controls">
-            <input type="password" name="new_password">
-          </div>
-        </div>
-        <div class="control-group">
-          <label for="confirm_password" class="control-label">Confirm Password</label>
-          <div class="controls">
-            <input type="password" name="confirm_password">
-          </div>
-        </div>      
-      </div>
+    </body>
 
-      <div class="modal-footer">
-        <button href="#" class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
-        <button href="#" class="btn btn-primary" id="myModal_save">Save changes</button>
-      </div>
-    </div>
+    <script type="text/javascript">
+        $(document).ready(function() {
+        $('#changePasswordForm').bootstrapValidator(changePasswordValidator)
+        .on('success.form.bv', function (e) {
+        $('#success_message').slideDown({opacity: "show"}, "slow");
+        $('#changePasswordForm').data('bootstrapValidator').resetForm();
+
+        // Get the form instance
+        var $form = $(e.target);
+
+        // Get the BootstrapValidator instance
+        var bv = $form.data('bootstrapValidator');
+
+        // Use Ajax to submit form data
+        $.post($form.attr('action'), $form.serialize(), function (result) {
+        console.log("validacia" + result);
+        }, 'json');
+        });
+        $("#myModal_save").click(function () {
+        console.log($('#changePasswordForm').bootstrapValidator('validate'));
+        });
+
+        });
+
+    </script>
 
 
-    <table id="detailTable">
-      <tbody id="detailTableContainer"></tbody>
-    </table>
-    <button type="button" class="btn btn-primary" id="editButton" onclick="startEditableDoctorInputs()">Edit</button>
-    <button type="button" class="btn btn-success" id="saveButton" onclick="saveEditableDoctorInputs();  updateDoctor();">Save</button>
-    <button type="button" class="btn btn-danger" id="cancelButton" onclick="cancelEditableDoctorInputs()">Cancel</button>
-  </div>
-</body>
-</html>                                 		
+</html>

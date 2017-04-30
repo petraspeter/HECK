@@ -15,6 +15,8 @@ import java.sql.Timestamp;
     @NamedQuery(name = "findAllDoctors", query = "select doc from Doctor doc"),
     @NamedQuery(name = "findDoctorByLogin",
             query = "select doc from Doctor doc where doc.loginDoctor = :login"),
+        @NamedQuery(name = "findDoctorByEmail",
+                query = "select doc from Doctor doc where doc.emailDoctor = :email"),
     @NamedQuery(name = "findDoctorByLoginAndPassword",
             query = "select doc from Doctor doc where doc.loginDoctor = :login and doc.passwordDoctor = :password")
 })

@@ -2,23 +2,15 @@ package sk.upjs.ics.pro1a.heck.resources;
 
 import io.dropwizard.auth.Auth;
 import io.dropwizard.hibernate.UnitOfWork;
-import java.util.List;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
 import sk.upjs.ics.pro1a.heck.repositories.DoctorDao;
 import sk.upjs.ics.pro1a.heck.repositories.SpecializationDao;
 import sk.upjs.ics.pro1a.heck.services.HeckService;
-import sk.upjs.ics.pro1a.heck.services.dto.AuthorizedUserDto;
-import sk.upjs.ics.pro1a.heck.services.dto.DoctorDto;
-import sk.upjs.ics.pro1a.heck.services.dto.LoginRequestDto;
-import sk.upjs.ics.pro1a.heck.services.dto.LoginResponseDto;
+import sk.upjs.ics.pro1a.heck.services.dto.*;
+
+import javax.ws.rs.*;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import java.util.List;
 
 /**
  *
@@ -86,6 +78,51 @@ public class DoctorResources {
     public Response getAllDoctors(@Auth AuthorizedUserDto user) {
         List<DoctorDto> doctors = heckService.getAllDoctors();
         return Response.ok(doctors).build();
+    }
+
+    @POST
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    @Path("/doctors/checkLogin")
+    @UnitOfWork
+    public Response isLoginValid(@FormParam("login") String login) {
+        if (login == null) {
+            return Response.status(Response.Status.BAD_REQUEST).build();
+        }
+        IsValidDto isValidDto = heckService.isLoginValid(login);
+        return Response.ok(isValidDto).build();
+    }
+
+    @POST
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    @Path("/doctors/checkEmail")
+    @UnitOfWork
+    public Response isEmailValid(@FormParam("email") String email, @FormParam("userEmail") String userEmail) {
+        if (email == null) {
+            return Response.status(Response.Status.BAD_REQUEST).build();
+        }
+        IsValidDto isValidDto = heckService.isEmailValid(email, userEmail);
+        return Response.ok(isValidDto).build();
+    }
+
+    @POST
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Path("/doctors/{id}/changePassword")
+    @UnitOfWork
+    public Response changePassword(@PathParam("id") Long id, ChangePasswordDto changePasswordDto) {
+        try {
+            heckService.changeDoctorPassword(id, changePasswordDto);
+            return Response.ok().build();
+        } catch (IllegalStateException ex) {
+            return Response.status(Response.Status.BAD_REQUEST).build();
+        }
+    }
+
+    @POST
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    @Path("/doctors/{id}/checkPassword")
+    @UnitOfWork
+    public Response checkPassword(@PathParam("id") Long id, @FormParam("currentModalPassword") String password) {
+            return Response.ok(heckService.checkDoctorPassword(id, password)).build();
     }
     
 }

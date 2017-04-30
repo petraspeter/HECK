@@ -1,11 +1,9 @@
 package sk.upjs.ics.pro1a.heck.services;
 
 import com.google.common.base.Throwables;
-import java.math.BigInteger;
-import java.security.SecureRandom;
-import java.sql.Timestamp;
 import org.jose4j.jws.JsonWebSignature;
 import org.jose4j.jwt.JwtClaims;
+import org.jose4j.jwt.NumericDate;
 import org.jose4j.keys.HmacKey;
 import org.jose4j.lang.JoseException;
 import sk.upjs.ics.pro1a.heck.repositories.DoctorDao;
@@ -14,15 +12,16 @@ import sk.upjs.ics.pro1a.heck.repositories.UserDao;
 import sk.upjs.ics.pro1a.heck.repositories.model.Doctor;
 import sk.upjs.ics.pro1a.heck.repositories.model.Specialization;
 import sk.upjs.ics.pro1a.heck.repositories.model.User;
-import sk.upjs.ics.pro1a.heck.services.dto.DoctorDto;
-import sk.upjs.ics.pro1a.heck.services.dto.LoginResponseDto;
-import sk.upjs.ics.pro1a.heck.services.dto.SpecializationDto;
-import sk.upjs.ics.pro1a.heck.services.dto.UserDto;
+import sk.upjs.ics.pro1a.heck.services.dto.*;
+import sk.upjs.ics.pro1a.heck.utils.PasswordManager;
+
+import java.math.BigInteger;
+import java.security.SecureRandom;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
+
 import static org.jose4j.jws.AlgorithmIdentifiers.HMAC_SHA256;
-import org.jose4j.jwt.NumericDate;
-import sk.upjs.ics.pro1a.heck.utils.PasswordManager;
 
 public class HeckService {
     
@@ -66,6 +65,7 @@ public class HeckService {
         LoginResponseDto loginResponse = new LoginResponseDto();
         loginResponse.setId(doctor.getIdDoctor());
         loginResponse.setLogin(doctor.getLoginDoctor());
+        loginResponse.setEmail(doctor.getEmailDoctor());
         loginResponse.setRole("doctor");
         loginResponse.setToken(generateToken(doctor.getLoginDoctor(), "doctor"));
         return loginResponse;
@@ -123,6 +123,7 @@ public class HeckService {
                 loginResponse.setId(doctor.getIdDoctor());
                 loginResponse.setLogin(doctor.getLoginDoctor());
                 loginResponse.setRole("doctor");
+                loginResponse.setEmail(doctor.getEmailDoctor());
 //                if(doctor.getIsAdmin()) {
 //                    loginResponse.setRole("admin");
 //                } else {
@@ -142,6 +143,7 @@ public class HeckService {
                 LoginResponseDto loginResponse = new LoginResponseDto();
                 loginResponse.setId(user.getIdUser());
                 loginResponse.setLogin(user.getLoginUser());
+                loginResponse.setEmail(user.getEmailUser());
                 loginResponse.setRole("user");
                 loginResponse.setToken(generateToken(login, "user"));
                 return loginResponse;
@@ -189,6 +191,7 @@ public class HeckService {
         LoginResponseDto loginResponse = new LoginResponseDto();
         loginResponse.setId(user.getIdUser());
         loginResponse.setLogin(user.getLoginUser());
+        loginResponse.setEmail(user.getEmailUser());
         loginResponse.setRole("user");
         loginResponse.setToken(generateToken(user.getLoginUser(), "user"));
         return loginResponse;
@@ -210,6 +213,7 @@ public class HeckService {
         LoginResponseDto loginResponse = new LoginResponseDto();
         loginResponse.setId(doctor.getIdDoctor());
         loginResponse.setLogin(doctor.getLoginDoctor());
+        loginResponse.setEmail(doctor.getEmailDoctor());
         loginResponse.setRole(role);
         NumericDate expiration = NumericDate.fromSeconds(actualExpirationTime);
         loginResponse.setToken(updateToken(name, role, expiration));
@@ -228,6 +232,7 @@ public class HeckService {
         LoginResponseDto loginResponse = new LoginResponseDto();
         loginResponse.setId(user.getIdUser());
         loginResponse.setLogin(user.getLoginUser());
+        loginResponse.setEmail(user.getEmailUser());
         loginResponse.setRole(role);
         NumericDate expiration = NumericDate.fromSeconds(actualExpirationTime);
         loginResponse.setToken(updateToken(name, role, expiration));
@@ -250,8 +255,54 @@ public class HeckService {
         }
         doctorDao.update(doctor);
     }
-    
-    
+
+    public IsValidDto isLoginValid(String login) {
+        IsValidDto isValidDto = new IsValidDto();
+        if (doctorDao.findByLogin(login) == null) {
+            isValidDto.setValid(true);
+        } else {
+            isValidDto.setValid(false);
+        }
+        return isValidDto;
+    }
+
+    public IsValidDto isEmailValid(String email, String userEmail) {
+        IsValidDto isValidDto = new IsValidDto();
+        if (email.equals(userEmail) || doctorDao.findByEmail(email) == null) {
+            isValidDto.setValid(true);
+        } else {
+            isValidDto.setValid(false);
+        }
+        return isValidDto;
+    }
+
+    public void changeDoctorPassword(Long id, ChangePasswordDto changePasswordDto) {
+        if (changePasswordDto.getNewPassword().equals(changePasswordDto.getConfirmPassword())) {
+            Doctor doctor = doctorDao.findById(id);
+            if (doctor != null) {
+                if (doctor.getPasswordDoctor().equals(PasswordManager.encryptPassword(doctor.getSaltDoctor(), changePasswordDto.getPassword()))) {
+                    doctor.setPasswordDoctor(PasswordManager.encryptPassword(doctor.getSaltDoctor(), changePasswordDto.getNewPassword()));
+                    doctorDao.update(doctor);
+                    return;
+                }
+            }
+        }
+        throw new IllegalStateException("Change password DTO is not valid.");
+    }
+
+    public IsValidDto checkDoctorPassword(Long id, String password) {
+        IsValidDto isValidDto = new IsValidDto();
+        Doctor doctor = doctorDao.findById(id);
+        if (doctor != null) {
+            if (doctor.getPasswordDoctor().equals(PasswordManager.encryptPassword(doctor.getSaltDoctor(), password))) {
+                isValidDto.setValid(true);
+                return isValidDto;
+            }
+        }
+        isValidDto.setValid(false);
+        return isValidDto;
+    }
+
     /**
      *      Private methods
      */
@@ -408,5 +459,4 @@ public class HeckService {
                 false
         );
     }
-    
 }

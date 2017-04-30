@@ -23,6 +23,10 @@ public class DoctorDao extends AbstractDAO<Doctor> {
         return uniqueResult(namedQuery("findDoctorByLogin").setParameter("login", login));
     }
 
+    public Doctor findByEmail(String email) {
+        return uniqueResult(namedQuery("findDoctorByEmail").setParameter("email", email));
+    }
+
     public Doctor findById(Long id) {
         return get(id);
     }

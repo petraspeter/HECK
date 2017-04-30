@@ -17,8 +17,19 @@ public class LoginResponseDto {
     @JsonProperty("role")
     private String role;
 
+    @JsonProperty("email")
+    private String email;
+
     @JsonProperty("token")
     private String token;
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
 
     public String getLogin() {
         return login;
