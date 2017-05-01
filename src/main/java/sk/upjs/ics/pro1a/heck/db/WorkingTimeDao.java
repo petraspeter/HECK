@@ -25,4 +25,12 @@ public class WorkingTimeDao extends AbstractDAO<WorkingTime>{
                 .setParameter("idDoctor", id)
                 .setParameter("dayOfTheWeek", dayName));
     }
+
+    public WorkingTime createWorkingTime(WorkingTime workingTime) {
+        return this.persist(workingTime);
+    }
+
+    public List<WorkingTime> findByDoctorId(long doctorId) {
+        return list(namedQuery("findWorkingTimeByDoctorId").setParameter("doctorId", doctorId));
+    }
 }

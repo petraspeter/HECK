@@ -1,8 +1,12 @@
 package sk.upjs.ics.pro1a.heck.services;
 
+import sk.upjs.ics.pro1a.heck.db.WorkingTimeDao;
+import sk.upjs.ics.pro1a.heck.db.core.WorkingTime;
+import sk.upjs.ics.pro1a.heck.services.dto.*;
 import sk.upjs.ics.pro1a.heck.utils.Tokenizer;
 import java.math.BigInteger;
 import java.security.SecureRandom;
+import java.sql.Time;
 import java.util.ArrayList;
 import java.util.List;
 import org.jose4j.jwt.NumericDate;
@@ -10,10 +14,6 @@ import sk.upjs.ics.pro1a.heck.db.DoctorDao;
 import sk.upjs.ics.pro1a.heck.db.SpecializationDao;
 import sk.upjs.ics.pro1a.heck.db.core.Doctor;
 import sk.upjs.ics.pro1a.heck.db.core.Specialization;
-import sk.upjs.ics.pro1a.heck.services.dto.ChangePasswordDto;
-import sk.upjs.ics.pro1a.heck.services.dto.DoctorDto;
-import sk.upjs.ics.pro1a.heck.services.dto.IsValidDto;
-import sk.upjs.ics.pro1a.heck.services.dto.LoginResponseDto;
 import sk.upjs.ics.pro1a.heck.utils.PasswordManager;
 
 /**
@@ -24,13 +24,15 @@ public class DoctorService {
     
     private DoctorDao doctorDao;
     private SpecializationDao specializationDao;
+    private WorkingTimeDao workingTimeDao;
     private final byte[] tokenSecret;
     private Tokenizer tokenizer;
     
-    public DoctorService(DoctorDao doctorDao, SpecializationDao specializationDao, byte[] tokenSecret) {
+    public DoctorService(DoctorDao doctorDao, SpecializationDao specializationDao, WorkingTimeDao workingTimeDao, byte[] tokenSecret) {
         this.doctorDao = doctorDao;
         this.specializationDao = specializationDao;
         this.tokenSecret = tokenSecret;
+        this.workingTimeDao = workingTimeDao;
         tokenizer = new Tokenizer(tokenSecret);
     }
     
@@ -235,6 +237,42 @@ public class DoctorService {
         NumericDate expiration = NumericDate.fromSeconds(actualExpirationTime);
         loginResponse.setToken(tokenizer.updateToken(name, role, expiration));
         return loginResponse;
+    }
+
+    public WorkingTimeDto getDoctorWorkingTime(long id) {
+        List<WorkingTime> workingTimes = workingTimeDao.findByDoctorId(id);
+        if(workingTimes.size()==0) {
+            return null;
+        }
+        WorkingTimeDto workingTimeDto = new WorkingTimeDto();
+        workingTimeDto.setInterval(workingTimes.get(0).getDoctor().getAppointmentInterval());
+
+        ArrayList<WorkingDayDto> workingDaysDto = new ArrayList<>();
+        for(WorkingTime workingTime: workingTimes){
+            WorkingDayDto workingDayDto = new WorkingDayDto();
+            workingDayDto.setDay(workingTime.getDayOfTheWeek());
+            workingDayDto.setEnd(workingTime.getStartingHour().toString());
+            workingDayDto.setStart(workingTime.getEndingHour().toString());
+            workingDaysDto.add(workingDayDto);
+        }
+        workingTimeDto.setWorkingTimes(workingDaysDto);
+
+        return workingTimeDto;
+    }
+
+    public void createDoctorWorkingTime(long doctorId, WorkingTimeDto workingTimeDto) {
+        Doctor doctor = doctorDao.findById(doctorId);
+        doctor.setAppointmentInterval(workingTimeDto.getInterval());
+
+        for (WorkingDayDto day : workingTimeDto.getWorkingTimes()) {
+            WorkingTime workingTime = new WorkingTime();
+            workingTime.setDayOfTheWeek(day.getDay());
+            workingTime.setDoctor(doctor);
+            //TODO: implement validation for String for end and start time
+            workingTime.setEndingHour(Time.valueOf(day.getEnd() + ":00"));
+            workingTime.setStartingHour(Time.valueOf(day.getStart() + ":00"));
+            workingTimeDao.createWorkingTime(workingTime);
+        }
     }
     
     /*

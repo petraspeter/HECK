@@ -8,7 +8,6 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import sk.upjs.ics.pro1a.heck.db.SpecializationDao;
 import sk.upjs.ics.pro1a.heck.services.SpecializationService;
 import sk.upjs.ics.pro1a.heck.services.dto.SpecializationDto;
 
@@ -21,11 +20,11 @@ import sk.upjs.ics.pro1a.heck.services.dto.SpecializationDto;
 public class SpecializationResources {
     
     private final SpecializationService specializationService;
-    
-    public SpecializationResources(SpecializationDao specializationDao, byte[] tokenSecret) {
-        this.specializationService = new SpecializationService(specializationDao);
+
+    public SpecializationResources(SpecializationService specializationService) {
+        this.specializationService = specializationService;
     }
-    
+
     @GET
     @Path("specializations/{id}")
     @UnitOfWork

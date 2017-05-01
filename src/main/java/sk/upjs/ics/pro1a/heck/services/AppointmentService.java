@@ -1,8 +1,6 @@
 package sk.upjs.ics.pro1a.heck.services;
 
 import java.sql.Timestamp;
-import java.time.DayOfWeek;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
@@ -53,16 +51,15 @@ public class AppointmentService {
         List<WorkingTime> docHours = workingTimeDao.findWorkingTimeByDoctorIdAndDayName(idDoc,
                 dayOfWeek);
         for (WorkingTime docHour : docHours) {
-            Timestamp start = docHour.getStartingHour();
+            Timestamp start = new Timestamp(docHour.getStartingHour().getTime());
             Timestamp end = new Timestamp((start.getTime() + ((period * 60) * 1000)));
-            while (end.before(docHour.getEndingHour())) {
+            while (end.before(new Timestamp(docHour.getEndingHour().getTime()+1))) {    // aby sme vratili aj termin, ktory konci presne na konci pracovnej doby provnavame cas o 1ms neskor
                 appointments.add(generateAppointment(idDoc, idUser, start, end));
                 start = end;
                 end = new Timestamp((start.getTime() + ((period * 60) * 1000)));    //convert period from minutes to miliseconds
             }
         }
         List<Appointment> occupied = appointmentDao.findOccupiedByDoctorIdAndDate(idDoc, date);
-        
         if (occupied != null) {
             for (int i = 0; i < appointments.size(); i++) {
                 for (Appointment occupiedAppointment : occupied) {

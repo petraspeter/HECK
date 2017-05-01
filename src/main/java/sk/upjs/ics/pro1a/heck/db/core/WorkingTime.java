@@ -1,14 +1,8 @@
 package sk.upjs.ics.pro1a.heck.db.core;
 
 import java.io.Serializable;
-import java.sql.Timestamp;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.NamedNativeQueries;
-import javax.persistence.NamedNativeQuery;
-import javax.persistence.NamedQueries;
-import javax.persistence.Table;
+import java.sql.Time;
+import javax.persistence.*;
 
 /**
  *
@@ -29,61 +23,67 @@ import javax.persistence.Table;
             resultClass = WorkingTime.class
     )
 })
+@NamedQueries({
+        @NamedQuery(name = "findWorkingTimeByDoctorId",
+                query = "select w from WorkingTime w where w.doctor.idDoctor = :doctorId")
+
+})
 public class WorkingTime implements Serializable{
-    
     @Id
-    @Column(name = "id_doctor")
-    private Long idDoctor;
-    
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
+    private Long id;
+
+    @JoinColumn(name = "id_doctor")
+    @ManyToOne(cascade = CascadeType.ALL)
+    private Doctor doctor;
+
     @Column(name = "day_of_the_week")
-    private String dayOfTheWeek;
-    
+    private int dayOfTheWeek;
+
     @Column(name = "starting_hour")
-    private Timestamp startingHour;
-    
+    private Time startingHour;
+
     @Column(name = "ending_hour")
-    private Timestamp endingHour;
-    
-    public Long getIdDoctor() {
-        return idDoctor;
+    private Time endingHour;
+
+    public Long getId() {
+        return id;
     }
-    
-    public void setIdDoctor(Long idDoctor) {
-        this.idDoctor = idDoctor;
+
+    public void setId(Long id) {
+        this.id = id;
     }
-    
-    public String getDayOfTheWeek() {
+
+    public Doctor getDoctor() {
+        return doctor;
+    }
+
+    public void setDoctor(Doctor doctor) {
+        this.doctor = doctor;
+    }
+
+    public int getDayOfTheWeek() {
         return dayOfTheWeek;
     }
-    
-    public void setDayOfTheWeek(String dayOfTheWeek) {
+
+    public void setDayOfTheWeek(int dayOfTheWeek) {
         this.dayOfTheWeek = dayOfTheWeek;
     }
-    
-    public Timestamp getStartingHour() {
+
+    public Time getStartingHour() {
         return startingHour;
     }
-    
-    public void setStartingHour(Timestamp startingHour) {
+
+    public void setStartingHour(Time startingHour) {
         this.startingHour = startingHour;
     }
-    
-    public Timestamp getEndingHour() {
+
+    public Time getEndingHour() {
         return endingHour;
     }
-    
-    public void setEndingHour(Timestamp endingHour) {
+
+    public void setEndingHour(Time endingHour) {
         this.endingHour = endingHour;
     }
-    
-    public WorkingTime(Long idDoctor, String dayOfTheWeek, Timestamp startingHour, Timestamp endingHour) {
-        this.idDoctor = idDoctor;
-        this.dayOfTheWeek = dayOfTheWeek;
-        this.startingHour = startingHour;
-        this.endingHour = endingHour;
-    }
-    
-    public WorkingTime() {
-    }
-    
 }

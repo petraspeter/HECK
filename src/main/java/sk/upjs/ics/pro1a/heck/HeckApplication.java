@@ -23,6 +23,10 @@ import sk.upjs.ics.pro1a.heck.db.UserDao;
 import sk.upjs.ics.pro1a.heck.db.core.Doctor;
 import sk.upjs.ics.pro1a.heck.db.core.Specialization;
 import sk.upjs.ics.pro1a.heck.db.core.User;
+import sk.upjs.ics.pro1a.heck.services.AppointmentService;
+import sk.upjs.ics.pro1a.heck.services.DoctorService;
+import sk.upjs.ics.pro1a.heck.services.SpecializationService;
+import sk.upjs.ics.pro1a.heck.services.UserService;
 import sk.upjs.ics.pro1a.heck.services.dto.AuthorizedUserDto;
 
 import javax.servlet.DispatcherType;
@@ -43,17 +47,18 @@ import sk.upjs.ics.pro1a.heck.resources.UserResources;
  */
 public class HeckApplication extends Application<HeckConfiguration> {
     
-    private final HibernateBundle<HeckConfiguration> hibernateBundle =
-            new HibernateBundle<HeckConfiguration>(Specialization.class, Doctor.class, User.class,
-                    WorkingTime.class, Appointment.class) {
-                        
+    private final HibernateBundle<HeckConfiguration> hibernateBundle = new HibernateBundle<HeckConfiguration>(
+            Specialization.class,
+            Doctor.class,
+            User.class,
+            WorkingTime.class,
+            Appointment.class) {
                         @Override
                         public DataSourceFactory getDataSourceFactory(HeckConfiguration configuration) {
                             return configuration.getDataSourceFactory();
                         }
-                        
                     };
-    
+
     public static void main(final String[] args) throws Exception {
         new HeckApplication().run(args);
     }
@@ -79,8 +84,14 @@ public class HeckApplication extends Application<HeckConfiguration> {
         final UserDao userDao = new UserDao(hibernateBundle.getSessionFactory());
         final SpecializationDao specializationDao = new SpecializationDao(hibernateBundle.getSessionFactory());
         final AppointmentDao appointmentDao = new AppointmentDao(hibernateBundle.getSessionFactory());
-        final  WorkingTimeDao workingTimeDao = new WorkingTimeDao(hibernateBundle.getSessionFactory());
-        
+        final WorkingTimeDao workingTimeDao = new WorkingTimeDao(hibernateBundle.getSessionFactory());
+
+        final byte[] key = configuration.getJwtTokenSecret();
+        final AppointmentService appointmentService = new AppointmentService(appointmentDao, doctorDao, userDao, workingTimeDao, key);
+        final DoctorService doctorService = new DoctorService(doctorDao, specializationDao, workingTimeDao, key);
+        final SpecializationService specializationService = new SpecializationService(specializationDao);
+        final UserService userService = new UserService(userDao,key);
+
         /**
          * Create Jesrsey client
          */
@@ -92,9 +103,6 @@ public class HeckApplication extends Application<HeckConfiguration> {
         /**
          * Register resources and authorization
          */
-        
-        final byte[] key = configuration.getJwtTokenSecret();
-        
         final JwtConsumer consumer = new JwtConsumerBuilder()
                 .setAllowedClockSkewInSeconds(30) // allow some leeway in validating time based claims to account for clock skew
                 .setRequireExpirationTime() // the JWT must have an expiration time
@@ -117,12 +125,10 @@ public class HeckApplication extends Application<HeckConfiguration> {
         
         environment.jersey().register(new AuthValueFactoryProvider.Binder<>(AuthorizedUserDto.class));
         environment.jersey().register(RolesAllowedDynamicFeature.class);
-        environment.jersey().register(new DoctorResources(doctorDao, specializationDao, key));
-        environment.jersey().register(new UserResources(userDao, key));
-        environment.jersey().register(new SpecializationResources(specializationDao, key));
-        environment.jersey().register(new AppointmentResources(appointmentDao, doctorDao, userDao,
-                workingTimeDao, key));
-        
+        environment.jersey().register(new DoctorResources(doctorService));
+        environment.jersey().register(new UserResources(userService));
+        environment.jersey().register(new SpecializationResources(specializationService));
+        environment.jersey().register(new AppointmentResources(appointmentService));
         // Enable CORS headers
         final FilterRegistration.Dynamic cors =
                 environment.servlets().addFilter("CORS", CrossOriginFilter.class);

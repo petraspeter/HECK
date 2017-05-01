@@ -11,7 +11,6 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import sk.upjs.ics.pro1a.heck.db.UserDao;
 import sk.upjs.ics.pro1a.heck.services.UserService;
 import sk.upjs.ics.pro1a.heck.services.dto.AuthorizedUserDto;
 import sk.upjs.ics.pro1a.heck.services.dto.LoginRequestDto;
@@ -27,11 +26,11 @@ import sk.upjs.ics.pro1a.heck.services.dto.UserDto;
 public class UserResources {    
     
     private final UserService userService;
-    
-    public UserResources(UserDao userDao, byte[] tokenSecret) {
-        this.userService = new UserService(userDao, tokenSecret);
+
+    public UserResources(UserService userService) {
+        this.userService = userService;
     }
-    
+
     @POST
     @Path("/users")
     @Consumes(MediaType.APPLICATION_JSON)

@@ -286,15 +286,16 @@ function addButton(day){
             var data = getDaysValues();    
 
             var ourRequest = new XMLHttpRequest();
-            console.log("data: " + data);
-            console.log("ourRequest: " + ourRequest);
+            console.log(JSON.stringify(data));
 
-            //ourRequest.open('POST', 'http://requestb.in/1i3j6k91');
-            //ourRequest.setRequestHeader("Content-Type", "application/json");
+            ourRequest.open('POST', 'http://localhost:8076/heck/doctors/' + JSON.parse(sessionStorage.getItem('user')).id + '/workingTime');
+            ourRequest.setRequestHeader("Content-Type", "application/json");
+            ourRequest.setRequestHeader("Authorization", "Bearer " + JSON.parse(sessionStorage.getItem('user')).token);
 
             ourRequest.onload = function() {
-                if (ourRequest.status == 200) {
+                if (ourRequest.status == 201) {
                     console.log("Success.");
+                    disableAllButtons();
                 } else {
                     console.log("We connected to the server, but it returned an error.");
                 }
@@ -308,24 +309,64 @@ function addButton(day){
         }
 
         function getDaysValues(){
-            var result = {};            
-            result["Monday"] = processDayValues("M");
-            result["Tuesday"] = processDayValues("T");
-            result["Wednesday"] = processDayValues("W");
-            result["Thursday"] = processDayValues("Th");
-            result["Friday"] = processDayValues("F");
-            result["Saturday"] = processDayValues("Sa");
-            result["Sunday"] = processDayValues("Su");
+            var result = {};
+            result["interval"] = $('#inputTimeInterval').val();
+            result["workingTimes"] = [];
+            var tempDayResult = processDayValues("M",0);
+            Array.prototype.pushArray = function(arr) {
+                this.push.apply(this, arr);
+            };
+            if(tempDayResult.length > 0) {
+                result["workingTimes"].pushArray(tempDayResult);
+            }
+            tempDayResult = processDayValues("T",1);
+            if(tempDayResult.length > 0) {
+                result["workingTimes"].pushArray(tempDayResult);
+            }
+            tempDayResult = processDayValues("W",2);
+            if(tempDayResult.length > 0) {
+                result["workingTimes"].pushArray(tempDayResult);
+            }
+            tempDayResult = processDayValues("Th",3);
+            if(tempDayResult.length > 0) {
+                result["workingTimes"].pushArray(tempDayResult);
+            }
+            tempDayResult = processDayValues("F",4);
+            if(tempDayResult.length > 0) {
+                result["workingTimes"].pushArray(tempDayResult);
+            }
+            tempDayResult = processDayValues("Sa",5);
+            if(tempDayResult.length > 0) {
+                result["workingTimes"].pushArray(tempDayResult);
+            }
+            tempDayResult = processDayValues("Su",6);
+            if(tempDayResult.length > 0) {
+                result["workingTimes"].pushArray(tempDayResult);
+            }
             console.log(result);
             return result;
         }
 
-        function processDayValues(day){
+function disableAllButtons(){
+    $.each($(':button'), function(index, item){
+        $(item).addClass("disabledButton");
+        $(item).removeAttr('onclick');
+    });
+    $('#inputTimeInterval').prop('disabled', true);
+    var arr = $('#allTimes').find(':text');
+    $.each(arr, function(index, item){
+        $(item).prop('disabled', true);
+    });
+}
+
+        function processDayValues(day, dayOfTheWeek){
             var node_list = document.getElementById("TextBoxesGroup" + day).children;
             var rowResult = [];
             for (i = 1; i < node_list.length; i++) { 
-                rowResult.push({"start": node_list[i].children[0].value,
-                    "end": node_list[i].children[1].value});
+                rowResult.push(
+                    {"start": node_list[i].children[0].value,
+                    "end": node_list[i].children[1].value,
+                    "day": dayOfTheWeek});
             }
             return rowResult;
         }

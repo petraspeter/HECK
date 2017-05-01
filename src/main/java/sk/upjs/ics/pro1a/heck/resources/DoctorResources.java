@@ -2,6 +2,7 @@ package sk.upjs.ics.pro1a.heck.resources;
 
 import io.dropwizard.auth.Auth;
 import io.dropwizard.hibernate.UnitOfWork;
+import java.util.Collections;
 import java.util.List;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.FormParam;
@@ -17,12 +18,7 @@ import javax.ws.rs.core.Response;
 import sk.upjs.ics.pro1a.heck.db.DoctorDao;
 import sk.upjs.ics.pro1a.heck.db.SpecializationDao;
 import sk.upjs.ics.pro1a.heck.services.DoctorService;
-import sk.upjs.ics.pro1a.heck.services.dto.AuthorizedUserDto;
-import sk.upjs.ics.pro1a.heck.services.dto.ChangePasswordDto;
-import sk.upjs.ics.pro1a.heck.services.dto.DoctorDto;
-import sk.upjs.ics.pro1a.heck.services.dto.IsValidDto;
-import sk.upjs.ics.pro1a.heck.services.dto.LoginRequestDto;
-import sk.upjs.ics.pro1a.heck.services.dto.LoginResponseDto;
+import sk.upjs.ics.pro1a.heck.services.dto.*;
 
 /**
  *
@@ -31,14 +27,13 @@ import sk.upjs.ics.pro1a.heck.services.dto.LoginResponseDto;
 @Path("/heck")
 @Produces(MediaType.APPLICATION_JSON)
 public class DoctorResources {
-    
-    
+
     private final DoctorService doctorService;
-    
-    public DoctorResources(DoctorDao doctorDao, SpecializationDao specializationDao, byte[] tokenSecret) {
-        this.doctorService = new DoctorService(doctorDao, specializationDao, tokenSecret);
+
+    public DoctorResources(DoctorService doctorService) {
+        this.doctorService = doctorService;
     }
-    
+
     @POST
     @Path("/doctors")
     @Consumes(MediaType.APPLICATION_JSON)
@@ -224,6 +219,25 @@ public class DoctorResources {
     public Response checkPassword(@PathParam("id") Long id, @FormParam("currentModalPassword") String password) {
             return Response.ok(doctorService.checkDoctorPassword(id, password)).build();
     }
+
+    @GET
+    @Path("/doctors/{id}/workingTime")
+    @UnitOfWork
+    public Response getDoctorWorkingTime(/*@Auth AuthorizedUserDto user, */@PathParam("id") long id) {
+        WorkingTimeDto workingHours = doctorService.getDoctorWorkingTime(id);
+        if(workingHours == null) {
+            Response.ok(Collections.emptyMap()).build();
+        }
+        return Response.ok(workingHours).build();
+    }
+
+    @POST
+    @Path("/doctors/{id}/workingTime")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @UnitOfWork
+    public Response setDoctorWorkingTime(@Auth AuthorizedUserDto user, @PathParam("id") long id, WorkingTimeDto workingTimeDto) {
+        doctorService.createDoctorWorkingTime(id, workingTimeDto);
+        return Response.status(Response.Status.CREATED).build();
+    }
     
 }
-
