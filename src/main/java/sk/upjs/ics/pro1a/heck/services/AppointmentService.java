@@ -55,14 +55,13 @@ public class AppointmentService {
         for (WorkingTime docHour : docHours) {
             Timestamp start = docHour.getStartingHour();
             Timestamp end = new Timestamp((start.getTime() + ((period * 60) * 1000)));
-            while (end.before(docHour.getEndingHour())) {
+            while (end.before(new Timestamp(docHour.getEndingHour().getTime()+1))) {    // aby sme vratili aj termin, ktory konci presne na konci pracovnej doby provnavame cas o 1ms neskor
                 appointments.add(generateAppointment(idDoc, idUser, start, end));
                 start = end;
                 end = new Timestamp((start.getTime() + ((period * 60) * 1000)));    //convert period from minutes to miliseconds
             }
         }
         List<Appointment> occupied = appointmentDao.findOccupiedByDoctorIdAndDate(idDoc, date);
-        
         if (occupied != null) {
             for (int i = 0; i < appointments.size(); i++) {
                 for (Appointment occupiedAppointment : occupied) {

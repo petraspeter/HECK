@@ -5,6 +5,8 @@ import io.dropwizard.hibernate.UnitOfWork;
 import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -14,6 +16,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import org.apache.commons.lang3.time.DateUtils;
 import sk.upjs.ics.pro1a.heck.db.AppointmentDao;
 import sk.upjs.ics.pro1a.heck.db.DoctorDao;
 import sk.upjs.ics.pro1a.heck.db.UserDao;
@@ -103,9 +106,11 @@ public class AppointmentResources {
             //  @Auth AuthorizedUserDto user,
             @QueryParam("idDoc") Long idDoc,
             @QueryParam("idUser") Long idUser
-    ) throws ParseException {
-        Timestamp tsFrom = new Timestamp(System.currentTimeMillis());
-        Timestamp tsTo = new Timestamp(System.currentTimeMillis()+(7*24*60*60*1000));
+    ) throws ParseException {        
+        SimpleDateFormat sdt = new SimpleDateFormat("yyyy-MM-dd");
+        Long actualDay = DateUtils.truncate(new Date(), Calendar.DATE).getTime();
+        Timestamp tsFrom = new Timestamp(actualDay);
+        Timestamp tsTo = new Timestamp(actualDay+(7*24*60*60*1000));
         List<AppointmentDto> appointments = appointmentService
                 .generateDoctorAppointmentForDays(idDoc, idUser, tsFrom, tsTo);
         if (appointments.size() > 0) {
