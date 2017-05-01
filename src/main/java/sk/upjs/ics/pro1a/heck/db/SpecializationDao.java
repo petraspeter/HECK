@@ -1,8 +1,8 @@
-package sk.upjs.ics.pro1a.heck.repositories;
+package sk.upjs.ics.pro1a.heck.db;
 
 import io.dropwizard.hibernate.AbstractDAO;
 import org.hibernate.SessionFactory;
-import sk.upjs.ics.pro1a.heck.repositories.model.Specialization;
+import sk.upjs.ics.pro1a.heck.db.core.Specialization;
 
 import java.util.List;
 

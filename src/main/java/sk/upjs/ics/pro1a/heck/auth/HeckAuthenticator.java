@@ -4,10 +4,10 @@ import io.dropwizard.auth.Authenticator;
 import io.dropwizard.hibernate.UnitOfWork;
 import org.jose4j.jwt.MalformedClaimException;
 import org.jose4j.jwt.consumer.JwtContext;
-import sk.upjs.ics.pro1a.heck.repositories.DoctorDao;
-import sk.upjs.ics.pro1a.heck.repositories.UserDao;
-import sk.upjs.ics.pro1a.heck.repositories.model.Doctor;
-import sk.upjs.ics.pro1a.heck.repositories.model.User;
+import sk.upjs.ics.pro1a.heck.db.DoctorDao;
+import sk.upjs.ics.pro1a.heck.db.UserDao;
+import sk.upjs.ics.pro1a.heck.db.core.Doctor;
+import sk.upjs.ics.pro1a.heck.db.core.User;
 import sk.upjs.ics.pro1a.heck.services.dto.AuthorizedUserDto;
 import java.util.Optional;
 

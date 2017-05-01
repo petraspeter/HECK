@@ -1,4 +1,4 @@
-package sk.upjs.ics.pro1a.heck.repositories.model;
+package sk.upjs.ics.pro1a.heck.db.core;
 
 import org.hibernate.annotations.Type;
 

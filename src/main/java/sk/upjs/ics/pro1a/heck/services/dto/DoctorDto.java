@@ -9,7 +9,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public class DoctorDto {
     
     @JsonProperty("id")
-    private long id;
+    private Long id;
     
     @JsonProperty("login")
     private String login;
@@ -42,16 +42,16 @@ public class DoctorDto {
     private String phoneNumber;
     
     @JsonProperty("specialization")
-    private long specialization;
+    private Long specialization;
         
-    @JsonProperty("admin")
-    private Boolean isAdmin;
+    @JsonProperty("interval")
+    private Short interval;
     
-    public long getId() {
+    public Long getId() {
         return id;
     }
     
-    public void setId(long id) {
+    public void setId(Long id) {
         this.id = id;
     }
     
@@ -143,19 +143,19 @@ public class DoctorDto {
         this.specialization = specialization;
     }
 
-    public Boolean getIsAdmin() {
-        return isAdmin;
+    public Short getInterval() {
+        return interval;
     }
 
-    public void setIsAdmin(Boolean isAdmin) {
-        this.isAdmin = isAdmin;
+    public void setInterval(Short interval) {
+        this.interval = interval;
     }
     
     public DoctorDto() {
     }
     
-    public DoctorDto(long id, String login, String password, String firstName, String lastName, String email, String office,
-            String address, String postalCode, String city, String phoneNumber, long specialization, boolean  admin) {
+    public DoctorDto(Long id, String login, String password, String firstName, String lastName, String email, String office,
+            String address, String postalCode, String city, String phoneNumber, Long specialization, Short  interval) {
         this.id = id;
         this.login = login;
         this.password = password;
@@ -168,11 +168,11 @@ public class DoctorDto {
         this.city = city;
         this.phoneNumber = phoneNumber;
         this.specialization = specialization;
-        this.isAdmin = admin;
+        this.interval = interval;
     }
     
-    public DoctorDto(long id, String login, String firstName, String lastName, String email, String office, String address,
-            String postalCode, String city, String phoneNumber, long specialization, boolean  admin) {
+    public DoctorDto(Long id, String login, String firstName, String lastName, String email, String office, String address,
+            String postalCode, String city, String phoneNumber, Long specialization, Short  interval) {
         this.id = id;
         this.login = login;
         this.firstName = firstName;
@@ -184,7 +184,7 @@ public class DoctorDto {
         this.city = city;
         this.phoneNumber = phoneNumber;
         this.specialization = specialization;
-        this.isAdmin = admin;
+        this.interval = interval;
     }
     
     
