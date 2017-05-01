@@ -110,6 +110,10 @@ public class AppointmentService {
         }
     }
     
+    public AppointmentDto updateAppointment(AppointmentDto appointmentDto) {
+        return createAppointmentDtoFromDao(createAppointmentDaoFromDto(appointmentDto));
+    }
+    
     /**
      * PRIVATE METHODS
      */

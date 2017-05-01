@@ -27,7 +27,7 @@ import org.hibernate.annotations.Formula;
 @NamedQueries({
     @NamedQuery(
             name = "findAllAppointments",
-            query = "select app from Appointment app"),    
+            query = "select app from Appointment app"),
     @NamedQuery(
             name = "findAppointmentById",
             query = "select app from Appointment app where app.idAppointment = :id")
@@ -228,5 +228,11 @@ public class Appointment implements Serializable {
     public void setSubjectAppointment(String subjectAppointment) {
         this.subjectAppointment = subjectAppointment;
     }
+    
+    @Override
+    public String toString() {
+        return "Appointment{" + "idAppointment=" + idAppointment + ", appointmentDoctor=" + appointmentDoctor + ", appointmentUser=" + appointmentUser + ", occupiedAppointment=" + occupiedAppointment + ", dateFromAppointment=" + dateFromAppointment + ", dateToAppointment=" + dateToAppointment + ", holidayAppointment=" + holidayAppointment + ", canceledAppointment=" + canceledAppointment + ", patitentName=" + patitentName + ", noteAppointment=" + noteAppointment + ", subjectAppointment=" + subjectAppointment + '}';
+    }
+    
     
 }
