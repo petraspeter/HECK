@@ -62,12 +62,13 @@ public class AppointmentService {
             }
         }
         List<Appointment> occupied = appointmentDao.findOccupiedByDoctorIdAndDate(idDoc, date);
+        
         if (occupied != null) {
-            for (Appointment appointment : appointments) {
+            for (int i = 0; i < appointments.size(); i++) {
                 for (Appointment occupiedAppointment : occupied) {
-                    if(appointment.getDateFromAppointment().after(occupiedAppointment.getDateFromAppointment()) &&
-                            appointment.getDateFromAppointment().before(occupiedAppointment.getDateFromAppointment())) {
-                        appointments.remove(appointment);
+                    if(appointments.get(i).getDateFromAppointment().toString()
+                            .equals(occupiedAppointment.getDateFromAppointment().toString())) {
+                        appointments.remove(i);
                     }
                 }
             }
