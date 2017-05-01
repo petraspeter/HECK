@@ -153,7 +153,8 @@ public class UserService {
                 userDto.getPhoneNumber(),
                 userDto.getPostalCode(),
                 userDto.getCity(),
-                userDto.getAddress()
+                userDto.getAddress(),
+                userDto.getRegistrationTime()
         );
     }
     
@@ -167,7 +168,8 @@ public class UserService {
                 user.getAddressUser(),
                 user.getPostalCodeUser(),
                 user.getCityUser(),
-                user.getPhoneUser()
+                user.getPhoneUser(),
+                user.getRegistrationTime()
         );
     }
     
@@ -182,7 +184,8 @@ public class UserService {
                 user.getAddressUser(),
                 user.getPostalCodeUser(),
                 user.getCityUser(),
-                user.getPhoneUser()
+                user.getPhoneUser(),
+                user.getRegistrationTime()
         );
     }
     

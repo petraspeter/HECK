@@ -224,5 +224,6 @@ public class DoctorResources {
     public Response checkPassword(@PathParam("id") Long id, @FormParam("currentModalPassword") String password) {
             return Response.ok(doctorService.checkDoctorPassword(id, password)).build();
     }
+    
 }
 

@@ -4,6 +4,7 @@ import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.sql.Timestamp;
 
 /**
  * @author raven
@@ -60,7 +61,10 @@ public class User implements Serializable {
     @Type(type = "org.hibernate.type.NumericBooleanType")
     @Column(name = "active_user")
     private Boolean activeUser;
-
+    
+    @Column(name = "registration_time_user")
+    private Timestamp registrationTime;
+    
     public Long getIdUser() {
         return idUser;
     }
@@ -157,11 +161,19 @@ public class User implements Serializable {
         this.activeUser = activeUser;
     }
 
+    public Timestamp getRegistrationTime() {
+        return registrationTime;
+    }
+
+    public void setRegistrationTime(Timestamp registrationTime) {
+        this.registrationTime = registrationTime;
+    }    
+    
     public User() {
     }
 
     public User(String emailUser, String loginUser, String passwordUser, String salt, String firstNameUser, String lastNameUser,
-                String phoneUser, String postalCodeUser, String cityUser, String addressUser) {
+                String phoneUser, String postalCodeUser, String cityUser, String addressUser, Timestamp registrationTime) {
         this.emailUser = emailUser;
         this.loginUser = loginUser;
         this.passwordUser = passwordUser;
@@ -173,5 +185,6 @@ public class User implements Serializable {
         this.cityUser = cityUser;
         this.addressUser = addressUser;
         this.activeUser = true;
+        this.registrationTime = registrationTime;
     }
 }

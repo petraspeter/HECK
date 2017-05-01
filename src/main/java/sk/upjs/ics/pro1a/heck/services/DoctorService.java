@@ -255,7 +255,8 @@ public class DoctorService {
                 doctorDto.getPostalCode(),
                 doctorDto.getCity(),
                 doctorDto.getAddress(), 
-                doctorDto.getInterval()
+                doctorDto.getInterval(),
+               doctorDto.getRegistrationTime()
         );
     }
     
@@ -272,7 +273,8 @@ public class DoctorService {
                 doctor.getCityDoctor(),
                 doctor.getPhoneNumberDoctor(),
                 doctor.getSpecializationDoctor().getId(),
-                doctor.getAppointmentInterval()
+                doctor.getAppointmentInterval(),
+                doctor.getRegistrationTime()
         );
     }
     
@@ -290,7 +292,8 @@ public class DoctorService {
                 doctor.getCityDoctor(),
                 doctor.getPhoneNumberDoctor(),
                 doctor.getSpecializationDoctor().getId(),
-                doctor.getAppointmentInterval()
+                doctor.getAppointmentInterval(),
+                doctor.getRegistrationTime()
         );
     }
     

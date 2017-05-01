@@ -19,7 +19,7 @@ import java.sql.Timestamp;
             name = "findDoctorByLogin",
             query = "select doc from Doctor doc where doc.loginDoctor = :login"),
     @NamedQuery(name = "findDoctorByEmail",
-                query = "select doc from Doctor doc where doc.emailDoctor = :email"),
+            query = "select doc from Doctor doc where doc.emailDoctor = :email"),
     @NamedQuery(
             name = "findDoctorByLoginAndPassword",
             query = "select doc from Doctor doc where doc.loginDoctor = :login and doc.passwordDoctor = :password")
@@ -116,14 +116,17 @@ public class Doctor implements Serializable {
     
     @Column(name = "interval_doctor")
     private Short appointmentInterval;
-        
+    
+    @Column(name = "registration_time_doctor")
+    private Timestamp registrationTime;
+    
     public Doctor() {
     }
     
     public Doctor(String emailDoctor, String loginDoctor, String passwordDoctor, String salt, Specialization specializationDoctor,
             String businessNameDoctor, String firstNameDoctor, String lastNameDoctor,
             String phoneNumberDoctor, String postalCodeDoctor, String cityDoctor, String addressDoctor,
-            Timestamp activationTimeDoctor, Short appointmentInterval) {
+            Timestamp activationTimeDoctor, Short appointmentInterval, Timestamp registrationTime) {
         this.emailDoctor = emailDoctor;
         this.loginDoctor = loginDoctor;
         this.passwordDoctor = passwordDoctor;
@@ -139,12 +142,13 @@ public class Doctor implements Serializable {
         this.activationTimeDoctor = activationTimeDoctor;
         this.activeDoctor = true;
         this.appointmentInterval = appointmentInterval;
+        this.registrationTime = registrationTime;
     }
     
     public Doctor(String emailDoctor, String loginDoctor, String passwordDoctor, String saltDoctor,
             Specialization specializationDoctor, String businessNameDoctor, String firstNameDoctor,
             String lastNameDoctor, String phoneNumberDoctor, String postalCodeDoctor, String cityDoctor,
-            String addressDoctor, Short appointmentInterval) {
+            String addressDoctor, Short appointmentInterval, Timestamp registrationTime) {
         this.emailDoctor = emailDoctor;
         this.loginDoctor = loginDoctor;
         this.passwordDoctor = passwordDoctor;
@@ -159,6 +163,7 @@ public class Doctor implements Serializable {
         this.addressDoctor = addressDoctor;
         this.activeDoctor = false;
         this.appointmentInterval = appointmentInterval;
+        this.registrationTime = registrationTime;
     }
     
     public Long getIdDoctor() {
@@ -287,6 +292,14 @@ public class Doctor implements Serializable {
     
     public void setAppointmentInterval(Short appointmentInterval) {
         this.appointmentInterval = appointmentInterval;
+    }
+    
+    public Timestamp getRegistrationTime() {
+        return registrationTime;
+    }
+    
+    public void setRegistrationTime(Timestamp registrationTime) {
+        this.registrationTime = registrationTime;
     }
     
 }

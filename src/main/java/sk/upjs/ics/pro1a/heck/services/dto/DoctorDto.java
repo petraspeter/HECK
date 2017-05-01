@@ -3,6 +3,7 @@ package sk.upjs.ics.pro1a.heck.services.dto;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import java.sql.Timestamp;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -43,9 +44,12 @@ public class DoctorDto {
     
     @JsonProperty("specialization")
     private Long specialization;
-        
+    
     @JsonProperty("interval")
     private Short interval;
+    
+    @JsonProperty("registrationTime")
+    private Timestamp registrationTime;
     
     public Long getId() {
         return id;
@@ -142,20 +146,29 @@ public class DoctorDto {
     public void setSpecialization(long specialization) {
         this.specialization = specialization;
     }
-
+    
     public Short getInterval() {
         return interval;
     }
-
+    
     public void setInterval(Short interval) {
         this.interval = interval;
+    }
+
+    public Timestamp getRegistrationTime() {
+        return registrationTime;
+    }
+
+    public void setRegistrationTime(Timestamp registrationTime) {
+        this.registrationTime = registrationTime;
     }
     
     public DoctorDto() {
     }
     
     public DoctorDto(Long id, String login, String password, String firstName, String lastName, String email, String office,
-            String address, String postalCode, String city, String phoneNumber, Long specialization, Short  interval) {
+            String address, String postalCode, String city, String phoneNumber, Long specialization, Short  interval,
+            Timestamp registrationTime) {
         this.id = id;
         this.login = login;
         this.password = password;
@@ -169,10 +182,12 @@ public class DoctorDto {
         this.phoneNumber = phoneNumber;
         this.specialization = specialization;
         this.interval = interval;
+        this.registrationTime = registrationTime;
     }
     
     public DoctorDto(Long id, String login, String firstName, String lastName, String email, String office, String address,
-            String postalCode, String city, String phoneNumber, Long specialization, Short  interval) {
+            String postalCode, String city, String phoneNumber, Long specialization, Short  interval,
+            Timestamp registrationTime) {
         this.id = id;
         this.login = login;
         this.firstName = firstName;
@@ -185,6 +200,7 @@ public class DoctorDto {
         this.phoneNumber = phoneNumber;
         this.specialization = specialization;
         this.interval = interval;
+        this.registrationTime = registrationTime;
     }
     
     

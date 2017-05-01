@@ -3,6 +3,7 @@ package sk.upjs.ics.pro1a.heck.services.dto;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import java.sql.Timestamp;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -38,6 +39,9 @@ public class UserDto {
     @JsonProperty("phoneNumber")
     private String phoneNumber;
 
+    @JsonProperty("registrationTime")
+    private Timestamp registrationTime;
+    
     public long getId() {
         return id;
     }
@@ -118,11 +122,19 @@ public class UserDto {
         this.phoneNumber = phoneNumber;
     }
 
+    public Timestamp getRegistrationTime() {
+        return registrationTime;
+    }
+
+    public void setRegistrationTime(Timestamp registrationTime) {
+        this.registrationTime = registrationTime;
+    }
+
     public UserDto() {
     }
 
     public UserDto(long id, String login, String password, String firstName, String lastName, String email, 
-            String address, String postalCode, String city, String phoneNumber) {
+            String address, String postalCode, String city, String phoneNumber, Timestamp registrationTime) {
         this.id = id;
         this.login = login;
         this.password = password;
@@ -133,10 +145,11 @@ public class UserDto {
         this.postalCode = postalCode;
         this.city = city;
         this.phoneNumber = phoneNumber;
+        this.registrationTime = registrationTime;
     }
 
     public UserDto(long id, String login, String firstName, String lastName, String email, String address, 
-            String postalCode, String city, String phoneNumber) {
+            String postalCode, String city, String phoneNumber, Timestamp registrationTime) {
         this.id = id;
         this.login = login;
         this.firstName = firstName;
@@ -146,6 +159,7 @@ public class UserDto {
         this.postalCode = postalCode;
         this.city = city;
         this.phoneNumber = phoneNumber;
+        this.registrationTime = registrationTime;
     }
         
 }
