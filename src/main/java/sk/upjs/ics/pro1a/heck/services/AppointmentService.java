@@ -1,6 +1,8 @@
 package sk.upjs.ics.pro1a.heck.services;
 
 import java.sql.Timestamp;
+import java.time.DayOfWeek;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
@@ -106,6 +108,12 @@ public class AppointmentService {
             appointmentDao.createAppointment(appointment);
             return appointmentDto;
         }
+    }
+    
+    public AppointmentDto updateAppointment(AppointmentDto appointmentDto) {
+        Appointment appointment = createAppointmentDaoFromDto(appointmentDto);
+        appointmentDao.update(appointment);
+        return createAppointmentDtoFromDao(appointment);
     }
     
     /**

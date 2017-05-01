@@ -22,7 +22,7 @@ public class AppointmentDto {
     private String dateToAppointment;
         
     @JsonProperty("doctor")
-    private AppointmentDoctorDto doctorAppointment;
+    private AppointmentDoctorDto appointmentDoctor;
     
     @JsonProperty("user")
     private AppointmentUserDto appointmentUser;
@@ -54,11 +54,11 @@ public class AppointmentDto {
     }
     
     public AppointmentDoctorDto getAppointmentDoctor() {
-        return doctorAppointment;
+        return appointmentDoctor;
     }
     
     public void setAppointmentDoctor(AppointmentDoctorDto doctorAppointment) {
-        this.doctorAppointment = doctorAppointment;
+        this.appointmentDoctor = doctorAppointment;
     }
     
     public AppointmentUserDto getAppointmentUser() {
@@ -131,6 +131,11 @@ public class AppointmentDto {
     
     public void setSubjectAppointment(String subjectAppointment) {
         this.subjectAppointment = subjectAppointment;
+    }
+
+    @Override
+    public String toString() {
+        return "AppointmentDto{" + "idAppointment=" + idAppointment + ", dateFromAppointment=" + dateFromAppointment + ", dateToAppointment=" + dateToAppointment + ", doctorAppointment=" + appointmentDoctor + ", appointmentUser=" + appointmentUser + ", patitentName=" + patitentName + ", noteAppointment=" + noteAppointment + ", subjectAppointment=" + subjectAppointment + ", occupiedAppointment=" + occupiedAppointment + ", canceledAppointment=" + canceledAppointment + ", holidayAppointment=" + holidayAppointment + '}';
     }
     
     
