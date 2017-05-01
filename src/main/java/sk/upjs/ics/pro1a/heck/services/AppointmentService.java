@@ -111,7 +111,9 @@ public class AppointmentService {
     }
     
     public AppointmentDto updateAppointment(AppointmentDto appointmentDto) {
-        return createAppointmentDtoFromDao(createAppointmentDaoFromDto(appointmentDto));
+        Appointment appointment = createAppointmentDaoFromDto(appointmentDto);
+        appointmentDao.update(appointment);
+        return createAppointmentDtoFromDao(appointment);
     }
     
     /**
