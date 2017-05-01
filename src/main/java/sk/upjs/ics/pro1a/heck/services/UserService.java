@@ -69,8 +69,12 @@ public class UserService {
                 LoginResponseDto loginResponse = new LoginResponseDto();
                 loginResponse.setId(user.getIdUser());
                 loginResponse.setLogin(user.getLoginUser());
-                loginResponse.setRole("user");
-                loginResponse.setToken(tokenizer.generateToken(login, "user"));
+                if(user.getAdmin()){
+                    loginResponse.setRole("admin");
+                } else {
+                        loginResponse.setRole("user");
+                }
+                loginResponse.setToken(tokenizer.generateToken(login, loginResponse.getRole()));
                 return loginResponse;
             }
         }

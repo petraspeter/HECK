@@ -11,46 +11,8 @@
         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script> 
 
         <script src="handlebars-v4.0.5.js"></script>
-
-
-        <script>
-            function signIn(){
-            var ourRequest = new XMLHttpRequest();
-            ourRequest.open('POST', 'http://localhost:8076/heck/login/doctor');
-            ourRequest.setRequestHeader("Content-Type", "application/json"); 
-
-            ourRequest.onload = function() {console.log("eroor onload");
-            if (ourRequest.status == 200) {
-            var data = JSON.parse(ourRequest.responseText);
-            console.log(data);
-
-
-            var url = data.role == "admin" ? 'AdminMainPage.html' : 'DoctorMainPage.html';
-            sessionStorage.setItem('user', JSON.stringify(data));
-            window.location.href = url;
-            } else if(ourRequest.status == 401){
-
-            //ked nie su spravne udaje
-            document.getElementById("wrongData").style.visibility = "visible";
-            }else{
-            console.log("We connected to the server, but it returned an error.");
-            }
-            };
-
-            ourRequest.onerror = function() {
-            console.log("eroor onerror");
-            console.log("Connection error");
-            };
-
-            let login = document.getElementById('lgn').value;
-            let password = document.getElementById('psw').value;
-
-            ourRequest.send(JSON.stringify({
-            login:login, 
-            password:password, 
-            }));
-            }
-        </script>
+        <script src="validacia.js"></script>
+        <script src="myScript.js"></script>
 
         <style type="text/css">
 

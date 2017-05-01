@@ -20,6 +20,7 @@
         <script type="text/javascript">
             $(document).ready(function(){
             document.getElementById('logged-user').innerHTML = JSON.parse(sessionStorage.getItem('user')).login;
+                checkWorkingHoursAvailability();
             });       
         </script>
 

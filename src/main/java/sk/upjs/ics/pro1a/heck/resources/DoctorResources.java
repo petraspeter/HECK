@@ -15,8 +15,6 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import sk.upjs.ics.pro1a.heck.db.DoctorDao;
-import sk.upjs.ics.pro1a.heck.db.SpecializationDao;
 import sk.upjs.ics.pro1a.heck.services.DoctorService;
 import sk.upjs.ics.pro1a.heck.services.dto.*;
 
@@ -223,7 +221,7 @@ public class DoctorResources {
     @GET
     @Path("/doctors/{id}/workingTime")
     @UnitOfWork
-    public Response getDoctorWorkingTime(/*@Auth AuthorizedUserDto user, */@PathParam("id") long id) {
+    public Response getDoctorWorkingTime(@Auth AuthorizedUserDto user, @PathParam("id") long id) {
         WorkingTimeDto workingHours = doctorService.getDoctorWorkingTime(id);
         if(workingHours == null) {
             Response.ok(Collections.emptyMap()).build();

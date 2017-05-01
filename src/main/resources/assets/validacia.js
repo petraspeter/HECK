@@ -167,58 +167,60 @@ var validator = {
   }
 };
 
-var changePasswordValidator = {
-  feedbackIcons: {
-    valid: 'glyphicon glyphicon-ok',
-    invalid: 'glyphicon glyphicon-remove',
-    validating: 'glyphicon glyphicon-refresh'
-  },
-  fields: {
-    verbose: false,
-    currentModalPassword: {
-      validators: {
-        notEmpty: {
-          message: 'Please supply your current password'
-        },
-        remote: {
-          message: 'The current password is incorrect',
-          url: 'http://localhost:8076/heck/doctors/' + JSON.parse(sessionStorage.getItem('user')).id + '/checkPassword',
-          type: 'POST'
-        }
-      }
+if(JSON.parse(sessionStorage.getItem('user'))!= null) {
+  var changePasswordValidator = {
+    feedbackIcons: {
+      valid: 'glyphicon glyphicon-ok',
+      invalid: 'glyphicon glyphicon-remove',
+      validating: 'glyphicon glyphicon-refresh'
     },
-    newModalPassword: {
-      validators: {
-        stringLength: {
-          min: 6
-        },
-        identical: {
-          field: 'newModalConfirmPassword',
-          message: 'The new password and its confirm are not the same'
-        },
-        regexp: {
-          regexp: /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[^\w\s]).{6,}$/,
-          message: 'The password must consist one uppercase, one lowercase, one digit, one special character.'
+    fields: {
+      verbose: false,
+      currentModalPassword: {
+        validators: {
+          notEmpty: {
+            message: 'Please supply your current password'
+          },
+          remote: {
+            message: 'The current password is incorrect',
+            url: 'http://localhost:8076/heck/doctors/' + JSON.parse(sessionStorage.getItem('user')).id + '/checkPassword',
+            type: 'POST'
+          }
         }
-      }
-    },
-    newModalConfirmPassword: {
-      validators: {
-        identical: {
-          field: 'newModalPassword',
-          message: 'The new password and its confirm are not the same'
-        },
-        stringLength: {
-          min: 6
-        },
-        regexp: {
-          regexp: /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[^\w\s]).{6,}$/,
-          message: 'The password must consist one uppercase, one lowercase, one digit, one special character.'
+      },
+      newModalPassword: {
+        validators: {
+          stringLength: {
+            min: 6
+          },
+          identical: {
+            field: 'newModalConfirmPassword',
+            message: 'The new password and its confirm are not the same'
+          },
+          regexp: {
+            regexp: /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[^\w\s]).{6,}$/,
+            message: 'The password must consist one uppercase, one lowercase, one digit, one special character.'
+          }
+        }
+      },
+      newModalConfirmPassword: {
+        validators: {
+          identical: {
+            field: 'newModalPassword',
+            message: 'The new password and its confirm are not the same'
+          },
+          stringLength: {
+            min: 6
+          },
+          regexp: {
+            regexp: /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[^\w\s]).{6,}$/,
+            message: 'The password must consist one uppercase, one lowercase, one digit, one special character.'
+          }
         }
       }
     }
-  }
-};
+  };
+}
 
 function setUpValidation() {
   $('#myForm').bootstrapValidator(validator)

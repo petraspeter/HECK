@@ -61,6 +61,10 @@ public class User implements Serializable {
     @Type(type = "org.hibernate.type.NumericBooleanType")
     @Column(name = "active_user")
     private Boolean activeUser;
+
+    @Type(type = "org.hibernate.type.NumericBooleanType")
+    @Column(name = "is_admin")
+    private Boolean isAdmin;
     
     @Column(name = "registration_time_user")
     private Timestamp registrationTime;
@@ -167,8 +171,16 @@ public class User implements Serializable {
 
     public void setRegistrationTime(Timestamp registrationTime) {
         this.registrationTime = registrationTime;
-    }    
-    
+    }
+
+    public Boolean getAdmin() {
+        return isAdmin;
+    }
+
+    public void setAdmin(Boolean admin) {
+        isAdmin = admin;
+    }
+
     public User() {
     }
 
