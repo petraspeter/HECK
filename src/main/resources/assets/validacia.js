@@ -117,7 +117,8 @@ var validator = {
     phoneNumber: {
       validators: {
         regexp: {
-          regexp: /^(\+)([0-9]{12})$/
+          regexp: /^(\+)([0-9]{12})$/,
+          message: 'The phone number should start with + and contains 12 digits'
         },
         notEmpty: {
           message: 'Please supply your phone number (+421xxxxxxxxx)'
@@ -157,7 +158,8 @@ var validator = {
     postalCode: {
       validators: {
         regexp: {
-          regexp: /^([0-9]{5})$/
+          regexp: /^([0-9]{5})$/,
+          message: 'The postal code should contains 5 digits'
         },
         notEmpty: {
           message: 'Please supply your postal code'

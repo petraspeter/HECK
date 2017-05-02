@@ -133,7 +133,7 @@ function getDoctorDetail() {
         if (ourRequest.status == 200) {
             var data = JSON.parse(ourRequest.responseText);
             console.log(data);
-            fillDetailTableDoctor(data);
+            fillDetailTable(data);
             loadSpecialization(data.specialization);
         } else if (ourRequest.status == 401) {
             var url = 'SignIn.html';
@@ -150,7 +150,34 @@ function getDoctorDetail() {
     ourRequest.send();
 }
 
-function fillDetailTableDoctor(rows) {
+function getAdminDetail() {
+    var ourRequest = new XMLHttpRequest();
+
+    ourRequest.open('GET', 'http://localhost:8076/heck/users/' + JSON.parse(sessionStorage.getItem('user')).id);
+    ourRequest.setRequestHeader("Authorization", "Bearer " + JSON.parse(sessionStorage.getItem('user')).token);
+
+    ourRequest.onload = function () {
+        if (ourRequest.status == 200) {
+            var data = JSON.parse(ourRequest.responseText);
+            console.log(data);
+            fillDetailTable(data);
+            setUpValidation();
+        } else if (ourRequest.status == 401) {
+            var url = 'SignIn.html';
+            window.location.href = url;
+        } else {
+            console.log("We connected to the server, but it returned an error.");
+        }
+    };
+
+    ourRequest.onerror = function () {
+        console.log("Connection error");
+    };
+
+    ourRequest.send();
+}
+
+function fillDetailTable(rows) {
     var rawTemplate = $("#detailTableTemplate").text();
     var compiledTemplate = Handlebars.compile(rawTemplate);
     var ourGeneratedHTML = compiledTemplate(rows);
@@ -169,8 +196,28 @@ function startEditableDoctorInputs() {
     console.log(oldValues);
 
     //TODO Jquery
-    document.getElementById("specialization").disabled = false;
+    if(document.getElementById("specialization")!= null) {
+        document.getElementById("specialization").disabled = false;
+    }
 
+    var editableInputs = $('.myInputs');
+
+    for (var i = 0; i < editableInputs.length; ++i) {
+        editableInputs[i].disabled = false;
+    }
+
+    document.getElementById("saveButton").style.visibility = "visible";
+    document.getElementById("cancelButton").style.visibility = "visible";
+    document.getElementById("editButton").style.visibility = "hidden";
+}
+
+var oldValues = {};
+function startEditableAdminInputs() {
+    var $inputs = $(':input:not(button)');
+    $inputs.each(function () {
+        oldValues[$(this).attr('id')] = $(this).val();
+    });
+    console.log(oldValues);
     var editableInputs = $('.myInputs');
 
     for (var i = 0; i < editableInputs.length; ++i) {
@@ -234,9 +281,45 @@ function cancelEditableDoctorInputs() {
     clearValidationMarkers($('#myForm'));
 }
 
+function cancelEditableAdminInputs() {
+
+    document.getElementById("firstName").value = oldValues["firstName"];
+    document.getElementById("lastName").value = oldValues["lastName"];
+    document.getElementById("email").value = oldValues["email"];
+    document.getElementById("firstName").value = oldValues["firstName"];
+    document.getElementById("address").value = oldValues["address"];
+    document.getElementById("phoneNumber").value = oldValues["phoneNumber"];
+    document.getElementById("city").value = oldValues["city"];
+    document.getElementById("postalCode").value = oldValues["postalCode"];
+
+
+    var inputs = document.getElementsByClassName('myInputs');
+
+    for (var i = 0; i < inputs.length; ++i) {
+        inputs[i].disabled = true;
+    }
+
+    document.getElementById("saveButton").style.visibility = "hidden";
+    document.getElementById("cancelButton").style.visibility = "hidden";
+    document.getElementById("editButton").style.visibility = "visible";
+    clearValidationMarkers($('#myForm'));
+}
+
 function saveEditableDoctorInputs() {
     //TODO
     document.getElementById("specialization").disabled = true;
+    var editableInputs = $('.myInputs');
+    for (var i = 0; i < editableInputs.length; ++i) {
+        editableInputs[i].disabled = true;
+    }
+    //TODO vymysliet funkciu
+    document.getElementById("saveButton").style.visibility = "hidden";
+    document.getElementById("cancelButton").style.visibility = "hidden";
+    document.getElementById("editButton").style.visibility = "visible";
+    clearValidationMarkers($('#myForm'));
+}
+
+function saveEditableAdminInputs() {
     var editableInputs = $('.myInputs');
     for (var i = 0; i < editableInputs.length; ++i) {
         editableInputs[i].disabled = true;
@@ -296,6 +379,39 @@ function updateDoctor() {
     var ourRequest = new XMLHttpRequest();
 
     ourRequest.open('PUT', 'http://localhost:8076/heck/doctors/' + JSON.parse(sessionStorage.getItem('user')).id);
+    ourRequest.setRequestHeader("Content-Type", "application/json");
+    ourRequest.setRequestHeader("Authorization", "Bearer " + JSON.parse(sessionStorage.getItem('user')).token);
+
+    ourRequest.onload = function () {
+        if (ourRequest.status == 200) {
+            console.log("Update successful.");
+        } else if (ourRequest.status == 401) {
+            var url = 'SignIn.html';
+            window.location.href = url;
+        } else {
+            console.log("We connected to the server, but it returned an error.");
+        }
+    };
+
+    ourRequest.onerror = function () {
+        console.log("Connection error");
+    };
+
+    ourRequest.send(JSON.stringify(ids));
+}
+
+function updateAdmin() {
+    var $inputs = $(':input:not(:button)');
+
+    var ids = {};
+    $inputs.each(function (index) {
+        //console.log(index + ': ' + $(this).attr('id')) ;
+        ids[$(this).attr('id')] = $(this).val();
+    });
+
+    var ourRequest = new XMLHttpRequest();
+
+    ourRequest.open('PUT', 'http://localhost:8076/heck/users/' + JSON.parse(sessionStorage.getItem('user')).id);
     ourRequest.setRequestHeader("Content-Type", "application/json");
     ourRequest.setRequestHeader("Authorization", "Bearer " + JSON.parse(sessionStorage.getItem('user')).token);
 

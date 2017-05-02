@@ -3,19 +3,11 @@ package sk.upjs.ics.pro1a.heck.resources;
 import io.dropwizard.auth.Auth;
 import io.dropwizard.hibernate.UnitOfWork;
 import java.util.List;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
+import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import sk.upjs.ics.pro1a.heck.services.UserService;
-import sk.upjs.ics.pro1a.heck.services.dto.AuthorizedUserDto;
-import sk.upjs.ics.pro1a.heck.services.dto.LoginRequestDto;
-import sk.upjs.ics.pro1a.heck.services.dto.LoginResponseDto;
-import sk.upjs.ics.pro1a.heck.services.dto.UserDto;
+import sk.upjs.ics.pro1a.heck.services.dto.*;
 
 /**
  *
@@ -75,5 +67,12 @@ public class UserResources {
         List<UserDto> users = userService.getAllUsers();
         return Response.ok(users).build();
     }
-    
+
+    @PUT
+    @Path("/users/{id}")
+    @UnitOfWork
+    public Response updateDoctor(@Auth AuthorizedUserDto user, @PathParam("id") Long id, UserDto userDto){
+        userService.updateUser(id, userDto);
+        return  Response.ok().build();
+    }
 }

@@ -141,7 +141,20 @@ public class UserService {
         loginResponse.setToken(tokenizer.updateToken(name, role, expiration));
         return loginResponse;
     }
-    
+
+    public void updateUser(Long id, UserDto userDto) {
+        User user = userDao.findById(id);
+        user.setAdmin(user.getAdmin());
+        user.setAddressUser(userDto.getAddress());
+        user.setCityUser(userDto.getCity());
+        user.setEmailUser(userDto.getEmail());
+        user.setFirstNameUser(userDto.getFirstName());
+        user.setLastNameUser(userDto.getLastName());
+        user.setLoginUser(userDto.getLogin());
+        user.setPhoneUser(userDto.getPhoneNumber());
+        user.setPostalCodeUser(userDto.getPostalCode());
+        userDao.update(user);
+    }
     
     /*
     Methods for convert between DTO and DAO
@@ -192,5 +205,4 @@ public class UserService {
                 user.getRegistrationTime()
         );
     }
-    
 }
