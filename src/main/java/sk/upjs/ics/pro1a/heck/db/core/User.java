@@ -184,8 +184,9 @@ public class User implements Serializable {
     public User() {
     }
 
-    public User(String emailUser, String loginUser, String passwordUser, String salt, String firstNameUser, String lastNameUser,
-                String phoneUser, String postalCodeUser, String cityUser, String addressUser, Timestamp registrationTime) {
+  public User(String emailUser, String loginUser, String passwordUser, String salt, String firstNameUser, String lastNameUser,
+            String phoneUser, String postalCodeUser, String cityUser, String addressUser, Timestamp registrationTime, 
+            boolean  isAdmin) {
         this.emailUser = emailUser;
         this.loginUser = loginUser;
         this.passwordUser = passwordUser;
@@ -198,5 +199,7 @@ public class User implements Serializable {
         this.addressUser = addressUser;
         this.activeUser = true;
         this.registrationTime = registrationTime;
+        this.isAdmin = isAdmin;
     }
+  
 }

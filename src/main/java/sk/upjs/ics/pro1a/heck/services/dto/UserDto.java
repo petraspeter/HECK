@@ -41,6 +41,9 @@ public class UserDto {
 
     @JsonProperty("registrationTime")
     private Timestamp registrationTime;
+        
+    @JsonProperty("isAdmin")
+    private boolean isAdmin;
     
     public long getId() {
         return id;
@@ -130,11 +133,20 @@ public class UserDto {
         this.registrationTime = registrationTime;
     }
 
+    public boolean isAdmin() {
+        return isAdmin;
+    }
+
+    public void setIsAdmin(boolean isAdmin) {
+        this.isAdmin = isAdmin;
+    }
+        
     public UserDto() {
     }
 
     public UserDto(long id, String login, String password, String firstName, String lastName, String email, 
-            String address, String postalCode, String city, String phoneNumber, Timestamp registrationTime) {
+            String address, String postalCode, String city, String phoneNumber, Timestamp registrationTime, 
+            boolean isAdmin) {
         this.id = id;
         this.login = login;
         this.password = password;
@@ -146,10 +158,28 @@ public class UserDto {
         this.city = city;
         this.phoneNumber = phoneNumber;
         this.registrationTime = registrationTime;
+        this.isAdmin = isAdmin;
+    }
+    
+      public UserDto(long id, String login, String password, String firstName, String lastName, String email, 
+            String address, String postalCode, String city, String phoneNumber) {
+        this.id = id;
+        this.login = login;
+        this.password = password;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.email = email;
+        this.address = address;
+        this.postalCode = postalCode;
+        this.city = city;
+        this.phoneNumber = phoneNumber;
+        this.registrationTime = new Timestamp(System.currentTimeMillis());
+        this.isAdmin = false;
     }
 
     public UserDto(long id, String login, String firstName, String lastName, String email, String address, 
-            String postalCode, String city, String phoneNumber, Timestamp registrationTime) {
+            String postalCode, String city, String phoneNumber, Timestamp registrationTime, 
+            boolean isAdmin) {
         this.id = id;
         this.login = login;
         this.firstName = firstName;
@@ -160,6 +190,7 @@ public class UserDto {
         this.city = city;
         this.phoneNumber = phoneNumber;
         this.registrationTime = registrationTime;
+        this.isAdmin = isAdmin;
     }
         
 }

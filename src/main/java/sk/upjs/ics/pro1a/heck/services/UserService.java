@@ -3,6 +3,7 @@ package sk.upjs.ics.pro1a.heck.services;
 import sk.upjs.ics.pro1a.heck.utils.Tokenizer;
 import java.math.BigInteger;
 import java.security.SecureRandom;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 import org.jose4j.jwt.NumericDate;
@@ -88,6 +89,7 @@ public class UserService {
         String salt = new BigInteger(130, new SecureRandom()).toString(32);
         String password = PasswordManager.encryptPassword(salt, userDto.getPassword());
         User user = createUserDaoFromUserDto(userDto, password, salt);
+        user.setRegistrationTime(new Timestamp(System.currentTimeMillis()));
         user = userDao.createUser(user);
         LoginResponseDto loginResponse = new LoginResponseDto();
         loginResponse.setId(user.getIdUser());
@@ -171,7 +173,8 @@ public class UserService {
                 userDto.getPostalCode(),
                 userDto.getCity(),
                 userDto.getAddress(),
-                userDto.getRegistrationTime()
+                userDto.getRegistrationTime(),
+                userDto.isAdmin()
         );
     }
     
@@ -186,7 +189,8 @@ public class UserService {
                 user.getPostalCodeUser(),
                 user.getCityUser(),
                 user.getPhoneUser(),
-                user.getRegistrationTime()
+                user.getRegistrationTime(),
+                user.getAdmin()
         );
     }
     
@@ -202,7 +206,10 @@ public class UserService {
                 user.getPostalCodeUser(),
                 user.getCityUser(),
                 user.getPhoneUser(),
-                user.getRegistrationTime()
+                user.getRegistrationTime(),
+                user.getAdmin()
+                
         );
     }
+    
 }

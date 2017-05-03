@@ -20,8 +20,8 @@ public class WorkingTimeDao extends AbstractDAO<WorkingTime>{
                 .setParameter("idDoctor", id));
     }
     
-     public List<WorkingTime> findWorkingTimeByDoctorIdAndDayName(Long id, String dayName) {
-        return list(namedQuery("findAlWorkingHoursByDoctorIdAndDayOfTheWeek")
+   public List<WorkingTime> findWorkingTimeByDoctorIdAndDay(Long id, int dayName) {
+        return list(namedQuery("findAlWorkingHoursByDoctorIdAndDayOfTheWeekNativeQuery")
                 .setParameter("idDoctor", id)
                 .setParameter("dayOfTheWeek", dayName));
     }

@@ -99,8 +99,7 @@ public class AppointmentResources {
     ) throws ParseException {
         SimpleDateFormat sdt = new SimpleDateFormat("yyyy-MM-dd");
         Timestamp tsFrom = new Timestamp(sdt.parse(dateFrom).getTime());
-        Timestamp tsTo = new Timestamp(sdt.parse(dateTo).getTime());
-        
+        Timestamp tsTo = new Timestamp(sdt.parse(dateTo).getTime());        
         List<AppointmentDto> appointments = appointmentService
                 .generateDoctorAppointmentForDays(idDoc, idUser, tsFrom, tsTo);
         if (appointments.size() > 0) {
@@ -118,10 +117,9 @@ public class AppointmentResources {
             @QueryParam("idDoc") Long idDoc,
             @QueryParam("idUser") Long idUser
     ) throws ParseException {        
-        SimpleDateFormat sdt = new SimpleDateFormat("yyyy-MM-dd");
         Long actualDay = DateUtils.truncate(new Date(), Calendar.DATE).getTime();
         Timestamp tsFrom = new Timestamp(actualDay);
-        Timestamp tsTo = new Timestamp(actualDay+(7*24*60*60*1000));
+        Timestamp tsTo = new Timestamp(actualDay+(6*24*60*60*1000));
         List<AppointmentDto> appointments = appointmentService
                 .generateDoctorAppointmentForDays(idDoc, idUser, tsFrom, tsTo);
         if (appointments.size() > 0) {

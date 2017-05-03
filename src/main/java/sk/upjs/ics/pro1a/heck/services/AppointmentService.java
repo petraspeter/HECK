@@ -1,13 +1,9 @@
 package sk.upjs.ics.pro1a.heck.services;
 
 import java.sql.Timestamp;
-import java.time.DayOfWeek;
-import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.GregorianCalendar;
 import java.util.List;
-import java.util.Locale;
+import org.joda.time.LocalDate;
 import sk.upjs.ics.pro1a.heck.db.AppointmentDao;
 import sk.upjs.ics.pro1a.heck.db.DoctorDao;
 import sk.upjs.ics.pro1a.heck.db.UserDao;
@@ -47,15 +43,17 @@ public class AppointmentService {
         List<Appointment> appointments = new ArrayList<>();
         Doctor doc = doctorDao.findById(idDoc);
         int period = doc.getAppointmentInterval();
-        Calendar calendar = new GregorianCalendar();
-        calendar.setTimeInMillis(date.getTime());
-        String dayOfWeek = calendar.getDisplayName( Calendar.DAY_OF_WEEK ,Calendar.LONG, Locale.ENGLISH);
-        List<WorkingTime> docHours = workingTimeDao.findWorkingTimeByDoctorIdAndDayName(idDoc,
-                dayOfWeek);
+        LocalDate jodaDate = new org.joda.time.LocalDate(date.getTime());
+        List<WorkingTime> docHours = workingTimeDao.findWorkingTimeByDoctorIdAndDay(idDoc, jodaDate.getDayOfWeek());
         for (WorkingTime docHour : docHours) {
-            Timestamp start = new Timestamp(docHour.getStartingHour().getTime());
+            /**
+             * posun o jednu hodinu je 3600000 ms, na vstupe webservici primam format YYYY-MM-DD, ktory parsujem 
+             * cez simple date format a ten sice berie do uvahy casove pasmo, ale nie casovy posun zimny/letny cas
+             */
+            Timestamp start = new Timestamp(docHour.getStartingHour().getTime()+date.getTime()+3600000);
             Timestamp end = new Timestamp((start.getTime() + ((period * 60) * 1000)));
-            while (end.before(new Timestamp(docHour.getEndingHour().getTime()+1))) {    // aby sme vratili aj termin, ktory konci presne na konci pracovnej doby provnavame cas o 1ms neskor
+            Timestamp ending = new Timestamp(docHour.getEndingHour().getTime()+date.getTime()+3600001);
+            while (end.before(ending)) {    // aby sme vratili aj termin, ktory konci presne na konci pracovnej doby provnavame cas o 1ms neskor
                 appointments.add(generateAppointment(idDoc, idUser, start, end));
                 start = end;
                 end = new Timestamp((start.getTime() + ((period * 60) * 1000)));    //convert period from minutes to miliseconds
