@@ -33,7 +33,7 @@ import java.sql.Timestamp;
     @NamedNativeQuery(
             name = "findAllDoctorsBySpecializationAndCityNativeSql",
             query = "select * from doctor doc where doc.specialization_doctor = :specialization "
-                    + "AND doc.postal_code_doctor = :pcn",
+                    + "AND doc.city_doctor = :city",
             resultClass = Doctor.class
     ),
     @NamedNativeQuery(
@@ -46,7 +46,7 @@ import java.sql.Timestamp;
             name = "findAllDoctorsBySpecializationAndFullNameAndCityNativeSql",
             query = "select * from doctor doc where doc.specialization_doctor = :specialization AND "
                     + "doc.first_name_doctor LIKE :firstName AND doc.last_name_doctor LIKE :lastName "
-                    + "AND  doc.postal_code_doctor = :pcn",
+                    + "AND doc.city_doctor = :city",
             resultClass = Doctor.class
     ),
     @NamedNativeQuery(
@@ -59,7 +59,7 @@ import java.sql.Timestamp;
             name = "findAllDoctorsBySpecializationAndLastNameAndCityNativeSql",
             query = "select * from doctor doc where doc.specialization_doctor = :specialization AND "
                     + "doc.last_name_doctor LIKE :lastName"
-                    + "AND  doc.postal_code_doctor = :pcn",
+                    + "AND doc.city_doctor = :city",
             resultClass = Doctor.class
     )
 })

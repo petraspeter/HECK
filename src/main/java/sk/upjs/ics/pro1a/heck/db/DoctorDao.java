@@ -47,10 +47,10 @@ public class DoctorDao extends AbstractDAO<Doctor> {
                 .setParameter("specialization", id));
     }
     
-    public List<Doctor> findDoctorsBySpecializationAndPostalCode(Long id, String pcn) {
+    public List<Doctor> findDoctorsBySpecializationAndPostalCode(Long id, String city) {
         return list(namedQuery("findAllDoctorsBySpecializationAndCityNativeSql")
                 .setParameter("specialization", id)
-                .setParameter("pcn", pcn));
+                .setParameter("city", city));
     }
     
     public List<Doctor> findDoctorsBySpecializationAndName(Long id, String firstName, String lastName) {
@@ -61,12 +61,12 @@ public class DoctorDao extends AbstractDAO<Doctor> {
     }
     
     public List<Doctor> findDoctorsBySpecializationAndNameAndPostalCode(Long id, String firstName,
-            String lastName, String pcn) {
+            String lastName, String city) {
         return list(namedQuery("findAllDoctorsBySpecializationAndNameAndCityNativeSql")
                 .setParameter("specialization", id)
                 .setParameter("firstName", firstName)
                 .setParameter("lastName", lastName)
-                .setParameter("pcn", pcn));
+                .setParameter("city", city));
     }
     public List<Doctor> findDoctorsBySpecializationAndLastName(Long id, String lastName) {
         return list(namedQuery("findAllDoctorsBySpecializationAndLastNameNativeSql")
@@ -75,11 +75,11 @@ public class DoctorDao extends AbstractDAO<Doctor> {
     }
     
     public List<Doctor> findDoctorsBySpecializationAndLastNameAndPostalCode(Long id, String lastName,
-            String pcn) {
+            String city) {
         return list(namedQuery("findAllDoctorsBySpecializationAndLastNameAndCityNativeSql")
                 .setParameter("specialization", id)
                 .setParameter("lastName", lastName)
-                .setParameter("pcn", pcn));
+                .setParameter("city", city));
     }
     
     
