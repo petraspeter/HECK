@@ -10,15 +10,19 @@ import sk.upjs.ics.pro1a.heck.db.core.Doctor;
 import sk.upjs.ics.pro1a.heck.db.core.User;
 import sk.upjs.ics.pro1a.heck.services.dto.AuthorizedUserDto;
 import java.util.Optional;
+import org.hibernate.SessionFactory;
+import org.hibernate.criterion.Restrictions;
 
 public class HeckAuthenticator implements Authenticator<JwtContext, AuthorizedUserDto> {
     
     private DoctorDao doctorDao;
     private UserDao userDao;
+    private final SessionFactory sessionFactory;
     
-    public HeckAuthenticator(DoctorDao doctorDao, UserDao userDao) {
+    public HeckAuthenticator(DoctorDao doctorDao, UserDao userDao, SessionFactory sessionFactory) {
         this.doctorDao = doctorDao;
         this.userDao = userDao;
+        this.sessionFactory = sessionFactory;
     }
     
     @Override
@@ -37,17 +41,12 @@ public class HeckAuthenticator implements Authenticator<JwtContext, AuthorizedUs
             final String role = context.getJwtClaims().getClaimValue("role").toString();
             final String login = context.getJwtClaims().getSubject();
             if ("doctor".equals(role)) {
-                Doctor doctor = doctorDao.findByLogin(login);
+                Doctor doctor =  (Doctor) sessionFactory.getCurrentSession().createCriteria(Doctor.class)
+                        .add(Restrictions.eq("loginDoctor", login)).uniqueResult();
                 if (doctor != null) {
                     return Optional.of(new AuthorizedUserDto(doctor.getIdDoctor(), login, "doctor"));
                 }
             }
-//            if ("admin".equals(role)) {
-//                Doctor doctor = doctorDao.findByLogin(login);
-//                if (doctor.getIsAdmin()) {
-//                    return Optional.of(new AuthorizedUserDto(doctor.getIdDoctor(), login, "admin"));
-//                }
-//            }
             if ("user".equals(role)) {
                 User user = userDao.findByLogin(login);
                 if (user != null) {

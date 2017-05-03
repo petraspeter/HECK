@@ -104,7 +104,7 @@ public class DoctorResources {
             @Auth AuthorizedUserDto user,
             @QueryParam("id") Long id,
             @QueryParam("pcn") String pcn) {
-        List<DoctorDto> doctors = doctorService.getDoctorsBySpecializationIdAndPostalCode(id, pcn);
+        List<DoctorDto> doctors = doctorService.getDoctorsBySpecializationIdAndCity(id, pcn);
         if (doctors == null) {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
@@ -149,7 +149,7 @@ public class DoctorResources {
             @QueryParam("firstName") String firstName,
             @QueryParam("lastName") String lastName,
             @QueryParam("pcn") String pcn) {
-        List<DoctorDto> doctors = doctorService.getDoctorsBySpecializationIdAndNameAndPostalCode(id, firstName,
+        List<DoctorDto> doctors = doctorService.getDoctorsBySpecializationIdAndNameAndCity(id, firstName,
                 lastName, pcn);
         if (doctors == null) {
             return Response.status(Response.Status.NOT_FOUND).build();
@@ -165,7 +165,7 @@ public class DoctorResources {
             @QueryParam("id") Long id,
             @QueryParam("lastName") String lastName,
             @QueryParam("pcn") String pcn) {
-        List<DoctorDto> doctors = doctorService.getDoctorsBySpecializationIdAndLastNameAndPostalCode(id,
+        List<DoctorDto> doctors = doctorService.getDoctorsBySpecializationIdAndLastNameAndCity(id,
                 lastName, pcn);
         if (doctors == null) {
             return Response.status(Response.Status.NOT_FOUND).build();

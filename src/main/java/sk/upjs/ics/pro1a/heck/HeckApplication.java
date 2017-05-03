@@ -33,6 +33,7 @@ import javax.servlet.DispatcherType;
 import javax.servlet.FilterRegistration;
 import javax.ws.rs.client.Client;
 import java.util.EnumSet;
+import org.hibernate.SessionFactory;
 import sk.upjs.ics.pro1a.heck.db.AppointmentDao;
 import sk.upjs.ics.pro1a.heck.db.WorkingTimeDao;
 import sk.upjs.ics.pro1a.heck.db.core.Appointment;
@@ -53,12 +54,12 @@ public class HeckApplication extends Application<HeckConfiguration> {
             User.class,
             WorkingTime.class,
             Appointment.class) {
-                        @Override
-                        public DataSourceFactory getDataSourceFactory(HeckConfiguration configuration) {
-                            return configuration.getDataSourceFactory();
-                        }
-                    };
-
+                @Override
+                public DataSourceFactory getDataSourceFactory(HeckConfiguration configuration) {
+                    return configuration.getDataSourceFactory();
+                }
+            };
+    
     public static void main(final String[] args) throws Exception {
         new HeckApplication().run(args);
     }
@@ -85,13 +86,15 @@ public class HeckApplication extends Application<HeckConfiguration> {
         final SpecializationDao specializationDao = new SpecializationDao(hibernateBundle.getSessionFactory());
         final AppointmentDao appointmentDao = new AppointmentDao(hibernateBundle.getSessionFactory());
         final WorkingTimeDao workingTimeDao = new WorkingTimeDao(hibernateBundle.getSessionFactory());
-
+        
         final byte[] key = configuration.getJwtTokenSecret();
-        final AppointmentService appointmentService = new AppointmentService(appointmentDao, doctorDao, userDao, workingTimeDao, key);
-        final DoctorService doctorService = new DoctorService(doctorDao, specializationDao, workingTimeDao, key);
+        final AppointmentService appointmentService = new AppointmentService(appointmentDao, doctorDao, userDao,
+                workingTimeDao, key, hibernateBundle.getSessionFactory());
+        final DoctorService doctorService = new DoctorService(doctorDao, workingTimeDao, key,
+                hibernateBundle.getSessionFactory());
         final SpecializationService specializationService = new SpecializationService(specializationDao);
         final UserService userService = new UserService(userDao,key);
-
+        
         /**
          * Create Jesrsey client
          */
@@ -112,7 +115,8 @@ public class HeckApplication extends Application<HeckConfiguration> {
                 .build(); // create the JwtConsumer instance
         
         HeckAuthenticator heckAuthenticator = new UnitOfWorkAwareProxyFactory(hibernateBundle)
-                .create(HeckAuthenticator.class, new Class[]{DoctorDao.class, UserDao.class}, new Object[]{doctorDao, userDao});
+                .create(HeckAuthenticator.class, new Class[]{DoctorDao.class, UserDao.class, SessionFactory.class},
+                        new Object[]{doctorDao, userDao, hibernateBundle.getSessionFactory()});
         
         environment.jersey().register(new AuthDynamicFeature(
                 new JwtAuthFilter.Builder<AuthorizedUserDto>()
