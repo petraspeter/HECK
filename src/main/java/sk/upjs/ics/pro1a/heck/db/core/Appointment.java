@@ -68,8 +68,6 @@ public class Appointment implements Serializable {
     @Column(name = "id_appointment")
     private Long idAppointment;
     
-//    @Formula("SELECT CONCAT(first_name_doctor, ' ', last_name_doctor) FROM "
-//            + "doctor doc JOIN appointment on  doc.id_doctor = id_doctor")
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "id_doctor")
     private Doctor appointmentDoctor;
