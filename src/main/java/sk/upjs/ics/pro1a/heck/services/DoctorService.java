@@ -1,6 +1,5 @@
 package sk.upjs.ics.pro1a.heck.services;
 
-import sk.upjs.ics.pro1a.heck.db.WorkingTimeDao;
 import sk.upjs.ics.pro1a.heck.db.core.WorkingTime;
 import sk.upjs.ics.pro1a.heck.services.dto.*;
 import sk.upjs.ics.pro1a.heck.utils.Tokenizer;
@@ -13,7 +12,6 @@ import org.hibernate.FetchMode;
 import org.hibernate.SessionFactory;
 import org.hibernate.criterion.Restrictions;
 import org.jose4j.jwt.NumericDate;
-import sk.upjs.ics.pro1a.heck.db.DoctorDao;
 import sk.upjs.ics.pro1a.heck.db.core.Doctor;
 import sk.upjs.ics.pro1a.heck.db.core.Specialization;
 import sk.upjs.ics.pro1a.heck.utils.PasswordManager;
@@ -24,19 +22,14 @@ import sk.upjs.ics.pro1a.heck.utils.PasswordManager;
  */
 public class DoctorService {
     
-    private DoctorDao doctorDao;
     private final byte[] tokenSecret;
     private Tokenizer tokenizer;
     private final SessionFactory sessionFactory;
-    private final WorkingTimeDao workingTimeDao;
     
-    public DoctorService(DoctorDao doctorDao, WorkingTimeDao workingTimeDao, byte[] tokenSecret,
-            SessionFactory sessionFactory) {
-        this.doctorDao = doctorDao;
+    public DoctorService(byte[] tokenSecret, SessionFactory sessionFactory) {
         this.tokenSecret = tokenSecret;
         tokenizer = new Tokenizer(tokenSecret);
         this.sessionFactory = sessionFactory;
-        this.workingTimeDao = workingTimeDao;
     }
     
     /*
@@ -44,18 +37,15 @@ public class DoctorService {
     */
     public List<DoctorDto> getAllDoctors() {
         List<DoctorDto> doctors = new ArrayList<>();
-        List<Doctor> iterate = sessionFactory.getCurrentSession().createCriteria(Doctor.class).list();
-        for (Doctor doctor :iterate) {
+        for (Doctor doctor :findAll()) {
             DoctorDto doctorDto = createDoctorDtoFromDoctorDaoWithoutPassword(doctor);
             doctors.add(doctorDto);
         }
-        
         return doctors;
     }
     
     public DoctorDto getDoctorById(long id) {
-        Doctor doctor =  (Doctor) sessionFactory.getCurrentSession().createCriteria(Doctor.class)
-                .add(Restrictions.eq("idDoctor", id)).uniqueResult();
+        Doctor doctor =  findById(id);
         if (doctor != null) {
             DoctorDto doctorDto = createDoctorDtoFromDoctorDaoWithPassword(doctor);
             return doctorDto;
@@ -64,8 +54,7 @@ public class DoctorService {
     }
     
     public DoctorDto getDoctorByLogin(String login) {
-        Doctor doctor = (Doctor) sessionFactory.getCurrentSession().createCriteria(Doctor.class)
-                .add(Restrictions.eq("loginDoctor", login)).uniqueResult();
+        Doctor doctor = findByLogin(login);
         if (doctor != null) {
             DoctorDto doctorDto = createDoctorDtoFromDoctorDaoWithPassword(doctor);
             return doctorDto;
@@ -73,13 +62,9 @@ public class DoctorService {
         return null;
     }
     
-    
     public List<DoctorDto> getDoctorsBySpecializationId(Long id) {
         List<DoctorDto> doctorsDto = new ArrayList<>();
-        List<Doctor> doctors =  sessionFactory.getCurrentSession().createCriteria(Doctor.class)
-                .setFetchMode("specializationDoctor", FetchMode.JOIN)
-                .createAlias("specializationDoctor", "sd")
-                .add(Restrictions.eq("sd.id", id)).list();
+        List<Doctor> doctors = findBySpecializationId(id);
         for (Doctor doctor : doctors) {
             DoctorDto doctorDto = createDoctorDtoFromDoctorDaoWithoutPassword(doctor);
             doctorsDto.add(doctorDto);
@@ -102,9 +87,9 @@ public class DoctorService {
         return doctors;
     }
     
-    public List<DoctorDto> getDoctorsBySpecializationIdAndName(Long id, String firstname, String lastName) {
+    public List<DoctorDto> getDoctorsBySpecializationIdAndFullName(Long id, String firstname, String lastName) {
         List<DoctorDto> doctors = new ArrayList<>();
-        List<Doctor> iterate = sessionFactory.getCurrentSession().createCriteria(Doctor.class)
+        List<Doctor> iterate = sessionFactory.getCurrentSession().createCriteria(Doctor.class)                
                 .setFetchMode("specializationDoctor", FetchMode.JOIN)
                 .createAlias("specializationDoctor", "sd")
                 .add(Restrictions.eq("sd.id", id))
@@ -118,7 +103,7 @@ public class DoctorService {
         return doctors;
     }
     
-    public List<DoctorDto> getDoctorsBySpecializationIdAndNameAndCity(Long id, String firstname,
+    public List<DoctorDto> getDoctorsBySpecializationIdAndFullNameAndCity(Long id, String firstname,
             String lastName, String city) {
         List<DoctorDto> doctors = new ArrayList<>();
         List<Doctor> iterate = sessionFactory.getCurrentSession().createCriteria(Doctor.class)
@@ -172,8 +157,7 @@ public class DoctorService {
     Login and registration methods
     */
     public LoginResponseDto loginAsDoctor(String login, String password) {
-        Doctor doctor = (Doctor) sessionFactory.getCurrentSession().createCriteria(Doctor.class)
-                .add(Restrictions.eq("loginDoctor", login)).uniqueResult();
+        Doctor doctor = findByLogin(login);
         if (doctor != null) {
             if (doctor.getPasswordDoctor().equals(PasswordManager.encryptPassword(doctor.getSaltDoctor(),
                     password))) {
@@ -194,10 +178,9 @@ public class DoctorService {
         }
         String salt = new BigInteger(130, new SecureRandom()).toString(32);
         String password = PasswordManager.encryptPassword(salt, doctorDto.getPassword());
-        Specialization specialization =  (Specialization) sessionFactory.getCurrentSession().createCriteria(Specialization.class)
-                .add(Restrictions.eq("id", doctorDto.getSpecialization())).uniqueResult();
+        Specialization specialization =  findSpecialization(doctorDto.getSpecialization());
         Doctor doctor = createDoctorDaoFromDoctorDto(doctorDto, password, salt, specialization);
-        doctor = doctorDao.createDoctor(doctor);
+        doctor = findByLogin(doctor.getLoginDoctor());
         LoginResponseDto loginResponse = new LoginResponseDto();
         loginResponse.setId(doctor.getIdDoctor());
         loginResponse.setLogin(doctor.getLoginDoctor());
@@ -206,31 +189,46 @@ public class DoctorService {
         return loginResponse;
     }
     
-    /*
-    Doctor update methods
-    */
-    public void updateDoctor(Long id, DoctorDto doctorDto) {
-        Doctor doctor =  (Doctor) sessionFactory.getCurrentSession().createCriteria(Doctor.class)
-                .add(Restrictions.eq("idDoctor", id)).uniqueResult();
-        doctor.setFirstNameDoctor(doctorDto.getFirstName());
-        doctor.setLastNameDoctor(doctorDto.getLastName());
-        doctor.setEmailDoctor(doctorDto.getEmail());
-        doctor.setBusinessNameDoctor(doctorDto.getOffice());
-        doctor.setAddressDoctor(doctorDto.getAddress());
-        doctor.setCityDoctor(doctorDto.getCity());
-        doctor.setPostalCodeDoctor(doctorDto.getPostalCode());
-        doctor.setPhoneNumberDoctor(doctorDto.getPhoneNumber());
-        if(!doctor.getSpecializationDoctor().getId().equals(doctorDto.getSpecialization())){
-            doctor.setSpecializationDoctor((Specialization) sessionFactory.getCurrentSession().createCriteria(Specialization.class)
-                    .add(Restrictions.eq("id", doctorDto.getSpecialization())).uniqueResult());
+    public WorkingTimeDto getDoctorWorkingTime(long id) {
+        List<WorkingTime> workingTimes = sessionFactory.getCurrentSession().createCriteria(WorkingTime.class)
+                .add(Restrictions.eq("id", id)).list();
+        if(workingTimes.isEmpty()) {
+            return null;
         }
-        doctorDao.update(doctor);
+        WorkingTimeDto workingTimeDto = new WorkingTimeDto();
+        workingTimeDto.setInterval(workingTimes.get(0).getDoctor().getAppointmentInterval());
+        
+        ArrayList<WorkingDayDto> workingDaysDto = new ArrayList<>();
+        for(WorkingTime workingTime: workingTimes) {
+            WorkingDayDto workingDayDto = new WorkingDayDto();
+            workingDayDto.setDay(workingTime.getDayOfTheWeek());
+            workingDayDto.setEnd(workingTime.getStartingHour().toString());
+            workingDayDto.setStart(workingTime.getEndingHour().toString());
+            workingDaysDto.add(workingDayDto);
+        }
+        workingTimeDto.setWorkingTimes(workingDaysDto);
+        
+        return workingTimeDto;
+    }
+    
+    public void createDoctorWorkingTime(long doctorId, WorkingTimeDto workingTimeDto) {
+        Doctor doctor = findById(doctorId);
+        doctor.setAppointmentInterval(workingTimeDto.getInterval());
+        
+        for (WorkingDayDto day : workingTimeDto.getWorkingTimes()) {
+            WorkingTime workingTime = new WorkingTime();
+            workingTime.setDayOfTheWeek(day.getDay());
+            workingTime.setDoctor(doctor);
+            //TODO: implement validation for String for end and start time
+            workingTime.setEndingHour(Time.valueOf(day.getEnd() + ":00"));
+            workingTime.setStartingHour(Time.valueOf(day.getStart() + ":00"));
+            sessionFactory.getCurrentSession().persist(workingTime);
+        }
     }
     
     public IsValidDto isLoginValid(String login) {
         IsValidDto isValidDto = new IsValidDto();
-        Doctor doctor = (Doctor) sessionFactory.getCurrentSession().createCriteria(Doctor.class)
-                .add(Restrictions.eq("loginDoctor", login)).uniqueResult();
+        Doctor doctor = findByLogin(login);
         if (doctor== null) {
             isValidDto.setValid(true);
         } else {
@@ -250,26 +248,9 @@ public class DoctorService {
         }
         return isValidDto;
     }
-    
-    public void changeDoctorPassword(Long id, ChangePasswordDto changePasswordDto) {
-        if (changePasswordDto.getNewPassword().equals(changePasswordDto.getConfirmPassword())) {
-            Doctor doctor =  (Doctor) sessionFactory.getCurrentSession().createCriteria(Doctor.class)
-                    .add(Restrictions.eq("idDoctor", id)).uniqueResult();
-            if (doctor != null) {
-                if (doctor.getPasswordDoctor().equals(PasswordManager.encryptPassword(doctor.getSaltDoctor(), changePasswordDto.getPassword()))) {
-                    doctor.setPasswordDoctor(PasswordManager.encryptPassword(doctor.getSaltDoctor(), changePasswordDto.getNewPassword()));
-                    doctorDao.update(doctor);
-                    return;
-                }
-            }
-        }
-        throw new IllegalStateException("Change password DTO is not valid.");
-    }
-    
     public IsValidDto checkDoctorPassword(Long id, String password) {
         IsValidDto isValidDto = new IsValidDto();
-        Doctor doctor =  (Doctor) sessionFactory.getCurrentSession().createCriteria(Doctor.class)
-                .add(Restrictions.eq("idDoctor", id)).uniqueResult();
+        Doctor doctor =  findById(id);
         if (doctor != null) {
             if (doctor.getPasswordDoctor().equals(PasswordManager.encryptPassword(doctor.getSaltDoctor(), password))) {
                 isValidDto.setValid(true);
@@ -280,12 +261,46 @@ public class DoctorService {
         return isValidDto;
     }
     
+    public void changeDoctorPassword(Long id, ChangePasswordDto changePasswordDto) {
+        if (changePasswordDto.getNewPassword().equals(changePasswordDto.getConfirmPassword())) {
+            Doctor doctor =  findById(id);
+            if (doctor != null) {
+                if (doctor.getPasswordDoctor().equals(PasswordManager.encryptPassword(doctor.getSaltDoctor(),
+                        changePasswordDto.getPassword()))) {
+                    doctor.setPasswordDoctor(PasswordManager.encryptPassword(doctor.getSaltDoctor(),
+                            changePasswordDto.getNewPassword()));
+                    sessionFactory.getCurrentSession().persist(doctor);
+                    return;
+                }
+            }
+        }
+        throw new IllegalStateException("Change password DTO is not valid.");
+    }
+    
+    /*
+    Doctor update methods
+    */
+    public void updateDoctor(Long id, DoctorDto doctorDto) {
+        Doctor doctor =  findById(id);
+        doctor.setFirstNameDoctor(doctorDto.getFirstName());
+        doctor.setLastNameDoctor(doctorDto.getLastName());
+        doctor.setEmailDoctor(doctorDto.getEmail());
+        doctor.setBusinessNameDoctor(doctorDto.getOffice());
+        doctor.setAddressDoctor(doctorDto.getAddress());
+        doctor.setCityDoctor(doctorDto.getCity());
+        doctor.setPostalCodeDoctor(doctorDto.getPostalCode());
+        doctor.setPhoneNumberDoctor(doctorDto.getPhoneNumber());
+        if(!doctor.getSpecializationDoctor().getId().equals(doctorDto.getSpecialization())){
+            doctor.setSpecializationDoctor(findSpecialization(doctorDto.getSpecialization()));
+        }
+        sessionFactory.getCurrentSession().persist(doctor);
+    }
+    
     /*
     Update token method
     */
     public LoginResponseDto updateDoctorsToken(String login, String role, Long actualExpirationTime) {
-        Doctor doctor = (Doctor) sessionFactory.getCurrentSession().createCriteria(Doctor.class)
-                .add(Restrictions.eq("loginDoctor", login)).uniqueResult();
+        Doctor doctor = findByLogin(login);
         LoginResponseDto loginResponse = new LoginResponseDto();
         loginResponse.setId(doctor.getIdDoctor());
         loginResponse.setLogin(doctor.getLoginDoctor());
@@ -295,43 +310,33 @@ public class DoctorService {
         return loginResponse;
     }
     
-    public WorkingTimeDto getDoctorWorkingTime(long id) {
-           List<WorkingTime> workingTimes = sessionFactory.getCurrentSession().createCriteria(WorkingTime.class)
-                .add(Restrictions.eq("id", id))
-                .list();
-        if(workingTimes.size()==0) {
-            return null;
-        }
-        WorkingTimeDto workingTimeDto = new WorkingTimeDto();
-        workingTimeDto.setInterval(workingTimes.get(0).getDoctor().getAppointmentInterval());
-        
-        ArrayList<WorkingDayDto> workingDaysDto = new ArrayList<>();
-        for(WorkingTime workingTime: workingTimes){
-            WorkingDayDto workingDayDto = new WorkingDayDto();
-            workingDayDto.setDay(workingTime.getDayOfTheWeek());
-            workingDayDto.setEnd(workingTime.getStartingHour().toString());
-            workingDayDto.setStart(workingTime.getEndingHour().toString());
-            workingDaysDto.add(workingDayDto);
-        }
-        workingTimeDto.setWorkingTimes(workingDaysDto);
-        
-        return workingTimeDto;
+    /*
+    Private "query" methods
+    */
+    private List<Doctor> findAll(){
+        return sessionFactory.getCurrentSession().createCriteria(Doctor.class).list();
     }
     
-    public void createDoctorWorkingTime(long doctorId, WorkingTimeDto workingTimeDto) {
-        Doctor doctor =  (Doctor) sessionFactory.getCurrentSession().createCriteria(Doctor.class)
-                .add(Restrictions.eq("idDoctor", doctorId)).uniqueResult();
-        doctor.setAppointmentInterval(workingTimeDto.getInterval());
-        
-        for (WorkingDayDto day : workingTimeDto.getWorkingTimes()) {
-            WorkingTime workingTime = new WorkingTime();
-            workingTime.setDayOfTheWeek(day.getDay());
-            workingTime.setDoctor(doctor);
-            //TODO: implement validation for String for end and start time
-            workingTime.setEndingHour(Time.valueOf(day.getEnd() + ":00"));
-            workingTime.setStartingHour(Time.valueOf(day.getStart() + ":00"));
-            workingTimeDao.createWorkingTime(workingTime);
-        }
+    private Doctor findById(long id) {
+        return (Doctor) sessionFactory.getCurrentSession().createCriteria(Doctor.class)
+                .add(Restrictions.eq("idDoctor", id)).uniqueResult();
+    }
+    
+    private Doctor findByLogin(String login) {
+        return (Doctor) sessionFactory.getCurrentSession().createCriteria(Doctor.class)
+                .add(Restrictions.eq("loginDoctor", login)).uniqueResult();
+    }
+    
+    private List<Doctor> findBySpecializationId(long id) {
+        return sessionFactory.getCurrentSession().createCriteria(Doctor.class)
+                .setFetchMode("specializationDoctor", FetchMode.JOIN)
+                .createAlias("specializationDoctor", "sd")
+                .add(Restrictions.eq("sd.id", id)).list();
+    }
+    
+    private Specialization findSpecialization(long id) {
+        return  (Specialization) sessionFactory.getCurrentSession().createCriteria(Specialization.class)
+                .add(Restrictions.eq("id",id)).uniqueResult();
     }
     
     /*

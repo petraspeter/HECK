@@ -10,24 +10,6 @@ import javax.persistence.*;
  */
 @Entity
 @Table(name = "working_time")
-@NamedQueries({
-    @NamedQuery(name = "findWorkingTimeByDoctorId",
-            query = "select w from WorkingTime w where w.doctor.idDoctor = :doctorId")
-        
-})
-@NamedNativeQueries({
-    @NamedNativeQuery(
-            name = "findAlWorkingHoursByDoctorIdNativeQuery",
-            query = "select * from working_time wt WHERE wt.id_doctor = :idDoctor",
-            resultClass = WorkingTime.class
-    ),
-    @NamedNativeQuery(
-            name = "findAlWorkingHoursByDoctorIdAndDayOfTheWeekNativeQuery",
-            query = "select * from working_time  wt WHERE wt.id_doctor = :idDoctor AND "
-                    + "wt.day_of_the_week = :dayOfTheWeek",
-            resultClass = WorkingTime.class
-    )
-})
 public class WorkingTime implements Serializable{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

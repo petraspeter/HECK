@@ -2,7 +2,8 @@ package sk.upjs.ics.pro1a.heck.services;
 
 import java.util.ArrayList;
 import java.util.List;
-import sk.upjs.ics.pro1a.heck.db.SpecializationDao;
+import org.hibernate.SessionFactory;
+import org.hibernate.criterion.Restrictions;
 import sk.upjs.ics.pro1a.heck.db.core.Specialization;
 import sk.upjs.ics.pro1a.heck.services.dto.SpecializationDto;
 
@@ -12,10 +13,10 @@ import sk.upjs.ics.pro1a.heck.services.dto.SpecializationDto;
  */
 public class SpecializationService {
     
-    private  SpecializationDao specializationDao;
+    private final SessionFactory sessionFactory;
     
-    public SpecializationService(SpecializationDao specializationDao) {
-        this.specializationDao = specializationDao;
+    public SpecializationService(SessionFactory sessionFactory) {
+        this.sessionFactory = sessionFactory;
     }
     
     /*
@@ -23,15 +24,18 @@ public class SpecializationService {
     */
     public List<SpecializationDto> getAllSpecializations() {
         List<SpecializationDto> specializations = new ArrayList<>();
-        for (Specialization s : specializationDao.findAll()) {
-            SpecializationDto specializationDto = new SpecializationDto(s.getId(), s.getSpecializationName());
+        List<Specialization> list = sessionFactory.getCurrentSession().createCriteria(Specialization.class).list();
+        for (Specialization specialization : list) {
+            SpecializationDto specializationDto = new SpecializationDto(specialization.getId(),
+                    specialization.getSpecializationName());
             specializations.add(specializationDto);
         }
         return specializations;
     }
     
     public SpecializationDto getSpecializationById(long id) {
-        Specialization specialization = specializationDao.findById(id);
+        Specialization specialization = (Specialization) sessionFactory.getCurrentSession()
+                .createCriteria(Specialization.class).add(Restrictions.eq("idDoctor", id)).uniqueResult();
         if (specialization != null) {
             return new SpecializationDto(specialization.getId(), specialization.getSpecializationName());
         }

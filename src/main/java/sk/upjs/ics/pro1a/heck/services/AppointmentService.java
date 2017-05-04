@@ -3,13 +3,11 @@ package sk.upjs.ics.pro1a.heck.services;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
+import org.hibernate.FetchMode;
 import org.hibernate.SessionFactory;
 import org.hibernate.criterion.Restrictions;
 import org.joda.time.LocalDate;
-import sk.upjs.ics.pro1a.heck.db.AppointmentDao;
-import sk.upjs.ics.pro1a.heck.db.DoctorDao;
-import sk.upjs.ics.pro1a.heck.db.UserDao;
-import sk.upjs.ics.pro1a.heck.db.WorkingTimeDao;
 import sk.upjs.ics.pro1a.heck.db.core.Appointment;
 import sk.upjs.ics.pro1a.heck.db.core.Doctor;
 import sk.upjs.ics.pro1a.heck.db.core.User;
@@ -24,24 +22,20 @@ import sk.upjs.ics.pro1a.heck.services.dto.AppointmentUserDto;
  */
 public class AppointmentService {
     
-    private final AppointmentDao appointmentDao;
-    private final DoctorDao doctorDao;
-    private final UserDao userDao;
-    private final WorkingTimeDao workingTimeDao;
     private final SessionFactory sessionFactory;
-    private final byte[] tokenSecret;
     
     private final int NUMBER_OF_RETURNED_APPOINTMENTS = 30;
     
-    public AppointmentService(AppointmentDao appointmentDao, DoctorDao appointmentDoctorDao,
-            UserDao appointmentUserDao, WorkingTimeDao workingTimeDao, byte[] tokenSecret,
-            SessionFactory sessionFactory) {
-        this.appointmentDao = appointmentDao;
-        this.userDao = appointmentUserDao;
-        this.doctorDao = appointmentDoctorDao;
-        this.workingTimeDao = workingTimeDao;
-        this.tokenSecret = tokenSecret;
+    public AppointmentService(SessionFactory sessionFactory) {
         this.sessionFactory = sessionFactory;
+    }
+    
+    private Appointment findExactAppointmentByDocIdAndDate(long id, Timestamp date) {
+        return (Appointment) sessionFactory.getCurrentSession().createCriteria(Appointment.class)
+                .setFetchMode("appointmentDoctor", FetchMode.JOIN)
+                .add(Restrictions.eq("appointmentDoctor.idDoctor", id))
+                .add(Restrictions.eq("dateFromAppointment", date))
+                .uniqueResult();
     }
     
     public List<AppointmentDto> generateDoctorAppointmentForDay(Long idDoc, Long idUser, Timestamp date) {
@@ -50,7 +44,7 @@ public class AppointmentService {
                 .add(Restrictions.eq("idDoctor", idDoc)).uniqueResult();
         int period = doc.getAppointmentInterval();
         LocalDate jodaDate = new org.joda.time.LocalDate(date.getTime());
-        List<WorkingTime> docHours = workingTimeDao.findWorkingTimeByDoctorIdAndDay(idDoc, jodaDate.getDayOfWeek());
+        List<WorkingTime> docHours = findWorkingTimeByDoctorIdAndDay(idDoc, jodaDate.getDayOfWeek());
         for (WorkingTime docHour : docHours) {
             /**
              * posun o jednu hodinu je 3600000 ms, na vstupe webservici primam format YYYY-MM-DD, ktory parsujem
@@ -65,13 +59,16 @@ public class AppointmentService {
                 end = new Timestamp((start.getTime() + ((period * 60) * 1000)));    //convert period from minutes to miliseconds
             }
         }
-        List<Appointment> occupied = appointmentDao.findOccupiedByDoctorIdAndDate(idDoc, date);
+        List<Appointment> occupied = findOccupiedByDoctorIdAndDate(idDoc, date);
         if (occupied != null) {
             for (int i = 0; i < appointments.size(); i++) {
                 for (Appointment occupiedAppointment : occupied) {
-                    if(appointments.get(i).getDateFromAppointment().toString()
-                            .equals(occupiedAppointment.getDateFromAppointment().toString())) {
-                        appointments.remove(i);
+                    if(occupiedAppointment.getCanceledAppointment() || occupiedAppointment.getHolidayAppointment()
+                            || occupiedAppointment.getOccupiedAppointment()) {
+                        if(appointments.get(i).getDateFromAppointment().toString()
+                                .equals(occupiedAppointment.getDateFromAppointment().toString())) {
+                            appointments.remove(i);
+                        }
                     }
                 }
             }
@@ -102,38 +99,75 @@ public class AppointmentService {
     }
     
     public AppointmentDto addAppointment(AppointmentDto appointmentDto) {
-        Appointment appointment = appointmentDao.findExactAppointmentByDocIdAndDate(
+        Appointment appointment = findExactAppointmentByDocIdAndDate(
                 appointmentDto.getAppointmentDoctor().getIdDoctor(),
                 new Timestamp(Long.parseLong(appointmentDto.getDateFromAppointment())));
         if(appointment.getOccupiedAppointment()) {
             return null;
         } else {
             appointment = createAppointmentDaoFromDto(appointmentDto);
-            appointmentDao.createAppointment(appointment);
-            return appointmentDto;
+            long id = (long) sessionFactory.getCurrentSession().save(appointment);
+            return createAppointmentDtoFromDao(findAppointmentById(id));
         }
     }
     
     public AppointmentDto updateAppointment(AppointmentDto appointmentDto) {
-        Appointment appointment = appointmentDao.findAppointmentById(appointmentDto.getIdAppointment());
+        Appointment appointment = findAppointmentById(appointmentDto.getIdAppointment());
         appointment.setCanceledAppointment(appointmentDto.getCanceledAppointment());
         appointment.setOccupiedAppointment(appointmentDto.getOccupiedAppointment());
         appointment.setHolidayAppointment(appointmentDto.getHolidayAppointment());
-        appointmentDao.update(appointment);
+        sessionFactory.getCurrentSession().persist(appointment);
         return createAppointmentDtoFromDao(appointment);
     }
     
     /**
      * PRIVATE METHODS
      */
+    private Appointment  findAppointmentById(long id) {
+        return (Appointment) sessionFactory.getCurrentSession().createCriteria(Appointment.class)
+                .add(Restrictions.eq("idAppointment", id))
+                .uniqueResult();
+    }
+    
+    private List<WorkingTime> findWorkingTimeByDoctorIdAndDay(long id, int day) {
+        return  sessionFactory.getCurrentSession().createCriteria(WorkingTime.class)
+                .setFetchMode("doctor", FetchMode.JOIN)
+                .add(Restrictions.eq("doctor.idDoctor", id))
+                .add(Restrictions.eq("dayOfTheWeek", day))
+                .list();
+    }
+    
+    private List<Appointment> findOccupiedByDoctorIdAndDate(long id, Timestamp minDate) {
+        Timestamp maxDate = new Timestamp(minDate.getTime() + TimeUnit.DAYS.toMillis(1));
+        /*
+        Restriction conjunction vyberie vsetky terminy, kde zaciatok terminu je vacsi alebo rovny minDate
+        a zaroven je mensi ako maxDate
+        */
+        return sessionFactory.getCurrentSession().createCriteria(Appointment.class)
+                .setFetchMode("appointmentDoctor", FetchMode.JOIN)
+                .add(Restrictions.eq("appointmentDoctor.idDoctor", id))
+                .add(Restrictions.conjunction()
+                        .add(Restrictions.ge("dateFromAppointment", minDate))
+                        .add(Restrictions.le("dateFromAppointment", maxDate)))
+                .list();
+    }
+    
+    private User findUserById(long id) {
+        return (User) sessionFactory.getCurrentSession().createCriteria(User.class)
+                .add(Restrictions.eq("idUser", id)).uniqueResult();
+    }
+    
+    private Doctor findDoctorById(long id) {
+        return (Doctor) sessionFactory.getCurrentSession()
+                .createCriteria(Doctor.class).add(Restrictions.eq("idDoctor", id)).uniqueResult();
+    }
     
     private Appointment generateAppointment(Long idDoc, Long idUser, Timestamp start, Timestamp end) {
         Appointment appointment = new Appointment();
         appointment.setDateFromAppointment(start);
         appointment.setDateToAppointment(end);
-        appointment.setAppointmentUser(userDao.findById(idUser));
-        appointment.setAppointmentDoctor( (Doctor) sessionFactory.getCurrentSession()
-                .createCriteria(Doctor.class).add(Restrictions.eq("idDoctor", idDoc)).uniqueResult());
+        appointment.setAppointmentUser(findUserById(idUser));
+        appointment.setAppointmentDoctor(findDoctorById(idDoc));
         appointment.setCanceledAppointment(false);
         appointment.setHolidayAppointment(false);
         appointment.setOccupiedAppointment(false);
@@ -152,10 +186,9 @@ public class AppointmentService {
     
     
     private Appointment createAppointmentDaoFromDto(AppointmentDto appointmentDto) {
-        Appointment appointment = appointmentDao.findAppointmentById(appointmentDto.getIdAppointment());
-        appointment.setAppointmentDoctor((Doctor) sessionFactory.getCurrentSession().createCriteria(Doctor.class)
-                .add(Restrictions.eq("idDoctor", appointmentDto.getAppointmentDoctor().getIdDoctor())).uniqueResult());
-        appointment.setAppointmentUser(userDao.findById(appointmentDto.getAppointmentUser().getIdUser()));
+        Appointment appointment = findAppointmentById(appointmentDto.getIdAppointment());
+        appointment.setAppointmentDoctor(findDoctorById(appointmentDto.getAppointmentDoctor().getIdDoctor()));
+        appointment.setAppointmentUser(findUserById(appointmentDto.getAppointmentUser().getIdUser()));
         appointment.setOccupiedAppointment(appointmentDto.getOccupiedAppointment());
         appointment.setDateFromAppointment(new Timestamp(Long.parseLong(appointmentDto.getDateFromAppointment())));
         appointment.setDateToAppointment(new Timestamp(Long.parseLong(appointmentDto.getDateToAppointment())));

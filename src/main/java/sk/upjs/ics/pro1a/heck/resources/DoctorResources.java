@@ -119,7 +119,7 @@ public class DoctorResources {
             @QueryParam("id") Long id,
             @QueryParam("firstName") String firstName,
             @QueryParam("lastName") String lastName) {
-        List<DoctorDto> doctors = doctorService.getDoctorsBySpecializationIdAndName(id, firstName, lastName);
+        List<DoctorDto> doctors = doctorService.getDoctorsBySpecializationIdAndFullName(id, firstName, lastName);
         if (doctors == null) {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
@@ -149,7 +149,7 @@ public class DoctorResources {
             @QueryParam("firstName") String firstName,
             @QueryParam("lastName") String lastName,
             @QueryParam("pcn") String pcn) {
-        List<DoctorDto> doctors = doctorService.getDoctorsBySpecializationIdAndNameAndCity(id, firstName,
+        List<DoctorDto> doctors = doctorService.getDoctorsBySpecializationIdAndFullNameAndCity(id, firstName,
                 lastName, pcn);
         if (doctors == null) {
             return Response.status(Response.Status.NOT_FOUND).build();

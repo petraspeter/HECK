@@ -12,10 +12,6 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.NamedNativeQueries;
-import javax.persistence.NamedNativeQuery;
-import javax.persistence.NamedQueries;
-import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 
 /**
@@ -23,44 +19,6 @@ import javax.persistence.Table;
  */
 @Entity
 @Table(name = "appointment")
-@NamedQueries({
-    @NamedQuery(
-            name = "findAllAppointments",
-            query = "select app from Appointment app"),
-    @NamedQuery(
-            name = "findAppointmentById",
-            query = "select app from Appointment app where app.idAppointment = :id")
-})
-@NamedNativeQueries({
-    @NamedNativeQuery(
-            name = "findAppointmentsByDoctorIdNativeSql",
-            query = "select * from appointment app where app.id_doctor = :id",
-            resultClass = Appointment.class
-    ),
-    @NamedNativeQuery(
-            name = "findAppointmentsByUserIdNativeSql",
-            query = "select * from appointment app where app.id_user = :id",
-            resultClass = Appointment.class
-    ),
-    @NamedNativeQuery(
-            name = "findAppointmentsByDoctorIdAndDateNativeSql",
-            query = "select * from appointment app where app.id_doctor = :id AND "
-                    + "DATE(app.date_from_appointment) = :date",
-            resultClass = Appointment.class
-    ),
-    @NamedNativeQuery(
-            name = "findAppointmentsByUserIdAndDateNativeSql",
-            query = "select * from appointment app where app.id_user = :id AND "
-                    + "DATE(app.date_from_appointment) = :date",
-            resultClass = Appointment.class
-    ),
-    @NamedNativeQuery(
-            name = "findAppointmentsByDocIdAndExactDateNativeSql",
-            query = "select * from appointment app where app.id_user = :id AND "
-                    + "app.date_from_appointment = :date",
-            resultClass = Appointment.class
-    )
-})
 public class Appointment implements Serializable {
     
     @Id

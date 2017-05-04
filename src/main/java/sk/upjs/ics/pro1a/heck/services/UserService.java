@@ -6,8 +6,9 @@ import java.security.SecureRandom;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
+import org.hibernate.SessionFactory;
+import org.hibernate.criterion.Restrictions;
 import org.jose4j.jwt.NumericDate;
-import sk.upjs.ics.pro1a.heck.db.UserDao;
 import sk.upjs.ics.pro1a.heck.db.core.User;
 import sk.upjs.ics.pro1a.heck.services.dto.LoginResponseDto;
 import sk.upjs.ics.pro1a.heck.services.dto.UserDto;
@@ -20,12 +21,12 @@ import sk.upjs.ics.pro1a.heck.utils.PasswordManager;
 public class UserService {
     
     
-    private  UserDao userDao;
     private final byte[] tokenSecret;
-    private Tokenizer tokenizer;
+    private final Tokenizer tokenizer;
+    private final SessionFactory sessionFactory;
     
-    public UserService(UserDao userDao, byte[] tokenSecret) {
-        this.userDao = userDao;
+    public UserService(byte[] tokenSecret, SessionFactory sessionFactory) {
+        this.sessionFactory = sessionFactory;
         this.tokenSecret = tokenSecret;
         tokenizer = new Tokenizer(tokenSecret);
     }
@@ -34,7 +35,7 @@ public class UserService {
     GET methods
     */
     public UserDto getUserById(long id) {
-        User user = userDao.findById(id);
+        User user = findById(id);
         if (user != null) {
             UserDto userDto = createUserDtoFromUserDaoWithPassword(user);
             return userDto;
@@ -43,7 +44,7 @@ public class UserService {
     }
     
     public UserDto getUserByLogin(String login) {
-        User user = userDao.findByLogin(login);
+        User user = findByLogin(login);
         if (user != null) {
             UserDto userDto = createUserDtoFromUserDaoWithPassword(user);
             return userDto;
@@ -52,19 +53,19 @@ public class UserService {
     }
     
     public List<UserDto> getAllUsers() {
-        List<UserDto> users = new ArrayList<>();
-        for (User user : userDao.findAll()) {
+        List<UserDto> usersDto = new ArrayList<>();
+        for (User user :  findAll()) {
             UserDto userDto = createUserDtoFromUserDaoWithoutPassword(user);
-            users.add(userDto);
+            usersDto.add(userDto);
         }
-        return users;
+        return usersDto;
     }
     
     /*
     Login and registration methods
     */
     public LoginResponseDto loginAsUser(String login, String password) {
-        User user = userDao.findByLogin(login);
+        User user = findByLogin(login);
         if (user != null) {
             if (user.getPasswordUser().equals(PasswordManager.encryptPassword(user.getSaltUser(), password))) {
                 LoginResponseDto loginResponse = new LoginResponseDto();
@@ -73,7 +74,7 @@ public class UserService {
                 if(user.getAdmin()){
                     loginResponse.setRole("admin");
                 } else {
-                        loginResponse.setRole("user");
+                    loginResponse.setRole("user");
                 }
                 loginResponse.setToken(tokenizer.generateToken(login, loginResponse.getRole()));
                 return loginResponse;
@@ -90,7 +91,8 @@ public class UserService {
         String password = PasswordManager.encryptPassword(salt, userDto.getPassword());
         User user = createUserDaoFromUserDto(userDto, password, salt);
         user.setRegistrationTime(new Timestamp(System.currentTimeMillis()));
-        user = userDao.createUser(user);
+        sessionFactory.getCurrentSession().persist(user);
+        user = findByLogin(user.getLoginUser());
         LoginResponseDto loginResponse = new LoginResponseDto();
         loginResponse.setId(user.getIdUser());
         loginResponse.setLogin(user.getLoginUser());
@@ -102,9 +104,8 @@ public class UserService {
     /*
     User update methods
     */
-    
     public void updateDoctor(Long id, UserDto userDto) {
-        User user = userDao.findById(id);
+        User user = findById(id);
         user.setFirstNameUser(userDto.getFirstName());
         user.setLastNameUser(userDto.getLastName());
         user.setEmailUser(userDto.getEmail());
@@ -112,40 +113,26 @@ public class UserService {
         user.setCityUser(userDto.getCity());
         user.setPhoneUser(userDto.getPhoneNumber());
         user.setPostalCodeUser(userDto.getPostalCode());
-        userDao.update(user);
+        sessionFactory.getCurrentSession().persist(user);
     }
     
     public void changePassword(Long id, String newPassword) {
-        User user = userDao.findById(id);
+        User user = findById(id);
         String salt = new BigInteger(130, new SecureRandom()).toString(32);
         String password = PasswordManager.encryptPassword(salt, newPassword);
         user.setSaltUser(salt);
         user.setPasswordUser(password);
-        userDao.update(user);
+        sessionFactory.getCurrentSession().persist(user);
     }
     
     public void deactivateAccount(Long id) {
-        User user = userDao.findById(id);
+        User user = findById(id);
         user.setActiveUser(false);
-        userDao.update(user);
+        sessionFactory.getCurrentSession().persist(user);
     }
     
-    /*
-    Update token method
-    */
-    public LoginResponseDto updateUsersToken(String name, String role, Long actualExpirationTime) {
-        User user= userDao.findByLogin(name);
-        LoginResponseDto loginResponse = new LoginResponseDto();
-        loginResponse.setId(user.getIdUser());
-        loginResponse.setLogin(user.getLoginUser());
-        loginResponse.setRole(role);
-        NumericDate expiration = NumericDate.fromSeconds(actualExpirationTime);
-        loginResponse.setToken(tokenizer.updateToken(name, role, expiration));
-        return loginResponse;
-    }
-
     public void updateUser(Long id, UserDto userDto) {
-        User user = userDao.findById(id);
+        User user = findById(id);
         user.setAdmin(user.getAdmin());
         user.setAddressUser(userDto.getAddress());
         user.setCityUser(userDto.getCity());
@@ -155,11 +142,42 @@ public class UserService {
         user.setLoginUser(userDto.getLogin());
         user.setPhoneUser(userDto.getPhoneNumber());
         user.setPostalCodeUser(userDto.getPostalCode());
-        userDao.update(user);
+        sessionFactory.getCurrentSession().persist(user);
     }
     
     /*
-    Methods for convert between DTO and DAO
+    Update token method
+    */
+    public LoginResponseDto updateUsersToken(String login, String role, Long actualExpirationTime) {
+        User user= findByLogin(login);
+        LoginResponseDto loginResponse = new LoginResponseDto();
+        loginResponse.setId(user.getIdUser());
+        loginResponse.setLogin(user.getLoginUser());
+        loginResponse.setRole(role);
+        NumericDate expiration = NumericDate.fromSeconds(actualExpirationTime);
+        loginResponse.setToken(tokenizer.updateToken(login, role, expiration));
+        return loginResponse;
+    }
+    
+    /*
+    Private "query"methods
+    */
+    private User findById(long id) {
+        return  (User) sessionFactory.getCurrentSession().createCriteria(User.class)
+                .add(Restrictions.eq("idUser", id)).uniqueResult();
+    }
+    
+    private User findByLogin(String login) {
+        return  (User) sessionFactory.getCurrentSession().createCriteria(User.class)
+                .add(Restrictions.eq("loginUser", login)).uniqueResult();
+    }
+    
+    private List<User> findAll() {
+        return (List<User>) sessionFactory.getCurrentSession().createCriteria(User.class).list();
+    }
+    
+    /*
+    Methods for convertation between DTO and DAO
     */
     private User createUserDaoFromUserDto(UserDto userDto, String password, String salt) {
         return new User(

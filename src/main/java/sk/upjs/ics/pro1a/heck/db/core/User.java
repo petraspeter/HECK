@@ -11,16 +11,6 @@ import java.sql.Timestamp;
  */
 @Entity
 @Table(name = "user")
-@NamedQueries({
-        @NamedQuery(name = "findAllUsers", query = "select u from User u"),
-        @NamedQuery(name = "findUserByLogin",
-                query = "select u from User u where u.loginUser = :login"),
-        @NamedQuery(name = "findUserById",
-                query = "select u from User u where u.idUser = :id"),
-        @NamedQuery(name = "findUserByLoginAndPassword",
-                query = "select u from User u where u.loginUser = :login and u.passwordUser= :password")
-
-})
 public class User implements Serializable {
 
     @Id
