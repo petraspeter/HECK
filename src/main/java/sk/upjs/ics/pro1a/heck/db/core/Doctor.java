@@ -262,6 +262,4 @@ public class Doctor implements Serializable {
                 + ", registrationTime=" + registrationTime + '}';
     }
     
-    
-    
 }
