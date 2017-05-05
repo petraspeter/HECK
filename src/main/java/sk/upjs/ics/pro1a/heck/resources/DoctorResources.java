@@ -100,11 +100,11 @@ public class DoctorResources {
     @GET
     @Path("/doctors/searchP")
     @UnitOfWork
-    public Response getDoctorsBySpecializationIdAndPostalCode(
+    public Response getDoctorsBySpecializationIdAndCity(
             @Auth AuthorizedUserDto user,
             @QueryParam("id") Long id,
-            @QueryParam("pcn") String pcn) {
-        List<DoctorDto> doctors = doctorService.getDoctorsBySpecializationIdAndCity(id, pcn);
+            @QueryParam("city") String city) {
+        List<DoctorDto> doctors = doctorService.getDoctorsBySpecializationIdAndCity(id, city);
         if (doctors == null) {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
@@ -143,14 +143,14 @@ public class DoctorResources {
     @GET
     @Path("/doctors/search")
     @UnitOfWork
-    public Response getDoctorsBySpecializationIdAndNameAndPostalCode(
+    public Response getDoctorsBySpecializationIdAndNameAndCity(
             @Auth AuthorizedUserDto user,
             @QueryParam("id") Long id,
             @QueryParam("firstName") String firstName,
             @QueryParam("lastName") String lastName,
-            @QueryParam("pcn") String pcn) {
+            @QueryParam("city") String city) {
         List<DoctorDto> doctors = doctorService.getDoctorsBySpecializationIdAndFullNameAndCity(id, firstName,
-                lastName, pcn);
+                lastName, city);
         if (doctors == null) {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
@@ -160,13 +160,13 @@ public class DoctorResources {
     @GET
     @Path("/doctors/searchLP")
     @UnitOfWork
-    public Response getDoctorsBySpecializationIdAndLastNameAndPostalCode(
+    public Response getDoctorsBySpecializationIdAndLastNameAndCity(
             @Auth AuthorizedUserDto user,
             @QueryParam("id") Long id,
             @QueryParam("lastName") String lastName,
-            @QueryParam("pcn") String pcn) {
+            @QueryParam("city") String city) {
         List<DoctorDto> doctors = doctorService.getDoctorsBySpecializationIdAndLastNameAndCity(id,
-                lastName, pcn);
+                lastName, city);
         if (doctors == null) {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
