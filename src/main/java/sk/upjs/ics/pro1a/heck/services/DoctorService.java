@@ -6,6 +6,7 @@ import sk.upjs.ics.pro1a.heck.utils.Tokenizer;
 import java.math.BigInteger;
 import java.security.SecureRandom;
 import java.sql.Time;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 import org.hibernate.FetchMode;
@@ -89,7 +90,7 @@ public class DoctorService {
     
     public List<DoctorDto> getDoctorsBySpecializationIdAndFullName(Long id, String firstname, String lastName) {
         List<DoctorDto> doctors = new ArrayList<>();
-        List<Doctor> iterate = sessionFactory.getCurrentSession().createCriteria(Doctor.class)                
+        List<Doctor> iterate = sessionFactory.getCurrentSession().createCriteria(Doctor.class)
                 .setFetchMode("specializationDoctor", FetchMode.JOIN)
                 .createAlias("specializationDoctor", "sd")
                 .add(Restrictions.eq("sd.id", id))
@@ -179,7 +180,12 @@ public class DoctorService {
         String salt = new BigInteger(130, new SecureRandom()).toString(32);
         String password = PasswordManager.encryptPassword(salt, doctorDto.getPassword());
         Specialization specialization =  findSpecialization(doctorDto.getSpecialization());
-        Doctor doctor = createDoctorDaoFromDoctorDto(doctorDto, password, salt, specialization);
+        Doctor doctor =  findByLogin(doctorDto.getLogin());
+        if(doctor != null) {
+            return null;
+        }
+        doctor =createDoctorDaoFromDoctorDto(doctorDto, password, salt, specialization);
+        reg(doctor);
         doctor = findByLogin(doctor.getLoginDoctor());
         LoginResponseDto loginResponse = new LoginResponseDto();
         loginResponse.setId(doctor.getIdDoctor());
@@ -213,11 +219,10 @@ public class DoctorService {
     
     public void createDoctorWorkingTime(long doctorId, WorkingTimeDto workingTimeDto) {
         Doctor doctor = findById(doctorId);
-        doctor.setAppointmentInterval(workingTimeDto.getInterval());
-        
+        doctor.setAppointmentInterval(workingTimeDto.getInterval());        
         for (WorkingDayDto day : workingTimeDto.getWorkingTimes()) {
             WorkingTime workingTime = new WorkingTime();
-            workingTime.setDayOfTheWeek(day.getDay());
+            workingTime.setDayOfTheWeek(day.getDay()+1);
             workingTime.setDoctor(doctor);
             //TODO: implement validation for String for end and start time
             workingTime.setEndingHour(Time.valueOf(day.getEnd() + ":00"));
@@ -397,6 +402,15 @@ public class DoctorService {
                 doctor.getAppointmentInterval(),
                 doctor.getRegistrationTime()
         );
+    }
+    
+    private void reg(Doctor doctor) {
+        doctor.setIdDoctor(0L);
+        doctor.setActivationTimeDoctor(new Timestamp(System.currentTimeMillis()));
+        doctor.setActiveDoctor(true);
+        doctor.setRegistrationTime(new Timestamp(System.currentTimeMillis()));
+        System.out.println(doctor.toString());
+        sessionFactory.getCurrentSession().save(doctor);
     }
     
 }

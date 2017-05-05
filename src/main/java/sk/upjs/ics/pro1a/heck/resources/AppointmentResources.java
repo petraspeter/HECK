@@ -30,12 +30,12 @@ import sk.upjs.ics.pro1a.heck.services.dto.AuthorizedUserDto;
 public class AppointmentResources {
     
     private final AppointmentService appointmentService;
-
+    
     public AppointmentResources(AppointmentService appointmentService) {
         this.appointmentService = appointmentService;
     }
-
-         
+    
+    
     @POST
     @Path("/appointments")
     @Consumes(MediaType.APPLICATION_JSON)
@@ -48,7 +48,7 @@ public class AppointmentResources {
             return Response.status(Response.Status.PRECONDITION_FAILED).build();
         }
     }
-              
+    
     @POST
     @Path("/appointments/update")
     @Consumes(MediaType.APPLICATION_JSON)
@@ -61,7 +61,7 @@ public class AppointmentResources {
             return Response.status(Response.Status.PRECONDITION_FAILED).build();
         }
     }
-        
+    
     @GET
     @Path("/appointments/day")
     @Consumes(MediaType.APPLICATION_JSON)
@@ -73,8 +73,9 @@ public class AppointmentResources {
             @QueryParam("date") String date
     ) throws ParseException {
         SimpleDateFormat sdt = new SimpleDateFormat("yyyy-MM-dd");
-        Timestamp ts = new Timestamp(sdt.parse(date).getTime());        
-        List<AppointmentDto> appointments = appointmentService.generateDoctorAppointmentForDay(idDoc, idUser, ts);        
+        Timestamp ts = new Timestamp(sdt.parse(date).getTime());
+        List<AppointmentDto> appointments = appointmentService.generateDoctorAppointmentForDays(idDoc,
+                idUser, ts, ts);
         if (appointments.size() > 0) {
             return  Response.ok(appointments).build();
         }
@@ -94,7 +95,7 @@ public class AppointmentResources {
     ) throws ParseException {
         SimpleDateFormat sdt = new SimpleDateFormat("yyyy-MM-dd");
         Timestamp tsFrom = new Timestamp(sdt.parse(dateFrom).getTime());
-        Timestamp tsTo = new Timestamp(sdt.parse(dateTo).getTime());        
+        Timestamp tsTo = new Timestamp(sdt.parse(dateTo).getTime());
         List<AppointmentDto> appointments = appointmentService
                 .generateDoctorAppointmentForDays(idDoc, idUser, tsFrom, tsTo);
         if (appointments.size() > 0) {
@@ -111,7 +112,7 @@ public class AppointmentResources {
             @Auth AuthorizedUserDto user,
             @QueryParam("idDoc") Long idDoc,
             @QueryParam("idUser") Long idUser
-    ) throws ParseException {        
+    ) throws ParseException {
         Long actualDay = DateUtils.truncate(new Date(), Calendar.DATE).getTime();
         Timestamp tsFrom = new Timestamp(actualDay);
         Timestamp tsTo = new Timestamp(actualDay+(6*24*60*60*1000));

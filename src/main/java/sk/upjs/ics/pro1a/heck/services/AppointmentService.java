@@ -10,6 +10,7 @@ import org.hibernate.criterion.Restrictions;
 import org.joda.time.LocalDate;
 import sk.upjs.ics.pro1a.heck.db.core.Appointment;
 import sk.upjs.ics.pro1a.heck.db.core.Doctor;
+import sk.upjs.ics.pro1a.heck.db.core.Holiday;
 import sk.upjs.ics.pro1a.heck.db.core.User;
 import sk.upjs.ics.pro1a.heck.db.core.WorkingTime;
 import sk.upjs.ics.pro1a.heck.services.dto.AppointmentDoctorDto;
@@ -38,13 +39,16 @@ public class AppointmentService {
                 .uniqueResult();
     }
     
-    public List<AppointmentDto> generateDoctorAppointmentForDay(Long idDoc, Long idUser, Timestamp date) {
+    private List<AppointmentDto> generateDoctorAppointmentForDay(Long idDoc, Long idUser, Timestamp date) {
         List<Appointment> appointments = new ArrayList<>();
         Doctor doc =  (Doctor) sessionFactory.getCurrentSession().createCriteria(Doctor.class)
                 .add(Restrictions.eq("idDoctor", idDoc)).uniqueResult();
         int period = doc.getAppointmentInterval();
         LocalDate jodaDate = new org.joda.time.LocalDate(date.getTime());
-        List<WorkingTime> docHours = findWorkingTimeByDoctorIdAndDay(idDoc, jodaDate.getDayOfWeek());
+        /*
+        den v tyzdni je v intervale 1-7, preco znizujem o 1
+        */
+        List<WorkingTime> docHours = findWorkingTimeByDoctorIdAndDay(idDoc, jodaDate.getDayOfWeek() - 1);
         for (WorkingTime docHour : docHours) {
             /**
              * posun o jednu hodinu je 3600000 ms, na vstupe webservici primam format YYYY-MM-DD, ktory parsujem
@@ -86,8 +90,16 @@ public class AppointmentService {
     
     public List<AppointmentDto> generateDoctorAppointmentForDays(Long idDoc, Long idUser, Timestamp from,
             Timestamp to) {
+        List<Holiday> holidays = findHolidays();
         List<AppointmentDto> appointments = new ArrayList<>();
         List<Timestamp> timestamps = generateTimestamps(from, to);
+        for (int i = 0; i < timestamps.size(); i++) {
+            for (Holiday holiday : holidays) {
+                if(timestamps.get(i).equals(holiday.getDate())) {
+                    timestamps.remove(timestamps.get(i));
+                }
+            }
+        }
         for (Timestamp timestamp : timestamps) {
             appointments.addAll(generateDoctorAppointmentForDay(idDoc, idUser, timestamp));
         }
@@ -134,6 +146,11 @@ public class AppointmentService {
                 .setFetchMode("doctor", FetchMode.JOIN)
                 .add(Restrictions.eq("doctor.idDoctor", id))
                 .add(Restrictions.eq("dayOfTheWeek", day))
+                .list();
+    }
+    
+    private List<Holiday> findHolidays() {
+        return sessionFactory.getCurrentSession().createCriteria(Holiday.class)
                 .list();
     }
     

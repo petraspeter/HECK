@@ -250,4 +250,18 @@ public class Doctor implements Serializable {
         this.registrationTime = registrationTime;
     }
     
+    @Override
+    public String toString() {
+        return "Doctor{" + "idDoctor=" + idDoctor + ", emailDoctor=" + emailDoctor + ", loginDoctor=" + loginDoctor
+                +   ", passwordDoctor=" + passwordDoctor + ", saltDoctor=" + saltDoctor + ", specializationDoctor="
+                +    specializationDoctor + ", businessNameDoctor=" + businessNameDoctor + ", firstNameDoctor="
+                +  firstNameDoctor + ", lastNameDoctor=" + lastNameDoctor + ", phoneNumberDoctor="
+                + phoneNumberDoctor + ", postalCodeDoctor=" + postalCodeDoctor + ", cityDoctor=" + cityDoctor
+                + ", addressDoctor=" +     addressDoctor + ", activationTimeDoctor=" + activationTimeDoctor
+                + ", activeDoctor=" + activeDoctor +    ", appointmentInterval=" + appointmentInterval
+                + ", registrationTime=" + registrationTime + '}';
+    }
+    
+    
+    
 }

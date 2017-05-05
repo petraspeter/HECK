@@ -31,6 +31,7 @@ import javax.ws.rs.client.Client;
 import java.util.EnumSet;
 import org.hibernate.SessionFactory;
 import sk.upjs.ics.pro1a.heck.db.core.Appointment;
+import sk.upjs.ics.pro1a.heck.db.core.Holiday;
 import sk.upjs.ics.pro1a.heck.db.core.WorkingTime;
 import sk.upjs.ics.pro1a.heck.resources.AppointmentResources;
 import sk.upjs.ics.pro1a.heck.resources.DoctorResources;
@@ -47,7 +48,9 @@ public class HeckApplication extends Application<HeckConfiguration> {
             Doctor.class,
             User.class,
             WorkingTime.class,
-            Appointment.class) {
+            Appointment.class,
+            Holiday.class
+    ) {
                 @Override
                 public DataSourceFactory getDataSourceFactory(HeckConfiguration configuration) {
                     return configuration.getDataSourceFactory();
