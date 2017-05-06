@@ -13,6 +13,8 @@ import org.hibernate.FetchMode;
 import org.hibernate.SessionFactory;
 import org.hibernate.criterion.Restrictions;
 import org.jose4j.jwt.NumericDate;
+import sk.upjs.ics.pro1a.heck.db.AppointmentDao;
+import sk.upjs.ics.pro1a.heck.db.core.Appointment;
 import sk.upjs.ics.pro1a.heck.db.core.Doctor;
 import sk.upjs.ics.pro1a.heck.db.core.Specialization;
 import sk.upjs.ics.pro1a.heck.utils.PasswordManager;
@@ -26,11 +28,13 @@ public class DoctorService {
     private final byte[] tokenSecret;
     private Tokenizer tokenizer;
     private final SessionFactory sessionFactory;
+    private final AppointmentDao appointmentDao;
     
     public DoctorService(byte[] tokenSecret, SessionFactory sessionFactory) {
         this.tokenSecret = tokenSecret;
         tokenizer = new Tokenizer(tokenSecret);
         this.sessionFactory = sessionFactory;
+        this.appointmentDao = new AppointmentDao(sessionFactory);
     }
     
     /*
@@ -73,7 +77,8 @@ public class DoctorService {
         return doctorsDto;
     }
     
-    public List<DoctorDto> getDoctorsBySpecializationIdAndCity(Long id, String city) {
+    public List<DoctorDto> getDoctorsBySpecializationIdAndCityAndDate(Long id, String city, Timestamp from,
+            Timestamp to) {
         List<DoctorDto> doctors = new ArrayList<>();
         List<Doctor> iterate = sessionFactory.getCurrentSession().createCriteria(Doctor.class)
                 .setFetchMode("specializationDoctor", FetchMode.JOIN)
@@ -82,13 +87,18 @@ public class DoctorService {
                 .add(Restrictions.like("cityDoctor", city))
                 .list();
         for (Doctor doctor : iterate) {
-            DoctorDto doctorDto = createDoctorDtoFromDoctorDaoWithoutPassword(doctor);
-            doctors.add(doctorDto);
+            List<AppointmentDto>appointments = appointmentDao.generateDoctorAppointmentForDays(
+                    doctor.getIdDoctor(), 0L, from, to);
+            if (appointments.size() > 0) {
+                DoctorDto doctorDto = createDoctorDtoFromDoctorDaoWithoutPassword(doctor);
+                doctors.add(doctorDto);
+            }
         }
         return doctors;
     }
     
-    public List<DoctorDto> getDoctorsBySpecializationIdAndFullName(Long id, String firstname, String lastName) {
+    public List<DoctorDto> getDoctorsBySpecializationIdAndFullNameAndDate(Long id, String firstname,
+            String lastName,Timestamp from, Timestamp to) {
         List<DoctorDto> doctors = new ArrayList<>();
         List<Doctor> iterate = sessionFactory.getCurrentSession().createCriteria(Doctor.class)
                 .setFetchMode("specializationDoctor", FetchMode.JOIN)
@@ -98,14 +108,18 @@ public class DoctorService {
                 .add(Restrictions.like("lastNameDoctor", lastName))
                 .list();
         for (Doctor doctor : iterate) {
-            DoctorDto doctorDto = createDoctorDtoFromDoctorDaoWithoutPassword(doctor);
-            doctors.add(doctorDto);
+            List<AppointmentDto>appointments = appointmentDao.generateDoctorAppointmentForDays(
+                    doctor.getIdDoctor(), 0L, from, to);
+            if (appointments.size() > 0) {
+                DoctorDto doctorDto = createDoctorDtoFromDoctorDaoWithoutPassword(doctor);
+                doctors.add(doctorDto);
+            }
         }
         return doctors;
     }
     
-    public List<DoctorDto> getDoctorsBySpecializationIdAndFullNameAndCity(Long id, String firstname,
-            String lastName, String city) {
+    public List<DoctorDto> getDoctorsBySpecializationIdAndFullNameAndCityAndDate(Long id, String firstname,
+            String lastName, String city,  Timestamp from, Timestamp to) {
         List<DoctorDto> doctors = new ArrayList<>();
         List<Doctor> iterate = sessionFactory.getCurrentSession().createCriteria(Doctor.class)
                 .setFetchMode("specializationDoctor", FetchMode.JOIN)
@@ -116,13 +130,18 @@ public class DoctorService {
                 .add(Restrictions.like("cityDoctor", city))
                 .list();
         for (Doctor doctor : iterate) {
-            DoctorDto doctorDto = createDoctorDtoFromDoctorDaoWithoutPassword(doctor);
-            doctors.add(doctorDto);
+            List<AppointmentDto>appointments = appointmentDao.generateDoctorAppointmentForDays(
+                    doctor.getIdDoctor(), 0L, from, to);
+            if (appointments.size() > 0) {
+                DoctorDto doctorDto = createDoctorDtoFromDoctorDaoWithoutPassword(doctor);
+                doctors.add(doctorDto);
+            }
         }
         return doctors;
     }
     
-    public List<DoctorDto> getDoctorsBySpecializationIdAndLastName(Long id, String lastName) {
+    public List<DoctorDto> getDoctorsBySpecializationIdAndLastNameAndDate(Long id, String lastName,
+            Timestamp from, Timestamp to) {
         List<DoctorDto> doctors = new ArrayList<>();
         List<Doctor> iterate = sessionFactory.getCurrentSession().createCriteria(Doctor.class)
                 .setFetchMode("specializationDoctor", FetchMode.JOIN)
@@ -131,14 +150,18 @@ public class DoctorService {
                 .add(Restrictions.like("lastNameDoctor", lastName))
                 .list();
         for (Doctor doctor : iterate) {
-            DoctorDto doctorDto = createDoctorDtoFromDoctorDaoWithoutPassword(doctor);
-            doctors.add(doctorDto);
+            List<AppointmentDto>appointments = appointmentDao.generateDoctorAppointmentForDays(
+                    doctor.getIdDoctor(), 0L, from, to);
+            if (appointments.size() > 0) {
+                DoctorDto doctorDto = createDoctorDtoFromDoctorDaoWithoutPassword(doctor);
+                doctors.add(doctorDto);
+            }
         }
         return doctors;
     }
     
-    public List<DoctorDto> getDoctorsBySpecializationIdAndLastNameAndCity(Long id, String lastName,
-            String city) {
+    public List<DoctorDto> getDoctorsBySpecializationIdAndLastNameAndCityAndDate(Long id, String lastName,
+            String city,  Timestamp from, Timestamp to) {
         List<DoctorDto> doctors = new ArrayList<>();
         List<Doctor> iterate = sessionFactory.getCurrentSession().createCriteria(Doctor.class)
                 .setFetchMode("specializationDoctor", FetchMode.JOIN)
@@ -148,8 +171,12 @@ public class DoctorService {
                 .add(Restrictions.like("cityDoctor", city))
                 .list();
         for (Doctor doctor : iterate) {
-            DoctorDto doctorDto = createDoctorDtoFromDoctorDaoWithoutPassword(doctor);
-            doctors.add(doctorDto);
+            List<AppointmentDto>appointments = appointmentDao.generateDoctorAppointmentForDays(
+                    doctor.getIdDoctor(), 0L, from, to);
+            if (appointments.size() > 0) {
+                DoctorDto doctorDto = createDoctorDtoFromDoctorDaoWithoutPassword(doctor);
+                doctors.add(doctorDto);
+            }
         }
         return doctors;
     }
@@ -219,7 +246,7 @@ public class DoctorService {
     
     public void createDoctorWorkingTime(long doctorId, WorkingTimeDto workingTimeDto) {
         Doctor doctor = findById(doctorId);
-        doctor.setAppointmentInterval(workingTimeDto.getInterval());        
+        doctor.setAppointmentInterval(workingTimeDto.getInterval());
         for (WorkingDayDto day : workingTimeDto.getWorkingTimes()) {
             WorkingTime workingTime = new WorkingTime();
             workingTime.setDayOfTheWeek(day.getDay()+1);

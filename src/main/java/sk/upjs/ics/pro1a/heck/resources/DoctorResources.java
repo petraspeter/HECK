@@ -2,8 +2,13 @@ package sk.upjs.ics.pro1a.heck.resources;
 
 import io.dropwizard.auth.Auth;
 import io.dropwizard.hibernate.UnitOfWork;
+import java.sql.Timestamp;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Collections;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
@@ -25,13 +30,13 @@ import sk.upjs.ics.pro1a.heck.services.dto.*;
 @Path("/heck")
 @Produces(MediaType.APPLICATION_JSON)
 public class DoctorResources {
-
+    
     private final DoctorService doctorService;
-
+    
     public DoctorResources(DoctorService doctorService) {
         this.doctorService = doctorService;
     }
-
+    
     @POST
     @Path("/doctors")
     @Consumes(MediaType.APPLICATION_JSON)
@@ -84,7 +89,7 @@ public class DoctorResources {
         List<DoctorDto> doctors = doctorService.getAllDoctors();
         return Response.ok(doctors).build();
     }
-        
+    
     @GET
     @Path("/doctors/specialization/{id}")
     @UnitOfWork
@@ -96,15 +101,24 @@ public class DoctorResources {
         return Response.ok(doctors).build();
     }
     
-    
     @GET
     @Path("/doctors/searchP")
     @UnitOfWork
-    public Response getDoctorsBySpecializationIdAndCity(
+    public Response getDoctorsBySpecializationIdAndCityAndDate(
             @Auth AuthorizedUserDto user,
             @QueryParam("id") Long id,
-            @QueryParam("city") String city) {
-        List<DoctorDto> doctors = doctorService.getDoctorsBySpecializationIdAndCity(id, city);
+            @QueryParam("city") String city,
+            @QueryParam("from") String from,
+            @QueryParam("to") String to) {
+        SimpleDateFormat sdt = new SimpleDateFormat("yyyy-MM-dd");
+        List<DoctorDto> doctors = null;
+        try {
+            Timestamp tsFrom = new Timestamp(sdt.parse(from).getTime());
+            Timestamp tsTo = new Timestamp(sdt.parse(to).getTime());
+            doctors = doctorService.getDoctorsBySpecializationIdAndCityAndDate(id, city, tsFrom, tsTo);
+        } catch(ParseException e) {
+            Logger.getLogger(DoctorResources.class.getName()).log(Level.SEVERE, null, e);
+        }
         if (doctors == null) {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
@@ -114,12 +128,22 @@ public class DoctorResources {
     @GET
     @Path("/doctors/searchN")
     @UnitOfWork
-    public Response getDoctorsBySpecializationIdAndName(
+    public Response getDoctorsBySpecializationIdAndNameAndDate(
             @Auth AuthorizedUserDto user,
             @QueryParam("id") Long id,
             @QueryParam("firstName") String firstName,
-            @QueryParam("lastName") String lastName) {
-        List<DoctorDto> doctors = doctorService.getDoctorsBySpecializationIdAndFullName(id, firstName, lastName);
+            @QueryParam("lastName") String lastName,
+            @QueryParam("from") String from,
+            @QueryParam("to") String to) {
+        SimpleDateFormat sdt = new SimpleDateFormat("yyyy-MM-dd");
+        List<DoctorDto> doctors = null;
+        try {
+            Timestamp tsFrom = new Timestamp(sdt.parse(from).getTime());
+            Timestamp tsTo = new Timestamp(sdt.parse(to).getTime());
+            doctors = doctorService.getDoctorsBySpecializationIdAndFullNameAndDate(id, firstName, lastName, tsFrom, tsTo);
+        } catch(ParseException e) {
+            Logger.getLogger(DoctorResources.class.getName()).log(Level.SEVERE, null, e);
+        }
         if (doctors == null) {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
@@ -129,11 +153,21 @@ public class DoctorResources {
     @GET
     @Path("/doctors/searchL")
     @UnitOfWork
-    public Response getDoctorsBySpecializationIdAndLastName(
+    public Response getDoctorsBySpecializationIdAndLastNameAndDate(
             @Auth AuthorizedUserDto user,
             @QueryParam("id") Long id,
-            @QueryParam("lastName") String lastName) {
-        List<DoctorDto> doctors = doctorService.getDoctorsBySpecializationIdAndLastName(id, lastName);
+            @QueryParam("lastName") String lastName,
+            @QueryParam("from") String from,
+            @QueryParam("to") String to) {
+        SimpleDateFormat sdt = new SimpleDateFormat("yyyy-MM-dd");
+        List<DoctorDto> doctors = null;
+        try {
+            Timestamp tsFrom = new Timestamp(sdt.parse(from).getTime());
+            Timestamp tsTo = new Timestamp(sdt.parse(to).getTime());
+            doctors = doctorService.getDoctorsBySpecializationIdAndLastNameAndDate(id, lastName, tsFrom, tsTo);
+        } catch(ParseException e) {
+            Logger.getLogger(DoctorResources.class.getName()).log(Level.SEVERE, null, e);
+        }
         if (doctors == null) {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
@@ -143,14 +177,24 @@ public class DoctorResources {
     @GET
     @Path("/doctors/search")
     @UnitOfWork
-    public Response getDoctorsBySpecializationIdAndNameAndCity(
+    public Response getDoctorsBySpecializationIdAndNameAndCityAndDate(
             @Auth AuthorizedUserDto user,
             @QueryParam("id") Long id,
             @QueryParam("firstName") String firstName,
             @QueryParam("lastName") String lastName,
-            @QueryParam("city") String city) {
-        List<DoctorDto> doctors = doctorService.getDoctorsBySpecializationIdAndFullNameAndCity(id, firstName,
-                lastName, city);
+            @QueryParam("city") String city,
+            @QueryParam("from") String from,
+            @QueryParam("to") String to) {
+        SimpleDateFormat sdt = new SimpleDateFormat("yyyy-MM-dd");
+        List<DoctorDto> doctors = null;
+        try {
+            Timestamp tsFrom = new Timestamp(sdt.parse(from).getTime());
+            Timestamp tsTo = new Timestamp(sdt.parse(to).getTime());
+            doctors = doctorService.getDoctorsBySpecializationIdAndFullNameAndCityAndDate(id, firstName,
+                    lastName, city, tsFrom, tsTo);
+        } catch(ParseException e) {
+            Logger.getLogger(DoctorResources.class.getName()).log(Level.SEVERE, null, e);
+        }
         if (doctors == null) {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
@@ -160,13 +204,23 @@ public class DoctorResources {
     @GET
     @Path("/doctors/searchLP")
     @UnitOfWork
-    public Response getDoctorsBySpecializationIdAndLastNameAndCity(
+    public Response getDoctorsBySpecializationIdAndLastNameAndCityAndDate(
             @Auth AuthorizedUserDto user,
             @QueryParam("id") Long id,
             @QueryParam("lastName") String lastName,
-            @QueryParam("city") String city) {
-        List<DoctorDto> doctors = doctorService.getDoctorsBySpecializationIdAndLastNameAndCity(id,
-                lastName, city);
+            @QueryParam("city") String city,
+            @QueryParam("from") String from,
+            @QueryParam("to") String to) {
+        SimpleDateFormat sdt = new SimpleDateFormat("yyyy-MM-dd");
+        List<DoctorDto> doctors = null;
+        try {
+            Timestamp tsFrom = new Timestamp(sdt.parse(from).getTime());
+            Timestamp tsTo = new Timestamp(sdt.parse(to).getTime());
+            doctors = doctorService.getDoctorsBySpecializationIdAndLastNameAndCityAndDate(id,
+                    lastName, city, tsFrom, tsTo);
+        } catch(ParseException e) {
+            Logger.getLogger(DoctorResources.class.getName()).log(Level.SEVERE, null, e);
+        }
         if (doctors == null) {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
@@ -184,7 +238,7 @@ public class DoctorResources {
         IsValidDto isValidDto = doctorService.isLoginValid(login);
         return Response.ok(isValidDto).build();
     }
-
+    
     @POST
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Path("/doctors/checkEmail")
@@ -196,7 +250,7 @@ public class DoctorResources {
         IsValidDto isValidDto = doctorService.isEmailValid(email, userEmail);
         return Response.ok(isValidDto).build();
     }
-
+    
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Path("/doctors/{id}/changePassword")
@@ -209,15 +263,15 @@ public class DoctorResources {
             return Response.status(Response.Status.BAD_REQUEST).build();
         }
     }
-
+    
     @POST
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Path("/doctors/{id}/checkPassword")
     @UnitOfWork
     public Response checkPassword(@PathParam("id") Long id, @FormParam("currentModalPassword") String password) {
-            return Response.ok(doctorService.checkDoctorPassword(id, password)).build();
+        return Response.ok(doctorService.checkDoctorPassword(id, password)).build();
     }
-
+    
     @GET
     @Path("/doctors/{id}/workingTime")
     @UnitOfWork
@@ -228,7 +282,7 @@ public class DoctorResources {
         }
         return Response.ok(workingHours).build();
     }
-
+    
     @POST
     @Path("/doctors/{id}/workingTime")
     @Consumes(MediaType.APPLICATION_JSON)
