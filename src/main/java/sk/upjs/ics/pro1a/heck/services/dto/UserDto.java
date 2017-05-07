@@ -42,10 +42,10 @@ public class UserDto {
     private String registrationTime;
 
     @JsonProperty("active")
-    private boolean isActive;
+    private Boolean isActive;
 
     @JsonProperty("isAdmin")
-    private boolean isAdmin;
+    private Boolean isAdmin;
 
     public long getId() {
         return id;
@@ -135,19 +135,19 @@ public class UserDto {
         this.registrationTime = registrationTime;
     }
 
-    public boolean isAdmin() {
+    public Boolean isAdmin() {
         return isAdmin;
     }
 
-    public void setIsAdmin(boolean isAdmin) {
+    public void setIsAdmin(Boolean isAdmin) {
         this.isAdmin = isAdmin;
     }
 
-    public boolean isActive() {
+    public Boolean isActive() {
         return isActive;
     }
 
-    public void setActive(boolean active) {
+    public void setActive(Boolean active) {
         this.isActive = active;
     }
 
@@ -155,7 +155,7 @@ public class UserDto {
     }
 
     public UserDto(long id, String login, String password, String firstName, String lastName, String email, String address, String postalCode,
-            String city, String phoneNumber, String registrationTime, boolean isActive, boolean isAdmin) {
+            String city, String phoneNumber, String registrationTime, Boolean isActive, Boolean isAdmin) {
         this.id = id;
         this.login = login;
         this.password = password;
@@ -172,7 +172,7 @@ public class UserDto {
     }
 
     public UserDto(long id, String login, String firstName, String lastName, String email, String address, String postalCode,
-            String city, String phoneNumber, String registrationTime, boolean isActive, boolean isAdmin) {
+            String city, String phoneNumber, String registrationTime, Boolean isActive, Boolean isAdmin) {
         this.id = id;
         this.login = login;
         this.firstName = firstName;

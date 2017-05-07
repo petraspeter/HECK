@@ -10,6 +10,7 @@ import java.security.SecureRandom;
 import java.sql.Time;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import org.jose4j.jwt.NumericDate;
 import sk.upjs.ics.pro1a.heck.db.AppointmentDao;
@@ -177,8 +178,8 @@ public class DoctorService {
         String password = PasswordManager.encryptPassword(salt, doctorDto.getPassword());
         Specialization specialization = specializationDao.findById(doctorDto.getSpecialization());
         doctorDto.setActive(true);
+        doctorDto.setRegistrationTime(new Date().toString());
         Doctor doctor = createDoctorDaoFromDoctorDto(doctorDto, password, salt, specialization);
-        doctor.setRegistrationTime(new Timestamp(System.currentTimeMillis()));
         doctor.setActivationTimeDoctor(new Timestamp(System.currentTimeMillis()));
         doctor = doctorDao.create(doctor);
         LoginResponseDto loginResponse = new LoginResponseDto();
@@ -202,7 +203,7 @@ public class DoctorService {
         doctor.setCityDoctor(doctorDto.getCity());
         doctor.setPostalCodeDoctor(doctorDto.getPostalCode());
         doctor.setPhoneNumberDoctor(doctorDto.getPhoneNumber());
-        doctor.setActiveDoctor(doctorDto.getActive());
+        doctor.setActiveDoctor((doctorDto.getActive() != null) ? doctorDto.getActive() : doctor.getActiveDoctor());
         if (!doctor.getSpecializationDoctor().getId().equals(doctorDto.getSpecialization())) {
             doctor.setSpecializationDoctor(specializationDao.findById(doctorDto.getSpecialization()));
         }
@@ -273,7 +274,7 @@ public class DoctorService {
     public WorkingTimeDto getDoctorWorkingTime(long id) {
         List<WorkingTime> workingTimes = workingTimeDao.findByDoctorId(id);
         if (workingTimes.isEmpty()) {
-            return null;
+            return new WorkingTimeDto();
         }
         WorkingTimeDto workingTimeDto = new WorkingTimeDto();
         workingTimeDto.setInterval(workingTimes.get(0).getDoctor().getAppointmentInterval());
@@ -293,16 +294,20 @@ public class DoctorService {
 
     public void createDoctorWorkingTime(long doctorId, WorkingTimeDto workingTimeDto) {
         Doctor doctor = doctorDao.findById(doctorId);
-        doctor.setAppointmentInterval(workingTimeDto.getInterval());
+        if(doctor != null) {
+            doctor.setAppointmentInterval(workingTimeDto.getInterval());
 
-        for (WorkingDayDto day : workingTimeDto.getWorkingTimes()) {
-            WorkingTime workingTime = new WorkingTime();
-            workingTime.setDayOfTheWeek(day.getDay());
-            workingTime.setDoctor(doctor);
-            //TODO: implement validation for String for end and start time
-            workingTime.setEndingHour(Time.valueOf(day.getEnd() + ":00"));
-            workingTime.setStartingHour(Time.valueOf(day.getStart() + ":00"));
-            workingTimeDao.create(workingTime);
+            for (WorkingDayDto day : workingTimeDto.getWorkingTimes()) {
+                WorkingTime workingTime = new WorkingTime();
+                workingTime.setDayOfTheWeek(day.getDay());
+                workingTime.setDoctor(doctor);
+                //TODO: implement validation for String for end and start time
+                workingTime.setEndingHour(Time.valueOf(day.getEnd() + ":00"));
+                workingTime.setStartingHour(Time.valueOf(day.getStart() + ":00"));
+                workingTimeDao.create(workingTime);
+            }
+        } else {
+            throw new IllegalStateException("Doctor does not exist.");
         }
     }
 

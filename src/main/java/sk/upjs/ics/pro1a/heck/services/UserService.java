@@ -6,6 +6,7 @@ import java.math.BigInteger;
 import java.security.SecureRandom;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import org.jose4j.jwt.NumericDate;
 import sk.upjs.ics.pro1a.heck.db.UserDao;
@@ -88,6 +89,7 @@ public class UserService {
         }
         String salt = new BigInteger(130, new SecureRandom()).toString(32);
         String password = PasswordManager.encryptPassword(salt, userDto.getPassword());
+        userDto.setRegistrationTime(new Date().toString());
         User user = createUserDaoFromUserDto(userDto, password, salt);
         user.setRegistrationTime(new Timestamp(System.currentTimeMillis()));
         user = userDao.create(user);
@@ -120,7 +122,6 @@ public class UserService {
 
     public void updateUser(Long id, UserDto userDto) {
         User user = userDao.findById(id);
-        user.setAdmin(user.getAdmin());
         user.setAddressUser(userDto.getAddress());
         user.setCityUser(userDto.getCity());
         user.setEmailUser(userDto.getEmail());
@@ -129,6 +130,7 @@ public class UserService {
         user.setLoginUser(userDto.getLogin());
         user.setPhoneUser(userDto.getPhoneNumber());
         user.setPostalCodeUser(userDto.getPostalCode());
+        user.setActiveUser(userDto.isActive() != null ? userDto.isActive() : user.getActiveUser());
         userDao.update(user);
     }
 

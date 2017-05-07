@@ -18,11 +18,14 @@ public class WorkingTimeDao extends AbstractDAO<WorkingTime>{
     }
     
     public List<WorkingTime> findByDoctorId(Long doctorId) {
-        return list(currentSession().createCriteria(WorkingTime.class).add(Restrictions.eq("doctor", doctorId)));
+        return list(currentSession().createCriteria(WorkingTime.class)
+                .add(Restrictions.eq("doctor.id", doctorId)));
     }
     
    public List<WorkingTime> findByDoctorIdAndDay(Long doctorId, int dayName) {
-        return list(currentSession().createCriteria(WorkingTime.class).add(Restrictions.eq("doctor", doctorId)).add(Restrictions.eq("dayOfTheWeek", dayName)));
+        return list(currentSession().createCriteria(WorkingTime.class)
+                .add(Restrictions.eq("doctor.id", doctorId))
+                .add(Restrictions.eq("dayOfTheWeek", dayName)));
     }
 
     public WorkingTime create(WorkingTime workingTime) {
