@@ -572,14 +572,43 @@ function getDoctors() {
 
     var ourRequest = new XMLHttpRequest();
 
-    ourRequest.open('GET', 'https://demo4287382.mockable.io/doctor');
+    ourRequest.open('GET', 'http://localhost:8076/heck/doctors');
+    ourRequest.setRequestHeader("Authorization", "Bearer " + JSON.parse(sessionStorage.getItem('user')).token);
 
     ourRequest.onload = function () {
         if (ourRequest.status == 200) {
             var data = JSON.parse(ourRequest.responseText);
             console.log(data);
             fillTable(data);
+            fillModalsDetails(data);
 
+
+            $('#myTable').DataTable(); //vyhladavanie a strankovanie
+        } else {
+            console.log("We connected to the server, but it returned an error.");
+        }
+    };
+
+    ourRequest.onerror = function () {
+        console.log("Connection error");
+    };
+
+    ourRequest.send();
+}
+
+function getUsers() {
+
+    var ourRequest = new XMLHttpRequest();
+
+    ourRequest.open('GET', 'http://localhost:8076/heck/users');
+    ourRequest.setRequestHeader("Authorization", "Bearer " + JSON.parse(sessionStorage.getItem('user')).token);
+
+    ourRequest.onload = function () {
+        if (ourRequest.status == 200) {
+            var data = JSON.parse(ourRequest.responseText);
+            console.log(data);
+            fillTable(data);
+            fillModalsDetails(data)
 
             $('#myTable').DataTable(); //vyhladavanie a strankovanie
         } else {

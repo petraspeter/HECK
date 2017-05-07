@@ -1,20 +1,25 @@
 package sk.upjs.ics.pro1a.heck.services;
 
-import sk.upjs.ics.pro1a.heck.db.WorkingTimeDao;
-import sk.upjs.ics.pro1a.heck.db.core.WorkingTime;
-import sk.upjs.ics.pro1a.heck.services.dto.*;
-import sk.upjs.ics.pro1a.heck.utils.Tokenizer;
-import java.math.BigInteger;
-import java.security.SecureRandom;
-import java.sql.Time;
-import java.util.ArrayList;
-import java.util.List;
 import org.jose4j.jwt.NumericDate;
 import sk.upjs.ics.pro1a.heck.db.DoctorDao;
 import sk.upjs.ics.pro1a.heck.db.SpecializationDao;
+import sk.upjs.ics.pro1a.heck.db.WorkingTimeDao;
 import sk.upjs.ics.pro1a.heck.db.core.Doctor;
 import sk.upjs.ics.pro1a.heck.db.core.Specialization;
+import sk.upjs.ics.pro1a.heck.db.core.WorkingTime;
+import sk.upjs.ics.pro1a.heck.services.dto.*;
 import sk.upjs.ics.pro1a.heck.utils.PasswordManager;
+import sk.upjs.ics.pro1a.heck.utils.Tokenizer;
+
+import java.math.BigInteger;
+import java.security.SecureRandom;
+import java.sql.Time;
+import java.sql.Timestamp;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 /**
  *
@@ -149,6 +154,8 @@ public class DoctorService {
         String salt = new BigInteger(130, new SecureRandom()).toString(32);
         String password = PasswordManager.encryptPassword(salt, doctorDto.getPassword());
         Specialization specialization = specializationDao.findById(doctorDto.getSpecialization());
+        doctorDto.setRegistrationTime(new Date().toString());
+        doctorDto.setActive(true);
         Doctor doctor = createDoctorDaoFromDoctorDto(doctorDto, password, salt, specialization);
         doctor = doctorDao.createDoctor(doctor);
         LoginResponseDto loginResponse = new LoginResponseDto();
@@ -172,6 +179,7 @@ public class DoctorService {
         doctor.setCityDoctor(doctorDto.getCity());
         doctor.setPostalCodeDoctor(doctorDto.getPostalCode());
         doctor.setPhoneNumberDoctor(doctorDto.getPhoneNumber());
+        doctor.setActiveDoctor(doctorDto.getActive());
         if(!doctor.getSpecializationDoctor().getId().equals(doctorDto.getSpecialization())){
             doctor.setSpecializationDoctor(specializationDao.findById(doctorDto.getSpecialization()));
         }
@@ -292,9 +300,10 @@ public class DoctorService {
                 doctorDto.getPhoneNumber(),
                 doctorDto.getPostalCode(),
                 doctorDto.getCity(),
-                doctorDto.getAddress(), 
+                doctorDto.getAddress(),
                 doctorDto.getInterval(),
-               doctorDto.getRegistrationTime()
+                ServiceUtils.convertStringToTimestamp(doctorDto.getRegistrationTime()),
+                doctorDto.getActive()
         );
     }
     
@@ -311,8 +320,10 @@ public class DoctorService {
                 doctor.getCityDoctor(),
                 doctor.getPhoneNumberDoctor(),
                 doctor.getSpecializationDoctor().getId(),
+                doctor.getSpecializationDoctor().getSpecializationName(),
                 doctor.getAppointmentInterval(),
-                doctor.getRegistrationTime()
+                doctor.getActiveDoctor(),
+                ServiceUtils.convertTimestampToString(doctor.getRegistrationTime())
         );
     }
     
@@ -330,8 +341,10 @@ public class DoctorService {
                 doctor.getCityDoctor(),
                 doctor.getPhoneNumberDoctor(),
                 doctor.getSpecializationDoctor().getId(),
+                doctor.getSpecializationDoctor().getSpecializationName(),
                 doctor.getAppointmentInterval(),
-                doctor.getRegistrationTime()
+                doctor.getActiveDoctor(),
+                ServiceUtils.convertTimestampToString(doctor.getRegistrationTime())
         );
     }
     

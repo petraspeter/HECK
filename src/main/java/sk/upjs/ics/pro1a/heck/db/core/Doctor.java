@@ -126,7 +126,7 @@ public class Doctor implements Serializable {
     public Doctor(String emailDoctor, String loginDoctor, String passwordDoctor, String salt, Specialization specializationDoctor,
             String businessNameDoctor, String firstNameDoctor, String lastNameDoctor,
             String phoneNumberDoctor, String postalCodeDoctor, String cityDoctor, String addressDoctor,
-            Timestamp activationTimeDoctor, Short appointmentInterval, Timestamp registrationTime) {
+            Timestamp activationTimeDoctor, Short appointmentInterval, Timestamp registrationTime, Boolean activeDoctor) {
         this.emailDoctor = emailDoctor;
         this.loginDoctor = loginDoctor;
         this.passwordDoctor = passwordDoctor;
@@ -143,12 +143,13 @@ public class Doctor implements Serializable {
         this.activeDoctor = true;
         this.appointmentInterval = appointmentInterval;
         this.registrationTime = registrationTime;
+        this.activeDoctor = activeDoctor;
     }
     
     public Doctor(String emailDoctor, String loginDoctor, String passwordDoctor, String saltDoctor,
             Specialization specializationDoctor, String businessNameDoctor, String firstNameDoctor,
             String lastNameDoctor, String phoneNumberDoctor, String postalCodeDoctor, String cityDoctor,
-            String addressDoctor, Short appointmentInterval, Timestamp registrationTime) {
+            String addressDoctor, Short appointmentInterval, Timestamp registrationTime, Boolean activeDoctor) {
         this.emailDoctor = emailDoctor;
         this.loginDoctor = loginDoctor;
         this.passwordDoctor = passwordDoctor;
@@ -164,6 +165,7 @@ public class Doctor implements Serializable {
         this.activeDoctor = false;
         this.appointmentInterval = appointmentInterval;
         this.registrationTime = registrationTime;
+        this.activeDoctor = activeDoctor;
     }
     
     public Long getIdDoctor() {
@@ -297,7 +299,7 @@ public class Doctor implements Serializable {
     public Timestamp getRegistrationTime() {
         return registrationTime;
     }
-    
+
     public void setRegistrationTime(Timestamp registrationTime) {
         this.registrationTime = registrationTime;
     }

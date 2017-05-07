@@ -3,7 +3,6 @@ package sk.upjs.ics.pro1a.heck.services.dto;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import java.sql.Timestamp;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -40,7 +39,13 @@ public class UserDto {
     private String phoneNumber;
 
     @JsonProperty("registrationTime")
-    private Timestamp registrationTime;
+    private String registrationTime;
+
+    @JsonProperty("active")
+    private boolean isActive;
+        
+    @JsonProperty("isAdmin")
+    private boolean isAdmin;
     
     public long getId() {
         return id;
@@ -122,19 +127,35 @@ public class UserDto {
         this.phoneNumber = phoneNumber;
     }
 
-    public Timestamp getRegistrationTime() {
+    public String getRegistrationTime() {
         return registrationTime;
     }
 
-    public void setRegistrationTime(Timestamp registrationTime) {
+    public void setRegistrationTime(String registrationTime) {
         this.registrationTime = registrationTime;
+    }
+
+    public boolean isAdmin() {
+        return isAdmin;
+    }
+
+    public void setIsAdmin(boolean isAdmin) {
+        this.isAdmin = isAdmin;
+    }
+
+    public boolean isActive() {
+        return isActive;
+    }
+
+    public void setActive(boolean active) {
+        this.isActive = active;
     }
 
     public UserDto() {
     }
 
-    public UserDto(long id, String login, String password, String firstName, String lastName, String email, 
-            String address, String postalCode, String city, String phoneNumber, Timestamp registrationTime) {
+    public UserDto(long id, String login, String password, String firstName, String lastName, String email, String address, String postalCode,
+                   String city, String phoneNumber, String registrationTime, boolean isActive, boolean isAdmin) {
         this.id = id;
         this.login = login;
         this.password = password;
@@ -146,10 +167,12 @@ public class UserDto {
         this.city = city;
         this.phoneNumber = phoneNumber;
         this.registrationTime = registrationTime;
+        this.isActive = isActive;
+        this.isAdmin = isAdmin;
     }
 
-    public UserDto(long id, String login, String firstName, String lastName, String email, String address, 
-            String postalCode, String city, String phoneNumber, Timestamp registrationTime) {
+    public UserDto(long id, String login, String firstName, String lastName, String email, String address, String postalCode,
+                   String city, String phoneNumber, String registrationTime, boolean isActive, boolean isAdmin) {
         this.id = id;
         this.login = login;
         this.firstName = firstName;
@@ -160,6 +183,8 @@ public class UserDto {
         this.city = city;
         this.phoneNumber = phoneNumber;
         this.registrationTime = registrationTime;
+        this.isActive = isActive;
+        this.isAdmin = isAdmin;
     }
         
 }
