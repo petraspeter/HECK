@@ -43,10 +43,10 @@ public class UserDto {
 
     @JsonProperty("active")
     private boolean isActive;
-        
+
     @JsonProperty("isAdmin")
     private boolean isAdmin;
-    
+
     public long getId() {
         return id;
     }
@@ -155,7 +155,7 @@ public class UserDto {
     }
 
     public UserDto(long id, String login, String password, String firstName, String lastName, String email, String address, String postalCode,
-                   String city, String phoneNumber, String registrationTime, boolean isActive, boolean isAdmin) {
+            String city, String phoneNumber, String registrationTime, boolean isActive, boolean isAdmin) {
         this.id = id;
         this.login = login;
         this.password = password;
@@ -172,7 +172,7 @@ public class UserDto {
     }
 
     public UserDto(long id, String login, String firstName, String lastName, String email, String address, String postalCode,
-                   String city, String phoneNumber, String registrationTime, boolean isActive, boolean isAdmin) {
+            String city, String phoneNumber, String registrationTime, boolean isActive, boolean isAdmin) {
         this.id = id;
         this.login = login;
         this.firstName = firstName;
@@ -186,5 +186,5 @@ public class UserDto {
         this.isActive = isActive;
         this.isAdmin = isAdmin;
     }
-        
+
 }

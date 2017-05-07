@@ -1,49 +1,50 @@
 package sk.upjs.ics.pro1a.heck.services;
 
-import org.jose4j.jwt.NumericDate;
-import sk.upjs.ics.pro1a.heck.db.DoctorDao;
-import sk.upjs.ics.pro1a.heck.db.SpecializationDao;
-import sk.upjs.ics.pro1a.heck.db.WorkingTimeDao;
-import sk.upjs.ics.pro1a.heck.db.core.Doctor;
-import sk.upjs.ics.pro1a.heck.db.core.Specialization;
+import sk.upjs.ics.pro1a.heck.utils.ServiceUtils;
 import sk.upjs.ics.pro1a.heck.db.core.WorkingTime;
 import sk.upjs.ics.pro1a.heck.services.dto.*;
-import sk.upjs.ics.pro1a.heck.utils.PasswordManager;
 import sk.upjs.ics.pro1a.heck.utils.Tokenizer;
 
 import java.math.BigInteger;
 import java.security.SecureRandom;
 import java.sql.Time;
 import java.sql.Timestamp;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
+import org.jose4j.jwt.NumericDate;
+import sk.upjs.ics.pro1a.heck.db.AppointmentDao;
+import sk.upjs.ics.pro1a.heck.db.DoctorDao;
+import sk.upjs.ics.pro1a.heck.db.SpecializationDao;
+import sk.upjs.ics.pro1a.heck.db.WorkingTimeDao;
+import sk.upjs.ics.pro1a.heck.db.core.Doctor;
+import sk.upjs.ics.pro1a.heck.db.core.Specialization;
+import sk.upjs.ics.pro1a.heck.utils.PasswordManager;
 
 /**
  *
  * @author Raven
  */
 public class DoctorService {
-    
+
     private DoctorDao doctorDao;
     private SpecializationDao specializationDao;
     private WorkingTimeDao workingTimeDao;
+    private AppointmentDao appointmentDao;
     private final byte[] tokenSecret;
     private Tokenizer tokenizer;
-    
-    public DoctorService(DoctorDao doctorDao, SpecializationDao specializationDao, WorkingTimeDao workingTimeDao, byte[] tokenSecret) {
+
+    public DoctorService(DoctorDao doctorDao, SpecializationDao specializationDao, WorkingTimeDao workingTimeDao, AppointmentDao appointmentDao, byte[] tokenSecret) {
         this.doctorDao = doctorDao;
         this.specializationDao = specializationDao;
         this.tokenSecret = tokenSecret;
         this.workingTimeDao = workingTimeDao;
+        this.appointmentDao = appointmentDao;
         tokenizer = new Tokenizer(tokenSecret);
     }
-    
+
     /*
     GET methods
-    */
+     */
     public List<DoctorDto> getAllDoctors() {
         List<DoctorDto> doctors = new ArrayList<>();
         for (Doctor doctor : doctorDao.findAll()) {
@@ -52,7 +53,7 @@ public class DoctorService {
         }
         return doctors;
     }
-    
+
     public DoctorDto getDoctorById(long id) {
         Doctor doctor = doctorDao.findById(id);
         if (doctor != null) {
@@ -61,7 +62,7 @@ public class DoctorService {
         }
         return null;
     }
-    
+
     public DoctorDto getDoctorByLogin(String login) {
         Doctor doctor = doctorDao.findByLogin(login);
         if (doctor != null) {
@@ -70,67 +71,88 @@ public class DoctorService {
         }
         return null;
     }
-    
+
     public List<DoctorDto> getDoctorsBySpecializationId(Long id) {
-        List<DoctorDto> doctors = new ArrayList<>();
-        for (Doctor doctor : doctorDao.findDoctorsBySpecialization(id)) {
+        List<DoctorDto> doctorsDto = new ArrayList<>();
+        for (Doctor doctor : doctorDao.findDoctorsBySpecializationId(id)) {
             DoctorDto doctorDto = createDoctorDtoFromDoctorDaoWithoutPassword(doctor);
-            doctors.add(doctorDto);
+            doctorsDto.add(doctorDto);
+        }
+        return doctorsDto;
+    }
+
+    public List<DoctorDto> getDoctorsBySpecializationIdAndCityAndDate(Long id, String city, Timestamp from,
+            Timestamp to) {
+        List<DoctorDto> doctors = new ArrayList<>();
+        for (Doctor doctor : doctorDao.findDoctorsBySpecializationIdAndCity(id, city)) {
+            List<AppointmentDto> appointments = appointmentDao.generateDoctorAppointmentForDays(
+                    doctor.getIdDoctor(), 0L, from, to);
+            if (appointments.size() > 0) {
+                DoctorDto doctorDto = createDoctorDtoFromDoctorDaoWithoutPassword(doctor);
+                doctors.add(doctorDto);
+            }
         }
         return doctors;
     }
-    
-    public List<DoctorDto> getDoctorsBySpecializationIdAndPostalCode(Long id, String pcn) {
+
+    public List<DoctorDto> getDoctorsBySpecializationIdAndFullNameAndDate(Long id, String firstname,
+            String lastName, Timestamp from, Timestamp to) {
         List<DoctorDto> doctors = new ArrayList<>();
-        for (Doctor doctor : doctorDao.findDoctorsBySpecializationAndPostalCode(id, pcn)) {
-            DoctorDto doctorDto = createDoctorDtoFromDoctorDaoWithoutPassword(doctor);
-            doctors.add(doctorDto);
+        for (Doctor doctor : doctorDao.findDoctorsBySpecializationIdAndName(id, firstname, lastName)) {
+            List<AppointmentDto> appointments = appointmentDao.generateDoctorAppointmentForDays(doctor.getIdDoctor(), 0L, from, to);
+            if (appointments.size() > 0) {
+                DoctorDto doctorDto = createDoctorDtoFromDoctorDaoWithoutPassword(doctor);
+                doctors.add(doctorDto);
+            }
         }
         return doctors;
     }
-    
-    public List<DoctorDto> getDoctorsBySpecializationIdAndName(Long id, String firstname, String LastName) {
+
+    public List<DoctorDto> getDoctorsBySpecializationIdAndFullNameAndCityAndDate(Long id, String firstname,
+            String lastName, String city, Timestamp from, Timestamp to) {
         List<DoctorDto> doctors = new ArrayList<>();
-        for (Doctor doctor : doctorDao.findDoctorsBySpecializationAndName(id, firstname, LastName)) {
-            DoctorDto doctorDto = createDoctorDtoFromDoctorDaoWithoutPassword(doctor);
-            doctors.add(doctorDto);
+        for (Doctor doctor : doctorDao.findDoctorsBySpecializationIdAndNameAndCity(id, firstname, lastName, city)) {
+            List<AppointmentDto> appointments = appointmentDao.generateDoctorAppointmentForDays(
+                    doctor.getIdDoctor(), 0L, from, to);
+            if (appointments.size() > 0) {
+                DoctorDto doctorDto = createDoctorDtoFromDoctorDaoWithoutPassword(doctor);
+                doctors.add(doctorDto);
+            }
         }
         return doctors;
     }
-    
-    public List<DoctorDto> getDoctorsBySpecializationIdAndNameAndPostalCode(Long id, String firstname,
-            String LastName, String pcn) {
+
+    public List<DoctorDto> getDoctorsBySpecializationIdAndLastNameAndDate(Long id, String lastName,
+            Timestamp from, Timestamp to) {
         List<DoctorDto> doctors = new ArrayList<>();
-        for (Doctor doctor : doctorDao.findDoctorsBySpecializationAndNameAndPostalCode(id, firstname, LastName,
-                pcn)) {
-            DoctorDto doctorDto = createDoctorDtoFromDoctorDaoWithoutPassword(doctor);
-            doctors.add(doctorDto);
+        for (Doctor doctor : doctorDao.findDoctorsBySpecializationIdAndLastName(id, lastName)) {
+            List<AppointmentDto> appointments = appointmentDao.generateDoctorAppointmentForDays(
+                    doctor.getIdDoctor(), 0L, from, to);
+            if (appointments.size() > 0) {
+                DoctorDto doctorDto = createDoctorDtoFromDoctorDaoWithoutPassword(doctor);
+                doctors.add(doctorDto);
+            }
         }
         return doctors;
     }
-        
-    public List<DoctorDto> getDoctorsBySpecializationIdAndLastName(Long id, String LastName) {
+
+    public List<DoctorDto> getDoctorsBySpecializationIdAndLastNameAndCityAndDate(Long id, String lastName,
+            String city, Timestamp from, Timestamp to) {
         List<DoctorDto> doctors = new ArrayList<>();
-        for (Doctor doctor : doctorDao.findDoctorsBySpecializationAndLastName(id, LastName)) {
-            DoctorDto doctorDto = createDoctorDtoFromDoctorDaoWithoutPassword(doctor);
-            doctors.add(doctorDto);
+        for (Doctor doctor : doctorDao.findDoctorsBySpecializationIdAndLastNameAndCity(id, lastName, city)) {
+            List<AppointmentDto> appointments = appointmentDao.generateDoctorAppointmentForDays(
+                    doctor.getIdDoctor(), 0L, from, to);
+            if (appointments.size() > 0) {
+                DoctorDto doctorDto = createDoctorDtoFromDoctorDaoWithoutPassword(doctor);
+                doctors.add(doctorDto);
+            }
         }
         return doctors;
     }
-    
-    public List<DoctorDto> getDoctorsBySpecializationIdAndLastNameAndPostalCode(Long id, String LastName,
-            String pcn) {
-        List<DoctorDto> doctors = new ArrayList<>();
-        for (Doctor doctor : doctorDao.findDoctorsBySpecializationAndLastNameAndPostalCode(id, LastName, pcn)) {
-            DoctorDto doctorDto = createDoctorDtoFromDoctorDaoWithoutPassword(doctor);
-            doctors.add(doctorDto);
-        }
-        return doctors;
-    }
-    
+
     /*
     Login and registration methods
-    */
+     */
     public LoginResponseDto loginAsDoctor(String login, String password) {
         Doctor doctor = doctorDao.findByLogin(login);
         if (doctor != null) {
@@ -146,7 +168,7 @@ public class DoctorService {
         }
         return null;
     }
-    
+
     public LoginResponseDto registerDoctor(DoctorDto doctorDto) {
         if (doctorDto.getPassword() == null || doctorDto.getPassword().length() < 6) {
             throw new IllegalStateException("Password does not match criteria.");
@@ -154,10 +176,11 @@ public class DoctorService {
         String salt = new BigInteger(130, new SecureRandom()).toString(32);
         String password = PasswordManager.encryptPassword(salt, doctorDto.getPassword());
         Specialization specialization = specializationDao.findById(doctorDto.getSpecialization());
-        doctorDto.setRegistrationTime(new Date().toString());
         doctorDto.setActive(true);
         Doctor doctor = createDoctorDaoFromDoctorDto(doctorDto, password, salt, specialization);
-        doctor = doctorDao.createDoctor(doctor);
+        doctor.setRegistrationTime(new Timestamp(System.currentTimeMillis()));
+        doctor.setActivationTimeDoctor(new Timestamp(System.currentTimeMillis()));
+        doctor = doctorDao.create(doctor);
         LoginResponseDto loginResponse = new LoginResponseDto();
         loginResponse.setId(doctor.getIdDoctor());
         loginResponse.setLogin(doctor.getLoginDoctor());
@@ -165,10 +188,10 @@ public class DoctorService {
         loginResponse.setToken(tokenizer.generateToken(doctor.getLoginDoctor(), "doctor"));
         return loginResponse;
     }
-    
+
     /*
     Doctor update methods
-    */
+     */
     public void updateDoctor(Long id, DoctorDto doctorDto) {
         Doctor doctor = doctorDao.findById(id);
         doctor.setFirstNameDoctor(doctorDto.getFirstName());
@@ -180,13 +203,13 @@ public class DoctorService {
         doctor.setPostalCodeDoctor(doctorDto.getPostalCode());
         doctor.setPhoneNumberDoctor(doctorDto.getPhoneNumber());
         doctor.setActiveDoctor(doctorDto.getActive());
-        if(!doctor.getSpecializationDoctor().getId().equals(doctorDto.getSpecialization())){
+        if (!doctor.getSpecializationDoctor().getId().equals(doctorDto.getSpecialization())) {
             doctor.setSpecializationDoctor(specializationDao.findById(doctorDto.getSpecialization()));
         }
         doctorDao.update(doctor);
     }
-    
- public IsValidDto isLoginValid(String login) {
+
+    public IsValidDto isLoginValid(String login) {
         IsValidDto isValidDto = new IsValidDto();
         if (doctorDao.findByLogin(login) == null) {
             isValidDto.setValid(true);
@@ -232,31 +255,31 @@ public class DoctorService {
         isValidDto.setValid(false);
         return isValidDto;
     }
-    
+
     /*
     Update token method
-    */
-    public LoginResponseDto updateDoctorsToken(String name, String role, Long actualExpirationTime) {
-        Doctor doctor = doctorDao.findByLogin(name);
+     */
+    public LoginResponseDto updateDoctorsToken(String login, String role, Long actualExpirationTime) {
+        Doctor doctor = doctorDao.findByLogin(login);
         LoginResponseDto loginResponse = new LoginResponseDto();
         loginResponse.setId(doctor.getIdDoctor());
         loginResponse.setLogin(doctor.getLoginDoctor());
         loginResponse.setRole(role);
         NumericDate expiration = NumericDate.fromSeconds(actualExpirationTime);
-        loginResponse.setToken(tokenizer.updateToken(name, role, expiration));
+        loginResponse.setToken(tokenizer.updateToken(login, role, expiration));
         return loginResponse;
     }
 
     public WorkingTimeDto getDoctorWorkingTime(long id) {
         List<WorkingTime> workingTimes = workingTimeDao.findByDoctorId(id);
-        if(workingTimes.size()==0) {
+        if (workingTimes.isEmpty()) {
             return null;
         }
         WorkingTimeDto workingTimeDto = new WorkingTimeDto();
         workingTimeDto.setInterval(workingTimes.get(0).getDoctor().getAppointmentInterval());
 
         ArrayList<WorkingDayDto> workingDaysDto = new ArrayList<>();
-        for(WorkingTime workingTime: workingTimes){
+        for (WorkingTime workingTime : workingTimes) {
             WorkingDayDto workingDayDto = new WorkingDayDto();
             workingDayDto.setDay(workingTime.getDayOfTheWeek());
             workingDayDto.setEnd(workingTime.getStartingHour().toString());
@@ -279,13 +302,13 @@ public class DoctorService {
             //TODO: implement validation for String for end and start time
             workingTime.setEndingHour(Time.valueOf(day.getEnd() + ":00"));
             workingTime.setStartingHour(Time.valueOf(day.getStart() + ":00"));
-            workingTimeDao.createWorkingTime(workingTime);
+            workingTimeDao.create(workingTime);
         }
     }
-    
+
     /*
     Methods for convert between DTO and DAO
-    */
+     */
     private Doctor createDoctorDaoFromDoctorDto(DoctorDto doctorDto, String password, String salt,
             Specialization specialization) {
         return new Doctor(
@@ -303,10 +326,9 @@ public class DoctorService {
                 doctorDto.getAddress(),
                 doctorDto.getInterval(),
                 ServiceUtils.convertStringToTimestamp(doctorDto.getRegistrationTime()),
-                doctorDto.getActive()
-        );
+                doctorDto.getActive());
     }
-    
+
     private DoctorDto createDoctorDtoFromDoctorDaoWithoutPassword(Doctor doctor) {
         return new DoctorDto(
                 doctor.getIdDoctor(),
@@ -326,7 +348,7 @@ public class DoctorService {
                 ServiceUtils.convertTimestampToString(doctor.getRegistrationTime())
         );
     }
-    
+
     private DoctorDto createDoctorDtoFromDoctorDaoWithPassword(Doctor doctor) {
         return new DoctorDto(
                 doctor.getIdDoctor(),
@@ -347,5 +369,5 @@ public class DoctorService {
                 ServiceUtils.convertTimestampToString(doctor.getRegistrationTime())
         );
     }
-    
+
 }

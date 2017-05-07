@@ -1,5 +1,6 @@
 package sk.upjs.ics.pro1a.heck.services;
 
+import sk.upjs.ics.pro1a.heck.utils.ServiceUtils;
 import sk.upjs.ics.pro1a.heck.utils.Tokenizer;
 import java.math.BigInteger;
 import java.security.SecureRandom;
@@ -18,21 +19,20 @@ import sk.upjs.ics.pro1a.heck.utils.PasswordManager;
  * @author Raven
  */
 public class UserService {
-    
-    
-    private  UserDao userDao;
+
+    private UserDao userDao;
     private final byte[] tokenSecret;
     private Tokenizer tokenizer;
-    
+
     public UserService(UserDao userDao, byte[] tokenSecret) {
         this.userDao = userDao;
         this.tokenSecret = tokenSecret;
         tokenizer = new Tokenizer(tokenSecret);
     }
-    
+
     /*
     GET methods
-    */
+     */
     public UserDto getUserById(long id) {
         User user = userDao.findById(id);
         if (user != null) {
@@ -41,7 +41,7 @@ public class UserService {
         }
         return null;
     }
-    
+
     public UserDto getUserByLogin(String login) {
         User user = userDao.findByLogin(login);
         if (user != null) {
@@ -50,19 +50,19 @@ public class UserService {
         }
         return null;
     }
-    
+
     public List<UserDto> getAllUsers() {
-        List<UserDto> users = new ArrayList<>();
+        List<UserDto> usersDto = new ArrayList<>();
         for (User user : userDao.findAll()) {
             UserDto userDto = createUserDtoFromUserDaoWithoutPassword(user);
-            users.add(userDto);
+            usersDto.add(userDto);
         }
-        return users;
+        return usersDto;
     }
-    
+
     /*
     Login and registration methods
-    */
+     */
     public LoginResponseDto loginAsUser(String login, String password) {
         User user = userDao.findByLogin(login);
         if (user != null) {
@@ -70,10 +70,10 @@ public class UserService {
                 LoginResponseDto loginResponse = new LoginResponseDto();
                 loginResponse.setId(user.getIdUser());
                 loginResponse.setLogin(user.getLoginUser());
-                if(user.getAdmin()){
+                if (user.getAdmin()) {
                     loginResponse.setRole("admin");
                 } else {
-                        loginResponse.setRole("user");
+                    loginResponse.setRole("user");
                 }
                 loginResponse.setToken(tokenizer.generateToken(login, loginResponse.getRole()));
                 return loginResponse;
@@ -81,7 +81,7 @@ public class UserService {
         }
         return null;
     }
-    
+
     public LoginResponseDto registerUser(UserDto userDto) {
         if (userDto.getPassword() == null || userDto.getPassword().length() < 6) {
             throw new IllegalStateException("Password does not match criteria.");
@@ -90,7 +90,8 @@ public class UserService {
         String password = PasswordManager.encryptPassword(salt, userDto.getPassword());
         User user = createUserDaoFromUserDto(userDto, password, salt);
         user.setRegistrationTime(new Timestamp(System.currentTimeMillis()));
-        user = userDao.createUser(user);
+        user = userDao.create(user);
+
         LoginResponseDto loginResponse = new LoginResponseDto();
         loginResponse.setId(user.getIdUser());
         loginResponse.setLogin(user.getLoginUser());
@@ -98,23 +99,10 @@ public class UserService {
         loginResponse.setToken(tokenizer.generateToken(user.getLoginUser(), "user"));
         return loginResponse;
     }
-    
+
     /*
     User update methods
-    */
-    
-    public void updateDoctor(Long id, UserDto userDto) {
-        User user = userDao.findById(id);
-        user.setFirstNameUser(userDto.getFirstName());
-        user.setLastNameUser(userDto.getLastName());
-        user.setEmailUser(userDto.getEmail());
-        user.setAddressUser(userDto.getAddress());
-        user.setCityUser(userDto.getCity());
-        user.setPhoneUser(userDto.getPhoneNumber());
-        user.setPostalCodeUser(userDto.getPostalCode());
-        userDao.update(user);
-    }
-    
+     */
     public void changePassword(Long id, String newPassword) {
         User user = userDao.findById(id);
         String salt = new BigInteger(130, new SecureRandom()).toString(32);
@@ -123,25 +111,11 @@ public class UserService {
         user.setPasswordUser(password);
         userDao.update(user);
     }
-    
+
     public void deactivateAccount(Long id) {
         User user = userDao.findById(id);
         user.setActiveUser(false);
         userDao.update(user);
-    }
-    
-    /*
-    Update token method
-    */
-    public LoginResponseDto updateUsersToken(String name, String role, Long actualExpirationTime) {
-        User user= userDao.findByLogin(name);
-        LoginResponseDto loginResponse = new LoginResponseDto();
-        loginResponse.setId(user.getIdUser());
-        loginResponse.setLogin(user.getLoginUser());
-        loginResponse.setRole(role);
-        NumericDate expiration = NumericDate.fromSeconds(actualExpirationTime);
-        loginResponse.setToken(tokenizer.updateToken(name, role, expiration));
-        return loginResponse;
     }
 
     public void updateUser(Long id, UserDto userDto) {
@@ -157,10 +131,27 @@ public class UserService {
         user.setPostalCodeUser(userDto.getPostalCode());
         userDao.update(user);
     }
-    
+
     /*
-    Methods for convert between DTO and DAO
-    */
+    Update token method
+     */
+    public LoginResponseDto updateUsersToken(String login, String role, Long actualExpirationTime) {
+        User user = userDao.findByLogin(login);
+        LoginResponseDto loginResponse = new LoginResponseDto();
+        loginResponse.setId(user.getIdUser());
+        loginResponse.setLogin(user.getLoginUser());
+        loginResponse.setRole(role);
+        NumericDate expiration = NumericDate.fromSeconds(actualExpirationTime);
+        loginResponse.setToken(tokenizer.updateToken(login, role, expiration));
+        return loginResponse;
+    }
+
+    /*
+    Private "query"methods
+     */
+ /*
+    Methods for convertation between DTO and DAO
+     */
     private User createUserDaoFromUserDto(UserDto userDto, String password, String salt) {
         return new User(
                 userDto.getEmail(),
@@ -175,10 +166,9 @@ public class UserService {
                 userDto.getAddress(),
                 ServiceUtils.convertStringToTimestamp(userDto.getRegistrationTime()),
                 userDto.isActive(),
-                userDto.isAdmin()
-        );
+                userDto.isAdmin());
     }
-    
+
     private UserDto createUserDtoFromUserDaoWithoutPassword(User user) {
         return new UserDto(
                 user.getIdUser(),
@@ -192,10 +182,9 @@ public class UserService {
                 user.getPhoneUser(),
                 ServiceUtils.convertTimestampToString(user.getRegistrationTime()),
                 user.getActiveUser(),
-                user.getAdmin()
-        );
+                user.getAdmin());
     }
-    
+
     private UserDto createUserDtoFromUserDaoWithPassword(User user) {
         return new UserDto(
                 user.getIdUser(),
@@ -210,9 +199,7 @@ public class UserService {
                 user.getPhoneUser(),
                 ServiceUtils.convertTimestampToString(user.getRegistrationTime()),
                 user.getActiveUser(),
-                user.getAdmin()
-                
-        );
+                user.getAdmin());
     }
-    
+
 }

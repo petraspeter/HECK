@@ -11,58 +11,6 @@ import java.sql.Timestamp;
  */
 @Entity
 @Table(name = "doctor")
-@NamedQueries({
-    @NamedQuery(
-            name = "findAllDoctors",
-            query = "select doc from Doctor doc"),
-    @NamedQuery(
-            name = "findDoctorByLogin",
-            query = "select doc from Doctor doc where doc.loginDoctor = :login"),
-    @NamedQuery(name = "findDoctorByEmail",
-            query = "select doc from Doctor doc where doc.emailDoctor = :email"),
-    @NamedQuery(
-            name = "findDoctorByLoginAndPassword",
-            query = "select doc from Doctor doc where doc.loginDoctor = :login and doc.passwordDoctor = :password")
-})
-@NamedNativeQueries({
-    @NamedNativeQuery(
-            name = "findAllDoctorsBySpecializationNativeSql",
-            query = "select * from doctor doc where doc.specialization_doctor = :specialization",
-            resultClass = Doctor.class
-    ),
-    @NamedNativeQuery(
-            name = "findAllDoctorsBySpecializationAndCityNativeSql",
-            query = "select * from doctor doc where doc.specialization_doctor = :specialization "
-                    + "AND doc.postal_code_doctor = :pcn",
-            resultClass = Doctor.class
-    ),
-    @NamedNativeQuery(
-            name = "findAllDoctorsBySpecializationAndFullNameNativeSql",
-            query = "select * from doctor doc where doc.specialization_doctor = :specialization AND"
-                    + " doc.first_name_doctor LIKE :firstName AND doc.last_name_doctor LIKE :lastName",
-            resultClass = Doctor.class
-    ),
-    @NamedNativeQuery(
-            name = "findAllDoctorsBySpecializationAndFullNameAndCityNativeSql",
-            query = "select * from doctor doc where doc.specialization_doctor = :specialization AND "
-                    + "doc.first_name_doctor LIKE :firstName AND doc.last_name_doctor LIKE :lastName "
-                    + "AND  doc.postal_code_doctor = :pcn",
-            resultClass = Doctor.class
-    ),
-    @NamedNativeQuery(
-            name = "findAllDoctorsBySpecializationAndLastNameNativeSql",
-            query = "select * from doctor doc where doc.specialization_doctor = :specialization AND "
-                    + "doc.last_name_doctor LIKE :lastName",
-            resultClass = Doctor.class
-    ),
-    @NamedNativeQuery(
-            name = "findAllDoctorsBySpecializationAndLastNameAndCityNativeSql",
-            query = "select * from doctor doc where doc.specialization_doctor = :specialization AND "
-                    + "doc.last_name_doctor LIKE :lastName"
-                    + "AND  doc.postal_code_doctor = :pcn",
-            resultClass = Doctor.class
-    )
-})
 public class Doctor implements Serializable {
     
     @Id
@@ -302,6 +250,18 @@ public class Doctor implements Serializable {
 
     public void setRegistrationTime(Timestamp registrationTime) {
         this.registrationTime = registrationTime;
+    }
+    
+    @Override
+    public String toString() {
+        return "Doctor{" + "idDoctor=" + idDoctor + ", emailDoctor=" + emailDoctor + ", loginDoctor=" + loginDoctor
+                +   ", passwordDoctor=" + passwordDoctor + ", saltDoctor=" + saltDoctor + ", specializationDoctor="
+                +    specializationDoctor + ", businessNameDoctor=" + businessNameDoctor + ", firstNameDoctor="
+                +  firstNameDoctor + ", lastNameDoctor=" + lastNameDoctor + ", phoneNumberDoctor="
+                + phoneNumberDoctor + ", postalCodeDoctor=" + postalCodeDoctor + ", cityDoctor=" + cityDoctor
+                + ", addressDoctor=" +     addressDoctor + ", activationTimeDoctor=" + activationTimeDoctor
+                + ", activeDoctor=" + activeDoctor +    ", appointmentInterval=" + appointmentInterval
+                + ", registrationTime=" + registrationTime + '}';
     }
     
 }

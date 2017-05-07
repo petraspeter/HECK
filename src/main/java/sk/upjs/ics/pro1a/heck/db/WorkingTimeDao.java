@@ -3,6 +3,8 @@ package sk.upjs.ics.pro1a.heck.db;
 import io.dropwizard.hibernate.AbstractDAO;
 import java.util.List;
 import org.hibernate.SessionFactory;
+import org.hibernate.criterion.Restrictions;
+import sk.upjs.ics.pro1a.heck.db.core.Specialization;
 import sk.upjs.ics.pro1a.heck.db.core.WorkingTime;
 
 /**
@@ -15,22 +17,15 @@ public class WorkingTimeDao extends AbstractDAO<WorkingTime>{
         super(sessionFactory);
     }
     
-    public List<WorkingTime> findWorkingTimeByDoctorId(Long id) {
-        return list(namedQuery("findAlWorkingHoursByDoctorId")
-                .setParameter("idDoctor", id));
+    public List<WorkingTime> findByDoctorId(Long doctorId) {
+        return list(currentSession().createCriteria(WorkingTime.class).add(Restrictions.eq("doctor", doctorId)));
     }
     
-   public List<WorkingTime> findWorkingTimeByDoctorIdAndDay(Long id, int dayName) {
-        return list(namedQuery("findAlWorkingHoursByDoctorIdAndDayOfTheWeekNativeQuery")
-                .setParameter("idDoctor", id)
-                .setParameter("dayOfTheWeek", dayName));
+   public List<WorkingTime> findByDoctorIdAndDay(Long doctorId, int dayName) {
+        return list(currentSession().createCriteria(WorkingTime.class).add(Restrictions.eq("doctor", doctorId)).add(Restrictions.eq("dayOfTheWeek", dayName)));
     }
 
-    public WorkingTime createWorkingTime(WorkingTime workingTime) {
+    public WorkingTime create(WorkingTime workingTime) {
         return this.persist(workingTime);
-    }
-
-    public List<WorkingTime> findByDoctorId(long doctorId) {
-        return list(namedQuery("findWorkingTimeByDoctorId").setParameter("doctorId", doctorId));
     }
 }

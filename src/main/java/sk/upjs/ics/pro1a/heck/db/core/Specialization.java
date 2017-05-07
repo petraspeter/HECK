@@ -8,14 +8,6 @@ import java.io.Serializable;
  */
 @Entity()
 @Table(name = "specialization")
-@NamedQueries({
-        @NamedQuery(name = "findAllSpecializations",
-                query = "select spec from Specialization spec"),
-        @NamedQuery(name = "findSpecializationById",
-                query = "select spec from Specialization spec WHERE spec.id = :id"),
-        @NamedQuery(name = "findSpecializationByName",
-                query = "select spec from Specialization spec WHERE spec.specializationName = :name")
-})
 public class Specialization implements Serializable {
 
     @Id

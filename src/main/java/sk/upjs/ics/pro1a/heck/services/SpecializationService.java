@@ -11,16 +11,16 @@ import sk.upjs.ics.pro1a.heck.services.dto.SpecializationDto;
  * @author Raven
  */
 public class SpecializationService {
-    
-    private  SpecializationDao specializationDao;
-    
+
+    private SpecializationDao specializationDao;
+
     public SpecializationService(SpecializationDao specializationDao) {
         this.specializationDao = specializationDao;
     }
-    
+
     /*
     GET methods
-    */
+     */
     public List<SpecializationDto> getAllSpecializations() {
         List<SpecializationDto> specializations = new ArrayList<>();
         for (Specialization s : specializationDao.findAll()) {
@@ -29,7 +29,7 @@ public class SpecializationService {
         }
         return specializations;
     }
-    
+
     public SpecializationDto getSpecializationById(long id) {
         Specialization specialization = specializationDao.findById(id);
         if (specialization != null) {
@@ -37,5 +37,5 @@ public class SpecializationService {
         }
         return null;
     }
-    
+
 }

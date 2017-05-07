@@ -1,90 +1,127 @@
 package sk.upjs.ics.pro1a.heck.db;
 
 import io.dropwizard.hibernate.AbstractDAO;
+import java.sql.Timestamp;
+import java.util.ArrayList;
 import org.hibernate.SessionFactory;
 import sk.upjs.ics.pro1a.heck.db.core.Doctor;
 
 import java.util.List;
+import org.hibernate.FetchMode;
+import org.hibernate.criterion.Restrictions;
+import sk.upjs.ics.pro1a.heck.services.dto.AppointmentDto;
+import sk.upjs.ics.pro1a.heck.services.dto.DoctorDto;
 
 /**
  * @author raven
  */
 public class DoctorDao extends AbstractDAO<Doctor> {
-    
+
     public DoctorDao(SessionFactory sessionFactory) {
         super(sessionFactory);
     }
-    
-    public List<Doctor> findAll() {
-        return list(namedQuery("findAllDoctors"));
-    }
-    
-    public Doctor findByLogin(String login) {
-        return uniqueResult(namedQuery("findDoctorByLogin")
-                .setParameter("login", login));
-    }
-    
+
     public Doctor findById(Long id) {
         return get(id);
     }
-    
-    public Doctor createDoctor(Doctor doctor) {
+
+    public Doctor create(Doctor doctor) {
         return this.persist(doctor);
     }
-    
-    public Doctor findByLoginAndPassword(String login, String password) {
-        return uniqueResult(namedQuery("findDoctorByLoginAndPassword")
-                .setParameter("login", login)
-                .setParameter("password", password));
-    }
-    
-    public void update(Doctor doctor){
+
+    public void update(Doctor doctor) {
         this.persist(doctor);
     }
-    
-    public List<Doctor> findDoctorsBySpecialization(Long id) {
-        return list(namedQuery("findAllDoctorsBySpecializationNativeSql")
-                .setParameter("specialization", id));
+
+    public List<Doctor> findAll() {
+        return list(currentSession().createCriteria(Doctor.class));
+    }
+
+    public Doctor findByLogin(String login) {
+        return uniqueResult(currentSession().createCriteria(Doctor.class).add(Restrictions.eq("loginDoctor", login)));
+    }
+
+    public Doctor findByLoginAndPassword(String login, String password) {
+        return uniqueResult(currentSession().createCriteria(Doctor.class).add(Restrictions.eq("loginDoctor", login)).add(Restrictions.eq("passwordDoctor", password)));
+    }
+
+    public List<Doctor> findDoctorsBySpecializationId(Long specializationId) {
+        return list(currentSession().createCriteria(Doctor.class).setFetchMode("specializationDoctor", FetchMode.JOIN)
+                .createAlias("specializationDoctor", "sd")
+                .add(Restrictions.eq("sd.id", specializationId)));
+    }
+
+    public List<Doctor> findDoctorsBySpecializationIdAndPostalCode(Long specializationId, String pcn) {
+        return list(currentSession().createCriteria(Doctor.class).setFetchMode("specializationDoctor", FetchMode.JOIN)
+                .createAlias("specializationDoctor", "sd")
+                .add(Restrictions.eq("sd.id", specializationId))
+                .add(Restrictions.eq("postalCodeDoctor", pcn)));
+    }
+
+    public List<Doctor> findDoctorsBySpecializationIdAndName(Long specializationId, String firstName, String lastName) {
+        return list(currentSession().createCriteria(Doctor.class)
+                .setFetchMode("specializationDoctor", FetchMode.JOIN)
+                .createAlias("specializationDoctor", "sd")
+                .add(Restrictions.eq("sd.id", specializationId))
+                .add(Restrictions.like("firstNameDoctor", firstName))/// isto tu ma byt LIKE??? nie EQ???
+                .add(Restrictions.like("lastNameDoctor", lastName)));/// isto tu ma byt LIKE??? nie EQ???
     }
     
-    public List<Doctor> findDoctorsBySpecializationAndPostalCode(Long id, String pcn) {
-        return list(namedQuery("findAllDoctorsBySpecializationAndCityNativeSql")
-                .setParameter("specialization", id)
-                .setParameter("pcn", pcn));
+    public List<Doctor> findDoctorsBySpecializationIdAndNameAndCity(Long specializationId, String firstName, String lastName, String city) {
+        return list(currentSession().createCriteria(Doctor.class)
+                .setFetchMode("specializationDoctor", FetchMode.JOIN)
+                .createAlias("specializationDoctor", "sd")
+                .add(Restrictions.eq("sd.id", specializationId))
+                .add(Restrictions.like("firstNameDoctor", firstName))/// isto tu ma byt LIKE??? nie EQ???
+                .add(Restrictions.like("lastNameDoctor", lastName))  /// isto tu ma byt LIKE??? nie EQ???      
+                .add(Restrictions.like("cityDoctor", city)));/// isto tu ma byt LIKE??? nie EQ???
+    }
+
+    public List<Doctor> findDoctorsBySpecializationIdAndNameAndPostalCode(Long specializationId, String firstName, String lastName, String pcn) {
+        return list(currentSession().createCriteria(Doctor.class)
+                .setFetchMode("specializationDoctor", FetchMode.JOIN)
+                .createAlias("specializationDoctor", "sd")
+                .add(Restrictions.eq("sd.id", specializationId))
+                .add(Restrictions.like("firstNameDoctor", firstName)) /// isto tu ma byt LIKE??? nie EQ???
+                .add(Restrictions.like("lastNameDoctor", lastName)) /// isto tu ma byt LIKE??? nie EQ???
+                .add(Restrictions.eq("postalCodeDoctor", pcn)));
+    }
+
+    public List<Doctor> findDoctorsBySpecializationIdAndLastName(Long specializationId, String lastName) {
+        return list(currentSession().createCriteria(Doctor.class)
+                .setFetchMode("specializationDoctor", FetchMode.JOIN)
+                .createAlias("specializationDoctor", "sd")
+                .add(Restrictions.eq("sd.id", specializationId))
+                .add(Restrictions.like("lastNameDoctor", lastName))); /// isto tu ma byt LIKE??? nie EQ???
+    }
+
+    public List<Doctor> findDoctorsBySpecializationIdAndLastNameAndPostalCode(Long specializationId, String lastName, String pcn) {
+        return list(currentSession().createCriteria(Doctor.class)
+                .setFetchMode("specializationDoctor", FetchMode.JOIN)
+                .createAlias("specializationDoctor", "sd")
+                .add(Restrictions.eq("sd.id", specializationId))
+                .add(Restrictions.like("lastNameDoctor", lastName)) /// isto tu ma byt LIKE??? nie EQ???
+                .add(Restrictions.eq("postalCodeDoctor", pcn)));
     }
     
-    public List<Doctor> findDoctorsBySpecializationAndName(Long id, String firstName, String lastName) {
-        return list(namedQuery("findAllDoctorsBySpecializationAndNameNativeSql")
-                .setParameter("specialization", id)
-                .setParameter("firstName", firstName)
-                .setParameter("lastName", lastName));
+    public List<Doctor> findDoctorsBySpecializationIdAndLastNameAndCity(Long specializationId, String lastName, String city) {
+        return list(currentSession().createCriteria(Doctor.class)
+                .setFetchMode("specializationDoctor", FetchMode.JOIN)
+                .createAlias("specializationDoctor", "sd")
+                .add(Restrictions.eq("sd.id", specializationId))
+                .add(Restrictions.like("lastNameDoctor", lastName)) /// isto tu ma byt LIKE??? nie EQ???
+                .add(Restrictions.like("cityDoctor", city)));
     }
     
-    public List<Doctor> findDoctorsBySpecializationAndNameAndPostalCode(Long id, String firstName,
-            String lastName, String pcn) {
-        return list(namedQuery("findAllDoctorsBySpecializationAndNameAndCityNativeSql")
-                .setParameter("specialization", id)
-                .setParameter("firstName", firstName)
-                .setParameter("lastName", lastName)
-                .setParameter("pcn", pcn));
+    public List<Doctor> findDoctorsBySpecializationIdAndCity(Long specializationId, String city) {
+        return list(currentSession().createCriteria(Doctor.class)
+                .setFetchMode("specializationDoctor", FetchMode.JOIN)
+                .createAlias("specializationDoctor", "sd")
+                .add(Restrictions.eq("sd.id", specializationId))
+                .add(Restrictions.like("cityDoctor", city))); /// isto tu ma byt LIKE??? nie EQ???
     }
-    public List<Doctor> findDoctorsBySpecializationAndLastName(Long id, String lastName) {
-        return list(namedQuery("findAllDoctorsBySpecializationAndLastNameNativeSql")
-                .setParameter("specialization", id)
-                .setParameter("lastName", lastName));
-    }
-    
-    public List<Doctor> findDoctorsBySpecializationAndLastNameAndPostalCode(Long id, String lastName,
-            String pcn) {
-        return list(namedQuery("findAllDoctorsBySpecializationAndLastNameAndCityNativeSql")
-                .setParameter("specialization", id)
-                .setParameter("lastName", lastName)
-                .setParameter("pcn", pcn));
-    }
-    
-    
+
     public Doctor findByEmail(String email) {
-        return uniqueResult(namedQuery("findDoctorByEmail").setParameter("email", email));
+        return uniqueResult(currentSession().createCriteria(Doctor.class).add(Restrictions.eq("doctorEmail", email)));
     }
-    
 }

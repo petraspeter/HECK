@@ -1,4 +1,4 @@
-package sk.upjs.ics.pro1a.heck.services;
+package sk.upjs.ics.pro1a.heck.utils;
 
 import java.sql.Timestamp;
 import java.text.ParseException;
