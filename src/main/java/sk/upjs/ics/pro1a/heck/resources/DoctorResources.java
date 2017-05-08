@@ -98,10 +98,10 @@ public class DoctorResources {
     @GET
     @Path("/doctors/specialization/{id}")
     @UnitOfWork
-    public Response getDoctorsBySpecializationId(
+    public Response getDoctorsBySpecialization(
             @Auth AuthorizedUserDto user,
-            @PathParam("id") Long id) {
-        List<DoctorDto> doctors = doctorService.getDoctorsBySpecializationId(id);
+            @PathParam("specialization") String specialization) {
+        List<DoctorDto> doctors = doctorService.getDoctorsBySpecializationId(specialization);
         if (doctors == null) {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
@@ -111,9 +111,9 @@ public class DoctorResources {
     @GET
     @Path("/doctors/searchP")
     @UnitOfWork
-    public Response getDoctorsBySpecializationIdAndCityAndDate(
+    public Response getDoctorsBySpecializationAndCityAndDate(
             @Auth AuthorizedUserDto user,
-            @QueryParam("id") Long id,
+            @QueryParam("specialization") String specialization,
             @QueryParam("city") String city,
             @QueryParam("from") String from,
             @QueryParam("to") String to) {
@@ -122,7 +122,7 @@ public class DoctorResources {
         try {
             Timestamp tsFrom = new Timestamp(sdt.parse(from).getTime());
             Timestamp tsTo = new Timestamp(sdt.parse(to).getTime());
-            doctors = doctorService.getDoctorsBySpecializationIdAndCityAndDate(id, city, tsFrom, tsTo);
+            doctors = doctorService.getDoctorsBySpecializationIdAndCityAndDate(specialization, city, tsFrom, tsTo);
         } catch(ParseException e) {
             Logger.getLogger(DoctorResources.class.getName()).log(Level.SEVERE, null, e);
         }
@@ -135,9 +135,9 @@ public class DoctorResources {
     @GET
     @Path("/doctors/searchN")
     @UnitOfWork
-    public Response getDoctorsBySpecializationIdAndNameAndDate(
+    public Response getDoctorsBySpecializationAndNameAndDate(
             @Auth AuthorizedUserDto user,
-            @QueryParam("id") Long id,
+            @QueryParam("specialization") String specialization,
             @QueryParam("firstName") String firstName,
             @QueryParam("lastName") String lastName,
             @QueryParam("from") String from,
@@ -147,7 +147,8 @@ public class DoctorResources {
         try {
             Timestamp tsFrom = new Timestamp(sdt.parse(from).getTime());
             Timestamp tsTo = new Timestamp(sdt.parse(to).getTime());
-            doctors = doctorService.getDoctorsBySpecializationIdAndFullNameAndDate(id, firstName, lastName, tsFrom, tsTo);
+            doctors = doctorService.getDoctorsBySpecializationIdAndFullNameAndDate(specialization, firstName,
+                    lastName, tsFrom, tsTo);
         } catch(ParseException e) {
             Logger.getLogger(DoctorResources.class.getName()).log(Level.SEVERE, null, e);
         }
@@ -160,9 +161,9 @@ public class DoctorResources {
     @GET
     @Path("/doctors/searchL")
     @UnitOfWork
-    public Response getDoctorsBySpecializationIdAndLastNameAndDate(
+    public Response getDoctorsBySpecializationAndLastNameAndDate(
             @Auth AuthorizedUserDto user,
-            @QueryParam("id") Long id,
+            @QueryParam("specialization") String specialization,
             @QueryParam("lastName") String lastName,
             @QueryParam("from") String from,
             @QueryParam("to") String to) {
@@ -171,7 +172,8 @@ public class DoctorResources {
         try {
             Timestamp tsFrom = new Timestamp(sdt.parse(from).getTime());
             Timestamp tsTo = new Timestamp(sdt.parse(to).getTime());
-            doctors = doctorService.getDoctorsBySpecializationIdAndLastNameAndDate(id, lastName, tsFrom, tsTo);
+            doctors = doctorService.getDoctorsBySpecializationIdAndLastNameAndDate(specialization, lastName,
+                    tsFrom, tsTo);
         } catch(ParseException e) {
             Logger.getLogger(DoctorResources.class.getName()).log(Level.SEVERE, null, e);
         }
@@ -184,9 +186,9 @@ public class DoctorResources {
     @GET
     @Path("/doctors/search")
     @UnitOfWork
-    public Response getDoctorsBySpecializationIdAndNameAndCityAndDate(
+    public Response getDoctorsBySpecializationAndNameAndCityAndDate(
             @Auth AuthorizedUserDto user,
-            @QueryParam("id") Long id,
+            @QueryParam("specialization") String specialization,
             @QueryParam("firstName") String firstName,
             @QueryParam("lastName") String lastName,
             @QueryParam("city") String city,
@@ -197,7 +199,7 @@ public class DoctorResources {
         try {
             Timestamp tsFrom = new Timestamp(sdt.parse(from).getTime());
             Timestamp tsTo = new Timestamp(sdt.parse(to).getTime());
-            doctors = doctorService.getDoctorsBySpecializationIdAndFullNameAndCityAndDate(id, firstName,
+            doctors = doctorService.getDoctorsBySpecializationIdAndFullNameAndCityAndDate(specialization, firstName,
                     lastName, city, tsFrom, tsTo);
         } catch(ParseException e) {
             Logger.getLogger(DoctorResources.class.getName()).log(Level.SEVERE, null, e);
@@ -211,9 +213,9 @@ public class DoctorResources {
     @GET
     @Path("/doctors/searchLP")
     @UnitOfWork
-    public Response getDoctorsBySpecializationIdAndLastNameAndCityAndDate(
+    public Response getDoctorsBySpecializationAndLastNameAndCityAndDate(
             @Auth AuthorizedUserDto user,
-            @QueryParam("id") Long id,
+            @QueryParam("specialization") String specialization,
             @QueryParam("lastName") String lastName,
             @QueryParam("city") String city,
             @QueryParam("from") String from,
@@ -223,7 +225,7 @@ public class DoctorResources {
         try {
             Timestamp tsFrom = new Timestamp(sdt.parse(from).getTime());
             Timestamp tsTo = new Timestamp(sdt.parse(to).getTime());
-            doctors = doctorService.getDoctorsBySpecializationIdAndLastNameAndCityAndDate(id,
+            doctors = doctorService.getDoctorsBySpecializationIdAndLastNameAndCityAndDate(specialization,
                     lastName, city, tsFrom, tsTo);
         } catch(ParseException e) {
             Logger.getLogger(DoctorResources.class.getName()).log(Level.SEVERE, null, e);
@@ -295,7 +297,7 @@ public class DoctorResources {
         WorkingTimeDto workingHours = doctorService.getDoctorWorkingTime(id);
         return Response.ok(workingHours).build();
     }
-
+    
     @GET
     @Path("/doctors/{id}/appointments")
     @UnitOfWork
