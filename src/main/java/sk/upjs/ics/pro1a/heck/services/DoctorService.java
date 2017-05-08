@@ -76,19 +76,28 @@ public class DoctorService {
         return null;
     }
 
-    public List<DoctorDto> getDoctorsBySpecializationId(String specialization) {
+    public List<DoctorDto> getDoctorsBySpecializationId(Long id) {
         List<DoctorDto> doctorsDto = new ArrayList<>();
-        for (Doctor doctor : doctorDao.findDoctorsBySpecializationId(specialization)) {
+        for (Doctor doctor : doctorDao.findDoctorsBySpecializationId(id)) {
+            DoctorDto doctorDto = createDoctorDtoFromDoctorDaoWithoutPassword(doctor);
+            doctorsDto.add(doctorDto);
+        }
+        return doctorsDto;
+    }
+    
+    public List<DoctorDto> getDoctorsBySpecialization(String specialization) {
+        List<DoctorDto> doctorsDto = new ArrayList<>();
+        for (Doctor doctor : doctorDao.findDoctorsBySpecialization(specialization)) {
             DoctorDto doctorDto = createDoctorDtoFromDoctorDaoWithoutPassword(doctor);
             doctorsDto.add(doctorDto);
         }
         return doctorsDto;
     }
 
-    public List<DoctorDto> getDoctorsBySpecializationIdAndCityAndDate(String specialization, String city, Timestamp from,
+    public List<DoctorDto> getDoctorsBySpecializationAndCityAndDate(String specialization, String city, Timestamp from,
             Timestamp to) {
         List<DoctorDto> doctors = new ArrayList<>();
-        for (Doctor doctor : doctorDao.findDoctorsBySpecializationIdAndCity(specialization, city)) {
+        for (Doctor doctor : doctorDao.findDoctorsBySpecializationAndCity(specialization, city)) {
             List<AppointmentDto> appointments = appointmentDao.generateUserAppointmentForDays(
                     doctor.getIdDoctor(), 0L, from, to);
             if (appointments.size() > 0) {
@@ -99,10 +108,10 @@ public class DoctorService {
         return doctors;
     }
 
-    public List<DoctorDto> getDoctorsBySpecializationIdAndFullNameAndDate(String specialization, String firstname,
+    public List<DoctorDto> getDoctorsBySpecializationAndFullNameAndDate(String specialization, String firstname,
             String lastName, Timestamp from, Timestamp to) {
         List<DoctorDto> doctors = new ArrayList<>();
-        for (Doctor doctor : doctorDao.findDoctorsBySpecializationIdAndName(specialization, firstname, lastName)) {
+        for (Doctor doctor : doctorDao.findDoctorsBySpecializationAndName(specialization, firstname, lastName)) {
             List<AppointmentDto> appointments = appointmentDao
                     .generateUserAppointmentForDays(doctor.getIdDoctor(), 0L, from, to);
             if (appointments.size() > 0) {
@@ -113,10 +122,10 @@ public class DoctorService {
         return doctors;
     }
 
-    public List<DoctorDto> getDoctorsBySpecializationIdAndFullNameAndCityAndDate(String specialization, String firstname,
+    public List<DoctorDto> getDoctorsBySpecializationAndFullNameAndCityAndDate(String specialization, String firstname,
             String lastName, String city, Timestamp from, Timestamp to) {
         List<DoctorDto> doctors = new ArrayList<>();
-        for (Doctor doctor : doctorDao.findDoctorsBySpecializationIdAndNameAndCity(specialization, firstname, lastName, city)) {
+        for (Doctor doctor : doctorDao.findDoctorsBySpecializationAndNameAndCity(specialization, firstname, lastName, city)) {
             List<AppointmentDto> appointments = appointmentDao.generateUserAppointmentForDays(
                     doctor.getIdDoctor(), 0L, from, to);
             if (appointments.size() > 0) {
@@ -127,10 +136,10 @@ public class DoctorService {
         return doctors;
     }
 
-    public List<DoctorDto> getDoctorsBySpecializationIdAndLastNameAndDate(String specialization, String lastName,
+    public List<DoctorDto> getDoctorsBySpecializationAndLastNameAndDate(String specialization, String lastName,
             Timestamp from, Timestamp to) {
         List<DoctorDto> doctors = new ArrayList<>();
-        for (Doctor doctor : doctorDao.findDoctorsBySpecializationIdAndLastName(specialization, lastName)) {
+        for (Doctor doctor : doctorDao.findDoctorsBySpecializationAndLastName(specialization, lastName)) {
             List<AppointmentDto> appointments = appointmentDao.generateUserAppointmentForDays(
                     doctor.getIdDoctor(), 0L, from, to);
             if (appointments.size() > 0) {
@@ -141,10 +150,10 @@ public class DoctorService {
         return doctors;
     }
 
-    public List<DoctorDto> getDoctorsBySpecializationIdAndLastNameAndCityAndDate(String specialization, String lastName,
+    public List<DoctorDto> getDoctorsBySpecializationAndLastNameAndCityAndDate(String specialization, String lastName,
             String city, Timestamp from, Timestamp to) {
         List<DoctorDto> doctors = new ArrayList<>();
-        for (Doctor doctor : doctorDao.findDoctorsBySpecializationIdAndLastNameAndCity(specialization, lastName, city)) {
+        for (Doctor doctor : doctorDao.findDoctorsBySpecializationAndLastNameAndCity(specialization, lastName, city)) {
             List<AppointmentDto> appointments = appointmentDao.generateUserAppointmentForDays(
                     doctor.getIdDoctor(), 0L, from, to);
             if (appointments.size() > 0) {
