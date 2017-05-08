@@ -35,36 +35,14 @@ public class AppointmentDao extends AbstractDAO<Appointment> {
     
     public Appointment create(Appointment appointment) {
         return this.persist(appointment);
-    }     
+    }
     
     public Appointment update(Appointment appointment) {
         return this.persist(appointment);
-    } 
+    }
     
-    public List<AppointmentDto> generateDoctorAppointmentForDay(Long idDoc, Long idUser, Timestamp date) {
-        List<Appointment> appointments = new ArrayList<>();
-        Doctor doc =  (Doctor) sessionFactory.getCurrentSession().createCriteria(Doctor.class)
-                .add(Restrictions.eq("idDoctor", idDoc)).uniqueResult();
-        int period = doc.getAppointmentInterval();
-        LocalDate jodaDate = new org.joda.time.LocalDate(date.getTime());
-        /*
-        den v tyzdni je v intervale 1-7, preco znizujem o 1
-        */
-        List<WorkingTime> docHours = findWorkingTimeByDoctorIdAndDay(idDoc, jodaDate.getDayOfWeek() - 1);
-        for (WorkingTime docHour : docHours) {
-            /**
-             * posun o jednu hodinu je 3600000 ms, na vstupe webservici primam format YYYY-MM-DD, ktory parsujem
-             * cez simple date format tak ten sice berie do uvahy casove pasmo, ale nie casovy posun zimny/letny cas
-             */
-            Timestamp start = new Timestamp(docHour.getStartingHour().getTime()+date.getTime()+3600000);
-            Timestamp end = new Timestamp((start.getTime() + ((period * 60) * 1000)));
-            Timestamp ending = new Timestamp(docHour.getEndingHour().getTime()+date.getTime()+3600001);
-            while (end.before(ending)) {    // aby sme vratili aj termin, ktory konci presne na konci pracovnej doby provnavame cas o 1ms neskor
-                appointments.add(generateAppointment(idDoc, idUser, start, end));
-                start = end;
-                end = new Timestamp((start.getTime() + ((period * 60) * 1000)));    //convert period from minutes to miliseconds
-            }
-        }
+    public List<AppointmentDto> generateUserAppointmentForDay(Long idDoc, Long idUser, Timestamp date) {
+        List<Appointment> appointments = generateBasicAppointmentForDay(idDoc, idUser, date);
         List<Appointment> occupied = findOccupiedByDoctorIdAndDate(idDoc, date);
         if (occupied != null) {
             for (int i = 0; i < appointments.size(); i++) {
@@ -90,18 +68,58 @@ public class AppointmentDao extends AbstractDAO<Appointment> {
         }
     }
     
-    public List<AppointmentDto> generateDoctorAppointmentForDays(Long idDoc, Long idUser, Timestamp from,
-            Timestamp to) {
-        List<Holiday> holidays = findHolidays();
-        List<AppointmentDto> appointments = new ArrayList<>();
-        List<Timestamp> timestamps = generateTimestamps(from, to);
-        for (int i = 0; i < timestamps.size(); i++) {
-            for (Holiday holiday : holidays) {
-                if(timestamps.get(i).equals(holiday.getDate())) {
-                    timestamps.remove(timestamps.get(i));
+    public List<AppointmentDto> generateDoctorAppointmentForDay(Long idDoc, Long idUser, Timestamp date) {
+        List<Appointment> appointments = generateBasicAppointmentForDay(idDoc, idUser, date);
+        List<Appointment> occupied = findOccupiedByDoctorIdAndDate(idDoc, date);
+        if (occupied != null) {
+            for (int i = 0; i < appointments.size(); i++) {
+                for (Appointment occupiedAppointment : occupied) {
+                    if(occupiedAppointment.getCanceledAppointment() || occupiedAppointment.getHolidayAppointment()
+                            || occupiedAppointment.getOccupiedAppointment()) {
+                        if(appointments.get(i).getDateFromAppointment().toString()
+                                .equals(occupiedAppointment.getDateFromAppointment().toString())) {
+                            appointments.get(i).setAppointmentUser(occupiedAppointment.getAppointmentUser());
+                            appointments.get(i).setCanceledAppointment(occupiedAppointment.getCanceledAppointment());
+                            appointments.get(i).setHolidayAppointment(occupiedAppointment.getHolidayAppointment());
+                            appointments.get(i).setIdAppointment(occupiedAppointment.getIdAppointment());
+                            appointments.get(i).setNoteAppointment(occupiedAppointment.getNoteAppointment());
+                            appointments.get(i).setOccupiedAppointment(occupiedAppointment.getOccupiedAppointment());
+                            appointments.get(i).setPatitentName(occupiedAppointment.getPatitentName());
+                            appointments.get(i).setSubjectAppointment(occupiedAppointment.getPatitentName());
+                        }
+                    }
                 }
             }
         }
+        List<AppointmentDto> appointmentsDto = new ArrayList<>();
+        for (Appointment appointment : appointments) {
+            appointmentsDto.add(createAppointmentDtoFromDao(appointment));
+        }
+        if (appointmentsDto.size() > NUMBER_OF_RETURNED_APPOINTMENTS) {
+            return appointmentsDto.subList(0, NUMBER_OF_RETURNED_APPOINTMENTS);
+        } else {
+            return appointmentsDto;
+        }
+    }
+    
+    public List<AppointmentDto> generateUserAppointmentForDays(Long idDoc, Long idUser, Timestamp from,
+            Timestamp to) {
+        List<Timestamp> timestamps = generateTimestamps(from, to);
+        List<AppointmentDto> appointments = generateBasicAppointmentForDays(idDoc, idUser, timestamps);
+        for (Timestamp timestamp : timestamps) {
+            appointments.addAll(generateUserAppointmentForDay(idDoc, idUser, timestamp));
+        }
+        if (appointments.size() > NUMBER_OF_RETURNED_APPOINTMENTS) {
+            return appointments.subList(0, NUMBER_OF_RETURNED_APPOINTMENTS);
+        } else {
+            return appointments;
+        }
+    }
+    
+    public List<AppointmentDto> generateDoctorAppointmentForDays(Long idDoc, Long idUser, Timestamp from,
+            Timestamp to) {
+        List<Timestamp> timestamps = generateTimestamps(from, to);
+        List<AppointmentDto> appointments = generateBasicAppointmentForDays(idDoc, idUser, timestamps);
         for (Timestamp timestamp : timestamps) {
             appointments.addAll(generateDoctorAppointmentForDay(idDoc, idUser, timestamp));
         }
@@ -159,7 +177,8 @@ public class AppointmentDao extends AbstractDAO<Appointment> {
     
     public Doctor findDoctorById(long id) {
         return (Doctor) sessionFactory.getCurrentSession()
-                .createCriteria(Doctor.class).add(Restrictions.eq("idDoctor", id)).uniqueResult();
+                .createCriteria(Doctor.class)
+                .add(Restrictions.eq("idDoctor", id)).uniqueResult();
     }
     
     public Appointment generateAppointment(Long idDoc, Long idUser, Timestamp start, Timestamp end) {
@@ -230,6 +249,48 @@ public class AppointmentDao extends AbstractDAO<Appointment> {
                 user.getFirstNameUser(),
                 user.getLastNameUser()
         );
+    }
+    
+    
+    private List<AppointmentDto> generateBasicAppointmentForDays(Long idDoc, Long idUser,
+            List<Timestamp> timestamps) {
+        List<Holiday> holidays = findHolidays();
+        List<AppointmentDto> appointments = new ArrayList<>();
+        for (int i = 0; i < timestamps.size(); i++) {
+            for (Holiday holiday : holidays) {
+                if(timestamps.get(i).equals(holiday.getDate())) {
+                    timestamps.remove(timestamps.get(i));
+                }
+            }
+        }
+        return appointments;
+    }
+    
+    private List<Appointment> generateBasicAppointmentForDay(Long idDoc, Long idUser, Timestamp date) {
+        List<Appointment> appointments = new ArrayList<>();
+        Doctor doc =  (Doctor) sessionFactory.getCurrentSession().createCriteria(Doctor.class)
+                .add(Restrictions.eq("idDoctor", idDoc)).uniqueResult();
+        int period = doc.getAppointmentInterval();
+        LocalDate jodaDate = new org.joda.time.LocalDate(date.getTime());
+        /*
+        den v tyzdni je v intervale 1-7, preco znizujem o 1
+        */
+        List<WorkingTime> docHours = findWorkingTimeByDoctorIdAndDay(idDoc, jodaDate.getDayOfWeek() - 1);
+        for (WorkingTime docHour : docHours) {
+            /**
+             * posun o jednu hodinu je 3600000 ms, na vstupe webservici primam format YYYY-MM-DD, ktory parsujem
+             * cez simple date format tak ten sice berie do uvahy casove pasmo, ale nie casovy posun zimny/letny cas
+             */
+            Timestamp start = new Timestamp(docHour.getStartingHour().getTime()+date.getTime()+3600000);
+            Timestamp end = new Timestamp((start.getTime() + ((period * 60) * 1000)));
+            Timestamp ending = new Timestamp(docHour.getEndingHour().getTime()+date.getTime()+3600001);
+            while (end.before(ending)) {    // aby sme vratili aj termin, ktory konci presne na konci pracovnej doby provnavame cas o 1ms neskor
+                appointments.add(generateAppointment(idDoc, idUser, start, end));
+                start = end;
+                end = new Timestamp((start.getTime() + ((period * 60) * 1000)));    //convert period from minutes to miliseconds
+            }
+        }
+        return appointments;
     }
     
 }

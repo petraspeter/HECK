@@ -21,7 +21,8 @@ public class SpecializationDao extends AbstractDAO<Specialization> {
     }
 
     public Specialization findById(Long id) {     
-        return uniqueResult(currentSession().createCriteria(Specialization.class).add(Restrictions.eq("id", id)));
+        return uniqueResult(currentSession().createCriteria(Specialization.class)
+                .add(Restrictions.eq("idDoctor", id)));        
     }
 
 }

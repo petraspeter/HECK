@@ -29,14 +29,17 @@ public class UserDao extends AbstractDAO<User> {
     }
     
     public User findByLoginAndPassword(String login, String password) {
-        return uniqueResult(currentSession().createCriteria(User.class).add(Restrictions.eq("loginUser", login)).add(Restrictions.eq("passwordUser", password)));
+        return uniqueResult(currentSession().createCriteria(User.class)
+                .add(Restrictions.eq("loginUser", login))
+                .add(Restrictions.eq("passwordUser", password)));
     }
     
     public User findByLogin(String login) {
-        return uniqueResult(currentSession().createCriteria(User.class).add(Restrictions.eq("loginUser", login)));
+        return uniqueResult(currentSession().createCriteria(User.class)
+                .add(Restrictions.eq("loginUser", login)));
     }
     
     public List<User> findAll() {
         return list(currentSession().createCriteria(User.class));
-    }    
+    }
 }

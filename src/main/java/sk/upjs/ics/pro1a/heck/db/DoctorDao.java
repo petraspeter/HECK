@@ -1,16 +1,11 @@
 package sk.upjs.ics.pro1a.heck.db;
 
 import io.dropwizard.hibernate.AbstractDAO;
-import java.sql.Timestamp;
-import java.util.ArrayList;
 import org.hibernate.SessionFactory;
 import sk.upjs.ics.pro1a.heck.db.core.Doctor;
-
 import java.util.List;
 import org.hibernate.FetchMode;
 import org.hibernate.criterion.Restrictions;
-import sk.upjs.ics.pro1a.heck.services.dto.AppointmentDto;
-import sk.upjs.ics.pro1a.heck.services.dto.DoctorDto;
 
 /**
  * @author raven
@@ -38,11 +33,14 @@ public class DoctorDao extends AbstractDAO<Doctor> {
     }
 
     public Doctor findByLogin(String login) {
-        return uniqueResult(currentSession().createCriteria(Doctor.class).add(Restrictions.eq("loginDoctor", login)));
+        return uniqueResult(currentSession().createCriteria(Doctor.class)
+                .add(Restrictions.eq("loginDoctor", login)));
     }
 
     public Doctor findByLoginAndPassword(String login, String password) {
-        return uniqueResult(currentSession().createCriteria(Doctor.class).add(Restrictions.eq("loginDoctor", login)).add(Restrictions.eq("passwordDoctor", password)));
+        return uniqueResult(currentSession().createCriteria(Doctor.class)
+                .add(Restrictions.eq("loginDoctor", login))
+                .add(Restrictions.eq("passwordDoctor", password)));
     }
 
     public List<Doctor> findDoctorsBySpecializationId(Long specializationId) {
@@ -58,7 +56,8 @@ public class DoctorDao extends AbstractDAO<Doctor> {
                 .add(Restrictions.eq("postalCodeDoctor", pcn)));
     }
 
-    public List<Doctor> findDoctorsBySpecializationIdAndName(Long specializationId, String firstName, String lastName) {
+    public List<Doctor> findDoctorsBySpecializationIdAndName(Long specializationId, String firstName, 
+            String lastName) {
         return list(currentSession().createCriteria(Doctor.class)
                 .setFetchMode("specializationDoctor", FetchMode.JOIN)
                 .createAlias("specializationDoctor", "sd")
@@ -67,7 +66,8 @@ public class DoctorDao extends AbstractDAO<Doctor> {
                 .add(Restrictions.like("lastNameDoctor", lastName)));/// isto tu ma byt LIKE??? nie EQ???
     }
     
-    public List<Doctor> findDoctorsBySpecializationIdAndNameAndCity(Long specializationId, String firstName, String lastName, String city) {
+    public List<Doctor> findDoctorsBySpecializationIdAndNameAndCity(Long specializationId, 
+            String firstName, String lastName, String city) {
         return list(currentSession().createCriteria(Doctor.class)
                 .setFetchMode("specializationDoctor", FetchMode.JOIN)
                 .createAlias("specializationDoctor", "sd")
@@ -77,7 +77,8 @@ public class DoctorDao extends AbstractDAO<Doctor> {
                 .add(Restrictions.like("cityDoctor", city)));/// isto tu ma byt LIKE??? nie EQ???
     }
 
-    public List<Doctor> findDoctorsBySpecializationIdAndNameAndPostalCode(Long specializationId, String firstName, String lastName, String pcn) {
+    public List<Doctor> findDoctorsBySpecializationIdAndNameAndPostalCode(Long specializationId, 
+            String firstName, String lastName, String pcn) {
         return list(currentSession().createCriteria(Doctor.class)
                 .setFetchMode("specializationDoctor", FetchMode.JOIN)
                 .createAlias("specializationDoctor", "sd")
@@ -95,7 +96,8 @@ public class DoctorDao extends AbstractDAO<Doctor> {
                 .add(Restrictions.like("lastNameDoctor", lastName))); /// isto tu ma byt LIKE??? nie EQ???
     }
 
-    public List<Doctor> findDoctorsBySpecializationIdAndLastNameAndPostalCode(Long specializationId, String lastName, String pcn) {
+    public List<Doctor> findDoctorsBySpecializationIdAndLastNameAndPostalCode(Long specializationId,
+            String lastName, String pcn) {
         return list(currentSession().createCriteria(Doctor.class)
                 .setFetchMode("specializationDoctor", FetchMode.JOIN)
                 .createAlias("specializationDoctor", "sd")
@@ -104,7 +106,8 @@ public class DoctorDao extends AbstractDAO<Doctor> {
                 .add(Restrictions.eq("postalCodeDoctor", pcn)));
     }
     
-    public List<Doctor> findDoctorsBySpecializationIdAndLastNameAndCity(Long specializationId, String lastName, String city) {
+    public List<Doctor> findDoctorsBySpecializationIdAndLastNameAndCity(Long specializationId,
+            String lastName, String city) {
         return list(currentSession().createCriteria(Doctor.class)
                 .setFetchMode("specializationDoctor", FetchMode.JOIN)
                 .createAlias("specializationDoctor", "sd")
@@ -122,6 +125,7 @@ public class DoctorDao extends AbstractDAO<Doctor> {
     }
 
     public Doctor findByEmail(String email) {
-        return uniqueResult(currentSession().createCriteria(Doctor.class).add(Restrictions.eq("emailDoctor", email)));
+        return uniqueResult(currentSession().createCriteria(Doctor.class)
+                .add(Restrictions.eq("doctorEmail", email)));
     }
 }

@@ -74,7 +74,7 @@ public class AppointmentResources {
     ) throws ParseException {
         SimpleDateFormat sdt = new SimpleDateFormat("yyyy-MM-dd");
         Timestamp ts = new Timestamp(sdt.parse(date).getTime());
-        List<AppointmentDto> appointments = appointmentService.generateDoctorAppointmentForDays(idDoc,
+        List<AppointmentDto> appointments = appointmentService.generateUserAppointmentForDays(idDoc,
                 idUser, ts, ts);
         if (appointments.size() > 0) {
             return  Response.ok(appointments).build();
@@ -97,7 +97,7 @@ public class AppointmentResources {
         Timestamp tsFrom = new Timestamp(sdt.parse(dateFrom).getTime());
         Timestamp tsTo = new Timestamp(sdt.parse(dateTo).getTime());
         List<AppointmentDto> appointments = appointmentService
-                .generateDoctorAppointmentForDays(idDoc, idUser, tsFrom, tsTo);
+                .generateUserAppointmentForDays(idDoc, idUser, tsFrom, tsTo);
         if (appointments.size() > 0) {
             return  Response.ok(appointments).build();
         }
@@ -117,10 +117,51 @@ public class AppointmentResources {
         Timestamp tsFrom = new Timestamp(actualDay);
         Timestamp tsTo = new Timestamp(actualDay+(6*24*60*60*1000));
         List<AppointmentDto> appointments = appointmentService
-                .generateDoctorAppointmentForDays(idDoc, idUser, tsFrom, tsTo);
+                .generateUserAppointmentForDays(idDoc, idUser, tsFrom, tsTo);
         if (appointments.size() > 0) {
             return  Response.ok(appointments).build();
         }
         return Response.status(Response.Status.NOT_FOUND).build();
     }
+    
+    @GET
+    @Path("/doctors/appointments")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @UnitOfWork
+    public Response findDoctorsAppointment(
+            @Auth AuthorizedUserDto user,
+            @QueryParam("idDoc") Long idDoc
+    ) {
+        Long actualDay = DateUtils.truncate(new Date(), Calendar.DATE).getTime();
+        Timestamp tsFrom = new Timestamp(actualDay);
+        Timestamp tsTo = new Timestamp(actualDay+(6*24*60*60*1000));
+        List<AppointmentDto> appointments = appointmentService
+                .generateDoctorAppointmentForDays(idDoc, 0L, tsFrom, tsTo);
+        if (appointments.size() > 0) {
+            return  Response.ok(appointments).build();
+        }
+        return Response.status(Response.Status.NOT_FOUND).build();
+    }
+    
+    @GET
+    @Path("/doctors/appointmentsDate")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @UnitOfWork
+    public Response findDoctorsAppointmentFromTo(
+            @Auth AuthorizedUserDto user,
+            @QueryParam("idDoc") Long id,
+            @QueryParam("from") String from,
+            @QueryParam("to") String to
+    ) throws ParseException {
+        SimpleDateFormat sdt = new SimpleDateFormat("yyyy-MM-dd");
+        Timestamp tsFrom = new Timestamp(sdt.parse(from).getTime());
+        Timestamp tsTo = new Timestamp(sdt.parse(to).getTime());
+        List<AppointmentDto> appointments = appointmentService
+                .generateDoctorAppointmentForDays(id, 0L, tsFrom, tsTo);
+        if (appointments.size() > 0) {
+            return  Response.ok(appointments).build();
+        }
+        return Response.status(Response.Status.NOT_FOUND).build();
+    }    
+    
 }

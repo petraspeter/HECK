@@ -66,7 +66,9 @@ public class DoctorResources {
     @GET
     @Path("/doctors/{id}")
     @UnitOfWork
-    public Response getDoctorById(@Auth AuthorizedUserDto user, @PathParam("id") Long id) {
+    public Response getDoctorById(
+            @Auth AuthorizedUserDto user,
+            @PathParam("id") Long id) {
         DoctorDto doctor = doctorService.getDoctorById(id);
         if (doctor == null) {
             return Response.status(Response.Status.NOT_FOUND).build();
@@ -77,7 +79,9 @@ public class DoctorResources {
     @PUT
     @Path("/doctors/{id}")
     @UnitOfWork
-    public Response updateDoctor(@Auth AuthorizedUserDto user, @PathParam("id") Long id, DoctorDto doctorDto){
+    public Response updateDoctor(
+            @Auth AuthorizedUserDto user,
+            @PathParam("id") Long id, DoctorDto doctorDto){
         doctorService.updateDoctor(id, doctorDto);
         return  Response.ok().build();
     }
@@ -85,7 +89,8 @@ public class DoctorResources {
     @GET
     @Path("/doctors")
     @UnitOfWork
-    public Response getAllDoctors(@Auth AuthorizedUserDto user) {
+    public Response getAllDoctors(
+            @Auth AuthorizedUserDto user) {
         List<DoctorDto> doctors = doctorService.getAllDoctors();
         return Response.ok(doctors).build();
     }
@@ -93,7 +98,9 @@ public class DoctorResources {
     @GET
     @Path("/doctors/specialization/{id}")
     @UnitOfWork
-    public Response getDoctorsBySpecializationId(@Auth AuthorizedUserDto user, @PathParam("id") Long id) {
+    public Response getDoctorsBySpecializationId(
+            @Auth AuthorizedUserDto user,
+            @PathParam("id") Long id) {
         List<DoctorDto> doctors = doctorService.getDoctorsBySpecializationId(id);
         if (doctors == null) {
             return Response.status(Response.Status.NOT_FOUND).build();
@@ -231,7 +238,8 @@ public class DoctorResources {
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Path("/doctors/checkLogin")
     @UnitOfWork
-    public Response isLoginValid(@FormParam("login") String login) {
+    public Response isLoginValid(
+            @FormParam("login") String login) {
         if (login == null) {
             return Response.status(Response.Status.BAD_REQUEST).build();
         }
@@ -243,7 +251,9 @@ public class DoctorResources {
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Path("/doctors/checkEmail")
     @UnitOfWork
-    public Response isEmailValid(@FormParam("email") String email, @FormParam("userEmail") String userEmail) {
+    public Response isEmailValid(
+            @FormParam("email") String email,
+            @FormParam("userEmail") String userEmail) {
         if (email == null) {
             return Response.status(Response.Status.BAD_REQUEST).build();
         }
@@ -255,7 +265,9 @@ public class DoctorResources {
     @Consumes(MediaType.APPLICATION_JSON)
     @Path("/doctors/{id}/changePassword")
     @UnitOfWork
-    public Response changePassword(@PathParam("id") Long id, ChangePasswordDto changePasswordDto) {
+    public Response changePassword(
+            @PathParam("id") Long id,
+            ChangePasswordDto changePasswordDto) {
         try {
             doctorService.changeDoctorPassword(id, changePasswordDto);
             return Response.ok().build();
@@ -268,14 +280,18 @@ public class DoctorResources {
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Path("/doctors/{id}/checkPassword")
     @UnitOfWork
-    public Response checkPassword(@PathParam("id") Long id, @FormParam("currentModalPassword") String password) {
+    public Response checkPassword(
+            @PathParam("id") Long id,
+            @FormParam("currentModalPassword") String password) {
         return Response.ok(doctorService.checkDoctorPassword(id, password)).build();
     }
     
     @GET
     @Path("/doctors/{id}/workingTime")
     @UnitOfWork
-    public Response getDoctorWorkingTime(@Auth AuthorizedUserDto user, @PathParam("id") long id) {
+    public Response getDoctorWorkingTime(
+            @Auth AuthorizedUserDto user,
+            @PathParam("id") long id) {
         WorkingTimeDto workingHours = doctorService.getDoctorWorkingTime(id);
         if(workingHours == null) {
             Response.ok(Collections.emptyMap()).build();
@@ -287,7 +303,10 @@ public class DoctorResources {
     @Path("/doctors/{id}/workingTime")
     @Consumes(MediaType.APPLICATION_JSON)
     @UnitOfWork
-    public Response setDoctorWorkingTime(@Auth AuthorizedUserDto user, @PathParam("id") long id, WorkingTimeDto workingTimeDto) {
+    public Response setDoctorWorkingTime(
+            @Auth AuthorizedUserDto user,
+            @PathParam("id") long id,
+            WorkingTimeDto workingTimeDto) {
         doctorService.createDoctorWorkingTime(id, workingTimeDto);
         return Response.status(Response.Status.CREATED).build();
     }
