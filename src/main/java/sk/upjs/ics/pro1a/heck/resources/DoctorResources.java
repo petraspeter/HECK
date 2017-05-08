@@ -108,7 +108,7 @@ public class DoctorResources {
     }
     
     @GET
-    @Path("/doctors/search")
+    @Path("/doctors/specialization")
     @UnitOfWork
     public Response getDoctorsBySpecialization(
             @Auth AuthorizedUserDto user,
