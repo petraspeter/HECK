@@ -126,6 +126,6 @@ public class DoctorDao extends AbstractDAO<Doctor> {
 
     public Doctor findByEmail(String email) {
         return uniqueResult(currentSession().createCriteria(Doctor.class)
-                .add(Restrictions.eq("doctorEmail", email)));
+                .add(Restrictions.eq("emailDoctor", email)));
     }
 }

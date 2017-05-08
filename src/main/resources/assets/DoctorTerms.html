@@ -13,12 +13,100 @@
         <script src="handlebars-v4.0.5.js"></script>
         <!-- validacia poli-->
 
+        <link href='fullcalendar-3.4.0/fullcalendar.min.css' rel='stylesheet' />
+        <link href='fullcalendar-3.4.0/fullcalendar.print.min.css' rel='stylesheet' media='print' />
+        <script src='fullcalendar-3.4.0/lib/moment.min.js'></script>
+        <script src='fullcalendar-3.4.0/lib/jquery.min.js'></script>
+        <script src='fullcalendar-3.4.0/fullcalendar.min.js'></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.bootstrapvalidator/0.5.3/js/bootstrapValidator.js"></script>
         <script src="myScript.js"></script>
         <script src="validacia.js"></script>
         <script type="text/javascript">
             $(document).ready(function(){
             document.getElementById('logged-user').innerHTML = JSON.parse(sessionStorage.getItem('user')).login;
+
+                $('#calendar').fullCalendar({
+                    header: {
+                        left: 'prev,next today',
+                        center: 'title',
+                        right: 'month,basicWeek,basicDay'
+                    },
+                    defaultDate: '2017-05-12',
+                    navLinks: true, // can click day/week names to navigate views
+                   // editable: true,
+                    eventLimit: true, // allow "more" link when too many events
+                    events: [
+                        {
+                            id: '10',
+                            title: 'All Day Event',
+                            start: '2017-05-01',
+                            color: 'red'
+                        },
+                        {
+                            title: 'Long Event',
+                            start: '2017-05-07',
+                            end: '2017-05-10'
+                        },
+                        {
+                            id: 999,
+                            title: 'Repeating Event',
+                            start: '2017-05-09 16:00:00'
+                        },
+                        {
+                            id: 999,
+                            title: 'Repeating Event',
+                            start: '2017-05-16T16:00:00'
+                        },
+                        {
+                            title: 'Conference',
+                            start: '2017-05-11',
+                            end: '2017-05-13'
+                        },
+                        {
+                            title: 'Meeting',
+                            start: '2017-05-12T10:30:00',
+                            end: '2017-05-12T12:30:00'
+                        },
+                        {
+                            title: 'Lunch',
+                            start: '2017-05-12T12:00:00'
+                        },
+                        {
+                            title: 'Meeting',
+                            start: '2017-05-12T14:30:00'
+                        },
+                        {
+                            title: 'Happy Hour',
+                            start: '2017-05-12T17:30:00'
+                        },
+                        {
+                            title: 'Dinner',
+                            start: '2017-05-12T20:00:00'
+                        },
+                        {
+                            title: 'Birthday Party',
+                            start: '2017-05-13T07:00:00'
+                        },
+                        {
+                            title: 'Click for Google',
+                            url: 'http://google.com/',
+                            start: '2017-05-28'
+                        }
+                    ],
+                    eventClick: function(calEvent, jsEvent, view) {
+                        alert('aaaa');
+                        alert('Event: ' + calEvent.title + '---' + calEvent.id);
+                        alert('Coordinates: ' + jsEvent.pageX + ',' + jsEvent.pageY);
+                        alert('View: ' + view.name);
+
+                        // change the border color just for fun
+                        $(this).css('border-color', 'red');
+
+                    }
+
+                });
+
+
             });
 
             function logout(){
@@ -30,14 +118,16 @@
         <style type="text/css">
             body{
                 padding-top: 70px;
+                margin: 40px 10px;
+                font-family: "Lucida Grande",Helvetica,Arial,Verdana,sans-serif;
+                font-size: 14px;
             }
 
-            .btn btn-default{
-
+            #calendar {
+                max-width: 900px;
+                margin: 0 auto;
             }
         </style>
-
-
     </head> 
     <body>
 
@@ -156,5 +246,8 @@
         </script>
 
         <!--END modal window-->
+
+        <div id='calendar'></div>
     </body>
-</html>                                 		
+</html>
+

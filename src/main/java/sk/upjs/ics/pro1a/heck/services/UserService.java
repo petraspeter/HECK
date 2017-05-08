@@ -118,7 +118,6 @@ public class UserService {
     
     public void updateUser(Long id, UserDto userDto) {
         User user = userDao.findById(id);
-        user.setAdmin(user.getAdmin());
         user.setAddressUser(userDto.getAddress());
         user.setCityUser(userDto.getCity());
         user.setEmailUser(userDto.getEmail());
@@ -127,6 +126,7 @@ public class UserService {
         user.setLoginUser(userDto.getLogin());
         user.setPhoneUser(userDto.getPhoneNumber());
         user.setPostalCodeUser(userDto.getPostalCode());
+        user.setActiveUser(userDto.isActive() == null ? user.getActiveUser() : userDto.isActive());
         userDao.update(user);
     }
     

@@ -293,10 +293,15 @@ public class DoctorResources {
             @Auth AuthorizedUserDto user,
             @PathParam("id") long id) {
         WorkingTimeDto workingHours = doctorService.getDoctorWorkingTime(id);
-        if(workingHours == null) {
-            Response.ok(Collections.emptyMap()).build();
-        }
         return Response.ok(workingHours).build();
+    }
+
+    @GET
+    @Path("/doctors/{id}/appointments")
+    @UnitOfWork
+    public Response getDoctorAppointments(@Auth AuthorizedUserDto user, @PathParam("id") long id) {
+        List<AppointmentDto> appointments = doctorService.getDoctorAppointments(id);
+        return Response.ok(appointments).build();
     }
     
     @POST

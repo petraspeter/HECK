@@ -1,5 +1,6 @@
 package sk.upjs.ics.pro1a.heck.services;
 
+import sk.upjs.ics.pro1a.heck.db.core.Appointment;
 import sk.upjs.ics.pro1a.heck.utils.ServiceUtils;
 import sk.upjs.ics.pro1a.heck.db.core.WorkingTime;
 import sk.upjs.ics.pro1a.heck.services.dto.*;
@@ -9,7 +10,9 @@ import java.math.BigInteger;
 import java.security.SecureRandom;
 import java.sql.Time;
 import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import org.jose4j.jwt.NumericDate;
 import sk.upjs.ics.pro1a.heck.db.AppointmentDao;
@@ -204,7 +207,7 @@ public class DoctorService {
         doctor.setCityDoctor(doctorDto.getCity());
         doctor.setPostalCodeDoctor(doctorDto.getPostalCode());
         doctor.setPhoneNumberDoctor(doctorDto.getPhoneNumber());
-        doctor.setActiveDoctor(doctorDto.getActive());
+        doctor.setActiveDoctor(doctorDto.getActive() == null ? doctor.getActiveDoctor() : doctorDto.getActive());
         if (!doctor.getSpecializationDoctor().getId().equals(doctorDto.getSpecialization())) {
             doctor.setSpecializationDoctor(specializationDao.findById(doctorDto.getSpecialization()));
         }
@@ -274,10 +277,10 @@ public class DoctorService {
 
     public WorkingTimeDto getDoctorWorkingTime(long id) {
         List<WorkingTime> workingTimes = workingTimeDao.findByDoctorId(id);
-        if (workingTimes.isEmpty()) {
-            return null;
-        }
         WorkingTimeDto workingTimeDto = new WorkingTimeDto();
+        if (workingTimes.isEmpty()) {
+            return workingTimeDto;
+        }
         workingTimeDto.setInterval(workingTimes.get(0).getDoctor().getAppointmentInterval());
 
         ArrayList<WorkingDayDto> workingDaysDto = new ArrayList<>();
@@ -327,7 +330,7 @@ public class DoctorService {
                 doctorDto.getCity(),
                 doctorDto.getAddress(),
                 doctorDto.getInterval(),
-                ServiceUtils.convertStringToTimestamp(doctorDto.getRegistrationTime()),
+                null,
                 doctorDto.getActive());
     }
 
@@ -372,4 +375,35 @@ public class DoctorService {
         );
     }
 
+    public List<AppointmentDto> getDoctorAppointments(long id) {
+        List<AppointmentDto> appointmentDtoList = new ArrayList<>();
+        for (Appointment app : appointmentDao.findByDoctorId(id)){
+            appointmentDtoList.add(createAppointmentDtoFromAppointmentDao(app));
+        }
+        return appointmentDtoList;
+    }
+
+    private AppointmentDto createAppointmentDtoFromAppointmentDao(Appointment appointment) {
+        AppointmentDto appointmentDto = new AppointmentDto();
+        appointmentDto.setAppointmentDoctor(new AppointmentDoctorDto(
+                appointment.getAppointmentDoctor().getIdDoctor(),
+                appointment.getAppointmentDoctor().getFirstNameDoctor(),
+                appointment.getAppointmentDoctor().getLastNameDoctor(),
+                appointment.getAppointmentDoctor().getBusinessNameDoctor()));
+        appointmentDto.setAppointmentUser(new AppointmentUserDto(
+                appointment.getAppointmentUser().getIdUser(),
+                appointment.getAppointmentUser().getFirstNameUser(),
+                appointment.getAppointmentUser().getLastNameUser()));
+        appointmentDto.setCanceledAppointment(appointment.getCanceledAppointment());
+        appointmentDto.setDateFromAppointment(ServiceUtils.convertTimestampToString(appointment.getDateFromAppointment()));
+        appointmentDto.setDateToAppointment(ServiceUtils.convertTimestampToString(appointment.getDateToAppointment()));
+        appointmentDto.setHolidayAppointment(appointment.getHolidayAppointment());
+        appointmentDto.setIdAppointment(appointment.getIdAppointment());
+        appointmentDto.setNoteAppointment(appointment.getNoteAppointment());
+        appointmentDto.setOccupiedAppointment(appointment.getOccupiedAppointment());
+        appointmentDto.setPatitentName(appointment.getPatitentName());
+        appointmentDto.setCanceledAppointment(appointment.getCanceledAppointment());
+        appointmentDto.setSubjectAppointment(appointment.getSubjectAppointment());
+        return appointmentDto;
+    }
 }
