@@ -75,4 +75,29 @@ public class UserResources {
         userService.updateUser(id, userDto);
         return  Response.ok().build();
     }
+
+    @POST
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    @Path("/users/{id}/checkPassword")
+    @UnitOfWork
+    public Response checkPassword(
+            @PathParam("id") Long id,
+            @FormParam("currentModalPassword") String password) {
+        return Response.ok(userService.checkUserPassword(id, password)).build();
+    }
+
+    @POST
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Path("/users/{id}/changePassword")
+    @UnitOfWork
+    public Response changePassword(
+            @PathParam("id") Long id,
+            ChangePasswordDto changePasswordDto) {
+        try {
+            userService.changeUserPassword(id, changePasswordDto);
+            return Response.ok().build();
+        } catch (IllegalStateException ex) {
+            return Response.status(Response.Status.BAD_REQUEST).build();
+        }
+    }
 }

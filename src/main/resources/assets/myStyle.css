@@ -1,0 +1,200 @@
+body {
+    padding-top: 70px;
+    margin-bottom: 20px;
+}
+
+.form-signin .form-control {
+    position: relative;
+    font-size: 16px;
+    height: auto;
+    padding: 10px;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    margin-bottom: 10px;
+}
+
+.new-account {
+    display: block;
+    margin-top: 10px;
+}
+
+.account-wall {
+    margin-top: 150px;
+}
+
+#wrongData {
+    color: red;
+    visibility: hidden;
+}
+
+/* doctors*/
+#detailTable > tbody > tr > td, #detailTable > tbody > tr > th {
+    padding: 8px;
+    line-height: 1.42857143;
+    vertical-align: top;
+    border-top: 1px solid #ddd;
+
+}
+
+#detailTable {
+    width: 100%;
+}
+
+#myTable_length.dataTables_length {
+    visibility: hidden;
+}
+
+#myTable_filter {
+    text-align: end;
+}
+
+#myTable_paginate {
+    width: 0px;
+    height: 0px;
+    visibility: hidden;
+}
+
+#myPagination {
+    text-align: center;
+}
+
+/*admin profile*/
+
+fieldset * {
+    -webkit-box-sizing: content-box !important;
+    -moz-box-sizing: content-box !important;
+    box-sizing: content-box !important;
+}
+
+input#login {
+    font-weight: bold;
+    margin-left: 3px;
+}
+
+#saveButton, #cancelButton {
+    visibility: hidden;
+}
+
+.myInputs:disabled {
+    height: 24px;
+    background-color: #fff;
+    border: none;
+    box-shadow: none;
+    margin-left: 4px;
+    width: initial;
+}
+
+.myInputs:not([disabled]), #specialization:not([disabled]) {
+    height: 24px;
+    padding: 3px 0px 3px 0px;
+    margin: 4px 0px 4px 0px;
+    border: 1px solid #ccc;
+    width: initial;
+}
+
+#specialization, input#login {
+    background-color: #fff;
+    border: none;
+    box-shadow: none;
+    height: 20px;
+}
+
+.control-label.nameLabel {
+    margin: 0px;
+    padding: 7px 15px 7px 15px;
+}
+
+.modal-body input {
+    padding: 3px 3px 3px 3px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+}
+
+.form-horizontal .control-label {
+    text-align: left;
+}
+
+select {
+    overflow: hidden;
+    width: 120%;
+}
+
+/*office hours*/
+
+.text-field-from {
+    margin-bottom: 4px;
+    width: 40%;
+    text-align: center;
+    margin-left: 5%;
+    margin-right: 10px;
+}
+
+.text-field-to {
+    margin-bottom: 4px;
+    width: 40%;
+    text-align: center;
+
+}
+
+.label-day {
+    width: 65%;
+    margin-left: 5px;
+}
+
+#inputTimeInterval {
+    max-width: 50px;
+}
+
+.disabledButton {
+    opacity: 0.65;
+    cursor: not-allowed;
+}
+
+#main_container {
+    margin: auto;
+
+}
+
+.my-add-button {
+    padding: 0px 6px;
+    margin-right: 10px;
+}
+
+.my-remove-button {
+    padding: 0px 6px;
+
+}
+
+p {
+    margin: 0 0 0px;
+}
+
+.text-field-from {
+    margin-bottom: 4px;
+    width: 90px;
+    text-align: center;
+    margin-left: 70px;
+    margin-right: 20px;
+}
+
+.text-field-to {
+    margin-bottom: 4px;
+    width: 90px;
+    text-align: center;
+}
+
+.label-day {
+    width: 215px;
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+
+    margin-top: 10px;
+
+}
+
+#calendar {
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+

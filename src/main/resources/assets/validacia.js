@@ -185,7 +185,8 @@ if(JSON.parse(sessionStorage.getItem('user'))!= null) {
           },
           remote: {
             message: 'The current password is incorrect',
-            url: 'http://localhost:8076/heck/doctors/' + JSON.parse(sessionStorage.getItem('user')).id + '/checkPassword',
+            url: (JSON.parse(sessionStorage.getItem('user')).role == 'doctor' ?
+                'http://localhost:8076/heck/doctors/' : 'http://localhost:8076/heck/users/') + JSON.parse(sessionStorage.getItem('user')).id + '/checkPassword',
             type: 'POST'
           }
         }

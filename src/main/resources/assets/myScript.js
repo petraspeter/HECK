@@ -65,7 +65,9 @@ function changePassword() {
     var newConfirmPassword = $('#newModalConfirmPassword').val();
 
     var ourRequest = new XMLHttpRequest();
-    ourRequest.open('POST', 'http://localhost:8076/heck/doctors/' + JSON.parse(sessionStorage.getItem('user')).id + '/changePassword');
+    ourRequest.open('POST',
+        (JSON.parse(sessionStorage.getItem('user')).role == 'doctor' ?
+        'http://localhost:8076/heck/doctors/' : 'http://localhost:8076/heck/users/') + JSON.parse(sessionStorage.getItem('user')).id + '/changePassword');
     ourRequest.setRequestHeader("Content-Type", "application/json");
 
     ourRequest.onload = function () {
@@ -623,3 +625,137 @@ function getUsers() {
     ourRequest.send();
 }
 
+    function initializeChangePassword() {
+        $('#changePasswordForm').bootstrapValidator(changePasswordValidator)
+            .on('success.form.bv', function (e) {
+                $('#success_message').slideDown({opacity: "show"}, "slow");
+                $('#changePasswordForm').data('bootstrapValidator').resetForm();
+
+                // Get the form instance
+                var $form = $(e.target);
+
+                // Get the BootstrapValidator instance
+                var bv = $form.data('bootstrapValidator');
+
+                // Use Ajax to submit form data
+                $.post($form.attr('action'), $form.serialize(), function (result) {
+                    console.log("validacia" + result);
+                }, 'json');
+            });
+        $("#myModal_save").click(function () {
+            console.log($('#changePasswordForm').bootstrapValidator('validate'));
+        });
+
+    }
+
+function fillTable(rows){
+
+    var rawTemplate = document.getElementById("tableTemplate").innerHTML;
+    var compiledTemplate = Handlebars.compile(rawTemplate);
+    var ourGeneratedHTML = compiledTemplate(rows);
+
+    var table = document.getElementById("tableContainer");
+    table.innerHTML = ourGeneratedHTML;
+}
+
+function fillModalsDetails(data){
+    var rawTemplate = document.getElementById("detailTableTemplate").innerHTML;
+    var compiledTemplate = Handlebars.compile(rawTemplate);
+    var ourGeneratedHTML = compiledTemplate(data);
+
+    var table = document.getElementById("detailTablesContainer");
+    table.innerHTML = ourGeneratedHTML;
+}
+
+
+function fillCalendar(){
+    var ourRequest = new XMLHttpRequest();
+
+    ourRequest.open('GET', 'http://localhost:8076/heck/doctors/' + JSON.parse(sessionStorage.getItem('user')).id + '/appointments');
+    ourRequest.setRequestHeader("Authorization", "Bearer " + JSON.parse(sessionStorage.getItem('user')).token);
+
+    ourRequest.onload = function () {
+        if (ourRequest.status == 200) {
+            var data = JSON.parse(ourRequest.responseText);
+            console.log(data);
+//                        canceled : false
+//                        doctor :
+//                            firstName : "dddd"
+//                            id : 22
+//                            lastName : "sssss"
+//                            office : "kllkj"
+//                        from : "2017-08-05 10:00:00"
+//                        holiday : false
+//                        id : 1
+//                        note : "Note1"
+//                        occupied : false
+//                        patient : "Johny"
+//                        subject : "Kontrola"
+//                        to : "2017-08-05 10:30:00"
+            fillCalendarModals(data);
+            var e = [];
+
+            data.forEach(function myFunction(item, index, arr) {
+                var color = 'green';
+                if (item.holiday) {
+                    color = 'blue';
+                } else if (item.occupied) {
+                    color = 'red';
+                } else if (item.canceled) {
+                    color = 'purple';
+                }
+                e.push({
+                    id: item.id,
+                    title: item.patient,
+                    start: item.from,
+                    end: item.to,
+                    color: color
+                });
+
+            });
+            $('#calendar').fullCalendar({
+                header: {
+                    left: 'prev,next today',
+                    center: 'title',
+                    right: 'month,basicWeek,basicDay'
+                },
+                defaultDate: '2017-05-12',
+                navLinks: true, // can click day/week names to navigate views
+                // editable: true,
+                eventLimit: true, // allow "more" link when too many events
+                events: e,
+                eventClick: function(calEvent, jsEvent, view) {
+                    $('#detailViewDialog' + calEvent.id).modal();
+                    //alert('Event: ' + calEvent.title + '---' + calEvent.id);
+
+
+                    // change the border color just for fun
+                    $(this).css('border-color', 'red');
+
+                }
+
+            });
+        } else if (ourRequest.status == 401) {
+            var url = 'SignIn.html';
+            window.location.href = url;
+        } else {
+            console.log("We connected to the server, but it returned an error.");
+        }
+    };
+
+    ourRequest.onerror = function () {
+        console.log("Connection error");
+    };
+
+    ourRequest.send();
+}
+
+function fillCalendarModals(data){
+    var rawTemplate = $("#detailTermTableTemplate").text();
+    var compiledTemplate = Handlebars.compile(rawTemplate);
+    var ourGeneratedHTML = compiledTemplate(data);
+
+    //TODO prerobit na jqurey
+    var table = document.getElementById("calendarModals");
+    table.innerHTML = ourGeneratedHTML;
+}

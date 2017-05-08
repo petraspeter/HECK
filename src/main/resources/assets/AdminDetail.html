@@ -4,29 +4,12 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>About admin</title>
+    <title>My profile</title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
           integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css"
           integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa"
-            crossorigin="anonymous"></script>
-
-    <script src="handlebars-v4.0.5.js"></script>
-    <!-- validacia poli-->
-
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.bootstrapvalidator/0.5.3/js/bootstrapValidator.js"></script>
-    <script src="myScript.js"></script>
-    <script src="validacia.js"></script>
-
-    <script type="text/javascript">
-        $(document).ready(function () {
-            document.getElementById('logged-user').innerHTML = JSON.parse(sessionStorage.getItem('user')).login;
-            getAdminDetail();
-        });
-    </script>
-
+    <link rel="stylesheet" href="myStyle.css">
 
     <script id="specializationTemplate" type="text/x-handlebars-template">
         <select disabled="true" id="specialization" name="specialization" class="form-control input-md" contentEditable="false">
@@ -104,9 +87,9 @@
                 <!-- Button -->
                 <div class="form-group">
                     <div class="col-md-4" id="buttons">
-                        <input type="button" class="btn btn-primary" id="editButton" onclick="startEditableAdminInputs()" value="Edit"></input>
-                        <input type="submit" class="btn btn-success" id="saveButton" onclick="saveEditableAdminInputs();  updateAdmin();" value="Save"></input>
-                        <input type="button" class="btn btn-danger" id="cancelButton" onclick="cancelEditableAdminInputs()" value="Cancel"></input>
+                        <input type="button" class="btn btn-primary" id="editButton" onclick="startEditableAdminInputs()" value="Edit">
+                        <input type="submit" class="btn btn-success" id="saveButton" onclick="saveEditableAdminInputs();  updateAdmin();" value="Save">
+                        <input type="button" class="btn btn-danger" id="cancelButton" onclick="cancelEditableAdminInputs()" value="Cancel">
                     </div>
                 </div>
             </fieldset>
@@ -115,67 +98,6 @@
 
     <style type="text/css">
 
-        fieldset * {
-            -webkit-box-sizing: content-box !important;
-            -moz-box-sizing: content-box !important;
-            box-sizing: content-box !important;
-        }
-
-        body {
-            padding-top: 70px;
-        }
-
-        input#login {
-            font-weight: bold;
-            margin-left: 3px;
-        }
-
-        #saveButton, #cancelButton {
-            visibility: hidden;
-        }
-
-        .myInputs:disabled {
-            height: 24px;
-            background-color: #fff;
-            border: none;
-            box-shadow: none;
-            margin-left: 4px;
-            width: initial;
-        }
-
-        .myInputs:not([disabled]), #specialization:not([disabled]) {
-            height: 24px;
-            padding: 3px 0px 3px 0px;
-            margin: 4px 0px 4px 0px;
-            border: 1px solid #ccc;
-            width: initial;
-        }
-
-        #specialization, input#login {
-            background-color: #fff;
-            border: none;
-            box-shadow: none;
-            height: 20px;
-        }
-
-        .control-label.nameLabel {
-            margin: 0px;
-            padding: 7px 15px 7px 15px;
-        }
-
-        .modal-body input {
-            padding: 3px 3px 3px 3px;
-            border-radius: 4px;
-            border: 1px solid #ccc;
-        }
-
-        .form-horizontal .control-label{
-            text-align: left;
-        }
-        select {
-            overflow:hidden;
-            width: 120%;
-        }
 
     </style>
 
@@ -193,10 +115,10 @@
         </div>
         <div class="collapse navbar-collapse" id="myNavbar">
             <ul class="nav navbar-nav">
-                <li><a href="DoctorMainPage.html">Dashboard</a></li>
-                <li><a href="DoctorTerms.html">Terms</a></li>
-                <li><a href="DoctorOfficeHour.html">Office hours</a></li>
-                <li role="presentation" class="active"><a href="DoctorDetail.html">My profile</a></li>
+                <li><a href="AdminMainPage.html">Dashboard</a></li>
+                <li><a href="Doctors.html">Doctors</a></li>
+                <li><a href="Users.html">Users</a></li>
+                <li role="presentation" class="active"><a href="AdminDetail.html">My profile</a></li>
             </ul>
             <ul class="nav navbar-nav navbar-right">
                 <li class="dropdown">
@@ -206,9 +128,6 @@
                         <span class="glyphicon glyphicon-chevron-down"></span>
                     </a>
                     <ul class="dropdown-menu">
-                        <li>
-                            <div class="navbar-login">
-                                <p class="text-left">
                         <li><a data-toggle="modal" href="#myModal"> Change password</a></li>
                         <li><a href="SignIn.html" onclick="logout()">Logout</a></li>
                     </ul>
@@ -229,28 +148,28 @@
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
-                    <h5 class="modal-title">Change password</h5>
+                    <h3 class="modal-title">Change password</h3>
                 </div>
 
                 <div class="modal-body">
                     <!-- The form is placed inside the body of modal -->
                     <form id="changePasswordForm" class="form-horizontal">
                         <div class="form-group">
-                            <label class="col-xs-3 control-label">Current password</label>
+                            <label class="col-xs-5 control-label">Current password</label>
                             <div class="col-xs-5">
                                 <input type="password" class="form-control" name="currentModalPassword" id="currentModalPassword"/>
                             </div>
                         </div>
 
                         <div class="form-group">
-                            <label class="col-xs-3 control-label">New password</label>
+                            <label class="col-xs-5 control-label">New password</label>
                             <div class="col-xs-5">
                                 <input type="password" class="form-control" name="newModalPassword" id="newModalPassword"/>
                             </div>
                         </div>
 
                         <div class="form-group">
-                            <label class="col-xs-3 control-label">Confirm password</label>
+                            <label class="col-xs-5 control-label">Confirm password</label>
                             <div class="col-xs-5">
                                 <input type="password" class="form-control" name="newModalConfirmPassword" id="newModalConfirmPassword"/>
                             </div>
@@ -266,37 +185,25 @@
             </div>
         </div>
     </div>
-
-    <!--END modal window-->
-
     <div id="detailTableContainer">
     </div>
 </div>
 </body>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa"
+        crossorigin="anonymous"></script>
+
+<script src="handlebars-v4.0.5.js"></script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.bootstrapvalidator/0.5.3/js/bootstrapValidator.js"></script>
+<script src="myScript.js"></script>
+<script src="validacia.js"></script>
 
 <script type="text/javascript">
-    $(document).ready(function() {
-        $('#changePasswordForm').bootstrapValidator(changePasswordValidator)
-                .on('success.form.bv', function (e) {
-                    $('#success_message').slideDown({opacity: "show"}, "slow");
-                    $('#changePasswordForm').data('bootstrapValidator').resetForm();
-
-                    // Get the form instance
-                    var $form = $(e.target);
-
-                    // Get the BootstrapValidator instance
-                    var bv = $form.data('bootstrapValidator');
-
-                    // Use Ajax to submit form data
-                    $.post($form.attr('action'), $form.serialize(), function (result) {
-                        console.log("validacia" + result);
-                    }, 'json');
-                });
-        $("#myModal_save").click(function () {
-            console.log($('#changePasswordForm').bootstrapValidator('validate'));
-        });
-
+    $(document).ready(function () {
+        document.getElementById('logged-user').innerHTML = JSON.parse(sessionStorage.getItem('user')).login;
+        getAdminDetail();
+        initializeChangePassword();
     });
-
 </script>
 </html>

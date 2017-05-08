@@ -4,49 +4,13 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Admin  users view</title>
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+    <title>Admin users view</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
+          integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css"
+          integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
+    <link rel="stylesheet" href="myStyle.css">
 
-    <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
-    <script src="https://cdn.datatables.net/1.10.13/js/jquery.dataTables.min.js"></script>
-    <script src="https://cdn.datatables.net/1.10.13/js/dataTables.bootstrap.min.js"></script>
-
-    <script src="handlebars-v4.0.5.js"></script>
-    <!-- validacia poli-->
-
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.bootstrapvalidator/0.5.3/js/bootstrapValidator.js"></script>
-    <script src="myScript.js"></script>
-    <script src="validacia.js"></script>
-
-    <script type="text/javascript">
-        $(document).ready(function(){
-            document.getElementById('logged-user').innerHTML = JSON.parse(sessionStorage.getItem('user')).login;
-        });
-        getUsers();
-
-        function fillTable(rows){
-
-            var rawTemplate = document.getElementById("tableTemplate").innerHTML;
-            var compiledTemplate = Handlebars.compile(rawTemplate);
-            var ourGeneratedHTML = compiledTemplate(rows);
-
-            var table = document.getElementById("tableContainer");
-            table.innerHTML = ourGeneratedHTML;
-        }
-
-        function fillModalsDetails(data){
-            var rawTemplate = document.getElementById("detailTableTemplate").innerHTML;
-            var compiledTemplate = Handlebars.compile(rawTemplate);
-            var ourGeneratedHTML = compiledTemplate(data);
-
-            var table = document.getElementById("detailTablesContainer");
-            table.innerHTML = ourGeneratedHTML;
-        }
-
-    </script>
 
     <script id="tableTemplate" type="text/x-handlebars-template">
         {{#each this}}
@@ -59,7 +23,7 @@
             {{#if active}}
             <td>
                 <p data-placement="top" data-toggle="tooltip" title="Deactivate">
-                    <button class="btn btn-danger btn-xs" data-title="Delete" data-toggle="modal" data-target="#delete" >
+                    <button class="btn btn-danger btn-xs" data-title="Delete" data-toggle="modal" data-target="#delete">
                         <span class="glyphicon glyphicon-remove-circle"></span>
                     </button>
                 </p>
@@ -69,7 +33,7 @@
 
             <td>
                 <p data-placement="top" data-toggle="tooltip" title="Activate">
-                    <button class="btn btn-success btn-xs" data-title="Delete" data-toggle="modal" data-target="#delete" >
+                    <button class="btn btn-success btn-xs" data-title="Delete" data-toggle="modal" data-target="#delete">
                         <span class="glyphicon glyphicon-ok-circle"></span>
                     </button>
                 </p>
@@ -90,20 +54,41 @@
                         <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
                             <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
                         </button>
-                        <h4 class="modal-title custom_align" id="Heading">Details</h4>
+                        <h4 class="modal-title custom_align" id="headTitle">Details</h4>
                     </div>
                     <div class="modal-body">
 
                         <table id="detailTable">
                             <tbody>
 
-                            <tr><td>Login: <td>{{login}} </td></tr>
-                            <tr><td>First name: <td>{{firstName}}</td></tr>
-                            <tr><td>Last name: <td>{{lastName}}</td></tr>
-                            <tr><td>Email: <td>{{email}}</td></tr>
-                            <tr><td>Adress: <td>{{address}}</td></tr>
-                            <tr><td>Phone: <td>{{phoneNumber}}</td></tr>
-                            <tr><td>Registration from: <td>{{registrationTime}}</td></tr>
+                            <tr>
+                                <td>Login:
+                                <td>{{login}}</td>
+                            </tr>
+                            <tr>
+                                <td>First name:
+                                <td>{{firstName}}</td>
+                            </tr>
+                            <tr>
+                                <td>Last name:
+                                <td>{{lastName}}</td>
+                            </tr>
+                            <tr>
+                                <td>Email:
+                                <td>{{email}}</td>
+                            </tr>
+                            <tr>
+                                <td>Adress:
+                                <td>{{address}}</td>
+                            </tr>
+                            <tr>
+                                <td>Phone:
+                                <td>{{phoneNumber}}</td>
+                            </tr>
+                            <tr>
+                                <td>Registration from:
+                                <td>{{registrationTime}}</td>
+                            </tr>
 
                             </tbody>
                         </table>
@@ -119,57 +104,19 @@
         {{/each}}
     </script>
 
-
-
-    <style type="text/css">
-        body{
-            padding-top: 70px;
-        }
-
-        #detailTable>tbody>tr>td, #detailTable>tbody>tr>th{
-            padding: 8px;
-            line-height: 1.42857143;
-            vertical-align: top;
-            border-top: 1px solid #ddd;
-
-        }
-        #detailTable{
-
-            width: 100%;
-        }
-
-        #myInput {
-            background-image: url('/css/searchicon.png'); /* Add a search icon to input */
-
-            background-repeat: no-repeat; /* Do not repeat the icon image */
-            width: 100%; /* Full-width */
-            font-size: 16px; /* Increase font-size */
-            padding: 5px 5px 5px 5px; /* Add some padding */
-            border: 1px solid #ddd; /* Add a grey border */
-            margin-bottom: 30px; /* Add some space below the input */
-        }
-
-
-    </style>
-
-
 </head>
 <body>
 <nav class="navbar navbar-default navbar-fixed-top">
     <div class="container">
         <div class="navbar-header">
-            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-            </button>
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar"></button>
             <a class="navbar-brand" href="#">HECK</a>
         </div>
         <div class="collapse navbar-collapse" id="myNavbar">
             <ul class="nav navbar-nav">
                 <li><a href="AdminMainPage.html">Dashboard</a></li>
-                <li role="presentation" class="active"><a href="Doctors.html">Doctors</a></li>
-                <li><a href="Users.html">Users</a></li>
+                <li><a href="Doctors.html">Doctors</a></li>
+                <li role="presentation" class="active"><a href="Users.html">Users</a></li>
                 <li><a href="AdminDetail.html">My profile</a></li>
             </ul>
             <ul class="nav navbar-nav navbar-right">
@@ -180,22 +127,14 @@
                         <span class="glyphicon glyphicon-chevron-down"></span>
                     </a>
                     <ul class="dropdown-menu">
-                        <li>
-                            <div class="navbar-login">
-                                <p class="text-left">
-
                         <li><a data-toggle="modal" href="#myModal"> Change password</a></li>
                         <li><a href="SignIn.html" onclick="logout()">Logout</a></li>
-                        </p>
+                    </ul>
+                </li>
+            </ul>
         </div>
-        </li>
-        </ul>
-        </li>
-        </ul>
-    </div>
     </div>
 </nav>
-
 
 
 <div class="container">
@@ -215,21 +154,21 @@
                     <!-- The form is placed inside the body of modal -->
                     <form id="changePasswordForm" class="form-horizontal">
                         <div class="form-group">
-                            <label class="col-xs-3 control-label">Current password</label>
+                            <label class="col-xs-5 control-label">Current password</label>
                             <div class="col-xs-5">
                                 <input type="password" class="form-control" name="currentModalPassword" id="currentModalPassword"/>
                             </div>
                         </div>
 
                         <div class="form-group">
-                            <label class="col-xs-3 control-label">New password</label>
+                            <label class="col-xs-5 control-label">New password</label>
                             <div class="col-xs-5">
                                 <input type="password" class="form-control" name="newModalPassword" id="newModalPassword"/>
                             </div>
                         </div>
 
                         <div class="form-group">
-                            <label class="col-xs-3 control-label">Confirm password</label>
+                            <label class="col-xs-5 control-label">Confirm password</label>
                             <div class="col-xs-5">
                                 <input type="password" class="form-control" name="newModalConfirmPassword" id="newModalConfirmPassword"/>
                             </div>
@@ -246,34 +185,6 @@
         </div>
     </div>
 
-    <script>
-        $(document).ready(function() {
-            $('#changePasswordForm').bootstrapValidator(changePasswordValidator)
-                    .on('success.form.bv', function (e) {
-                        $('#success_message').slideDown({opacity: "show"}, "slow");
-                        $('#changePasswordForm').data('bootstrapValidator').resetForm();
-
-                        // Get the form instance
-                        var $form = $(e.target);
-
-                        // Get the BootstrapValidator instance
-                        var bv = $form.data('bootstrapValidator');
-
-                        // Use Ajax to submit form data
-                        $.post($form.attr('action'), $form.serialize(), function (result) {
-                            console.log("validacia" + result);
-                        }, 'json');
-                    });
-            $("#myModal_save").click(function () {
-                console.log($('#changePasswordForm').bootstrapValidator('validate'));
-            });
-
-        });
-
-    </script>
-
-    <!--END modal window-->
-
     <div class="row">
 
         <table id="myTable" class="table table-bordred table-striped">
@@ -287,6 +198,16 @@
             </thead>
             <tbody id="tableContainer"></tbody>
         </table>
+        <nav aria-label="My pagination" id="myPagination">
+            <ul class="pagination">
+                <li class="page-item disabled">
+                    <a class="page-link" href="#" tabindex="-1">Previous</a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" href="#">Next</a>
+                </li>
+            </ul>
+        </nav>
 
     </div>
 
@@ -303,7 +224,7 @@
 
                 </div>
                 <div class="modal-footer ">
-                    <button type="button" class="btn btn-success" ><span class="glyphicon glyphicon-ok-sign"></span> Yes</button>
+                    <button type="button" class="btn btn-success"><span class="glyphicon glyphicon-ok-sign"></span> Yes</button>
                     <button type="button" class="btn btn-default" data-dismiss="modal"><span class="glyphicon glyphicon-remove"></span> No</button>
                 </div>
             </div>
@@ -315,4 +236,24 @@
 
 
 </body>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa"
+        crossorigin="anonymous"></script>
+
+<script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+<script src="https://cdn.datatables.net/1.10.13/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.10.13/js/dataTables.bootstrap.min.js"></script>
+
+<script src="handlebars-v4.0.5.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.bootstrapvalidator/0.5.3/js/bootstrapValidator.js"></script>
+<script src="myScript.js"></script>
+<script src="validacia.js"></script>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        document.getElementById('logged-user').innerHTML = JSON.parse(sessionStorage.getItem('user')).login;
+    });
+    getUsers();
+    initializeChangePassword();
+</script>
 </html>

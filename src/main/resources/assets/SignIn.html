@@ -6,57 +6,9 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <title>Sing in</title>
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
-        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
-        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
-        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script> 
-
-        <script src="handlebars-v4.0.5.js"></script>
-        <script src="validacia.js"></script>
-        <script src="myScript.js"></script>
-
-        <style type="text/css">
-
-            .row
-            {
-                justify-content: center;
-                align-items: center;
-            }
-
-            .form-signin
-            {
-                margin-bottom: 10px;font-weight: normal;
-            }
-
-            .form-signin .form-control
-            {
-                position: relative;
-                font-size: 16px;
-                height: auto;
-                padding: 10px;
-                -webkit-box-sizing: border-box;
-                -moz-box-sizing: border-box;
-                box-sizing: border-box;
-                margin-bottom: 10px;
-            }
-
-            .new-account
-            {
-                display: block;
-                margin-top: 10px;
-            }
-
-            .account-wall
-            {
-                margin-top: 150px;
-            }
-
-            #wrongData
-            {
-                color: red;
-                visibility: hidden;
-            }
-        </style>    
+        <link rel="stylesheet" href="myStyle.css">
     </head>
+
     <body>
 
         <div class="container">
@@ -65,16 +17,17 @@
                     <div class="account-wall">
                         <form class="form-signin">
                             <label id="wrongData">Access denied! Incorrect name or password</label>
-                            <input id="lgn" type="text" class="form-control" placeholder="Email" required autofocus>
+                            <input id="lgn" type="text" class="form-control" placeholder="Login" required autofocus>
                             <input id="psw" type="password" class="form-control" placeholder="Password" required>
-                            <input type="button" class="btn btn-lg btn-primary btn-block" onclick="signIn()" value="Sign in" ></input>
+                            <input type="button" class="btn btn-lg btn-primary btn-block" onclick="signIn()" value="Sign in" >
                             <a href="SignUp.html" class="text-center new-account">Create an account </a>
                         </form>
                     </div>
                 </div>
             </div>
         </div>
-
     </body>
+
+    <script src="myScript.js"></script>
 </html>                                       
 

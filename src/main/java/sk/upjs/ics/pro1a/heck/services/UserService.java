@@ -1,5 +1,8 @@
 package sk.upjs.ics.pro1a.heck.services;
 
+import sk.upjs.ics.pro1a.heck.db.core.Doctor;
+import sk.upjs.ics.pro1a.heck.services.dto.ChangePasswordDto;
+import sk.upjs.ics.pro1a.heck.services.dto.IsValidDto;
 import sk.upjs.ics.pro1a.heck.utils.ServiceUtils;
 import sk.upjs.ics.pro1a.heck.utils.Tokenizer;
 import java.math.BigInteger;
@@ -200,5 +203,31 @@ public class UserService {
                 user.getActiveUser(),
                 user.getAdmin());
     }
-    
+
+    public IsValidDto checkUserPassword(Long id, String password) {
+            IsValidDto isValidDto = new IsValidDto();
+            User user = userDao.findById(id);
+            if (user != null) {
+                if (user.getPasswordUser().equals(PasswordManager.encryptPassword(user.getSaltUser(), password))) {
+                    isValidDto.setValid(true);
+                    return isValidDto;
+                }
+            }
+            isValidDto.setValid(false);
+            return isValidDto;
+    }
+
+    public void changeUserPassword(Long id, ChangePasswordDto changePasswordDto) {
+        if (changePasswordDto.getNewPassword().equals(changePasswordDto.getConfirmPassword())) {
+            User user = userDao.findById(id);
+            if (user != null) {
+                if (user.getPasswordUser().equals(PasswordManager.encryptPassword(user.getSaltUser(), changePasswordDto.getPassword()))) {
+                    user.setPasswordUser(PasswordManager.encryptPassword(user.getSaltUser(), changePasswordDto.getNewPassword()));
+                    userDao.update(user);
+                    return;
+                }
+            }
+        }
+        throw new IllegalStateException("Change password DTO is not valid.");
+    }
 }
