@@ -49,11 +49,13 @@ body {
     text-align: end;
 }
 
-#myTable_paginate {
-    width: 0px;
-    height: 0px;
-    visibility: hidden;
+.pagination>li.paginate_button {
+    display: none;
 }
+
+.pagination>li.paginate_button:first-child, .pagination>li.paginate_button:last-child{
+     display: inline;
+ }
 
 #myPagination {
     text-align: center;
@@ -197,4 +199,10 @@ p {
     margin: 0 auto;
 }
 
+.visibleButton {
+    display: table-cell;
+}
 
+.hiddenButton {
+    display: none;
+}

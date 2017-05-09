@@ -519,7 +519,45 @@ function getDaysValues() {
     return result;
 }
 
-function disableAllButtonsAndTextFields() {
+function disableAllButtonsAndTextFields(data) {
+    if(data!= undefined) {
+        $('#inputTimeInterval').val(data.interval);
+        var newTextField;
+        data.workingTimes.forEach(function(e) {
+            switch(e.day){
+                case 0:
+                    addButton('M');
+                    newTextField = $('#TextBoxesGroupM').find(':text');
+                    break;
+                case 1:
+                    addButton('T');
+                    newTextField = $('#TextBoxesGroupT').find(':text');
+                    break;
+                case 2:
+                    addButton('W');
+                    newTextField = $('#TextBoxesGroupW').find(':text');
+                    break;
+                case 3:
+                    addButton('Th');
+                    newTextField = $('#TextBoxesGroupTh').find(':text');
+                    break;
+                case 4:
+                    addButton('F');
+                    newTextField = $('#TextBoxesGroupF').find(':text');
+                    break;
+                case 5:
+                    addButton('Sa');
+                    newTextField = $('#TextBoxesGroupSa').find(':text');
+                    break;
+                case 6:
+                    addButton('Su');
+                    newTextField = $('#TextBoxesGroupSu').find(':text');
+                    break;
+            }
+            newTextField[newTextField.size()-2].value = e.start.slice(0, -3);
+            newTextField[newTextField.size()-1].value = e.end.slice(0, -3);
+        });
+    }
     $.each($(':button'), function (index, item) {
         $(item).addClass("disabledButton");
         $(item).removeAttr('onclick');
@@ -542,7 +580,7 @@ function checkWorkingHoursAvailability() {
             var data = JSON.parse(ourRequest.responseText);
             console.log(data);
             if (data.interval > 0) {
-                disableAllButtonsAndTextFields();
+                disableAllButtonsAndTextFields(data);
             }
         } else {
             console.log("We connected to the server, but it returned an error.");
@@ -665,33 +703,26 @@ function fillModalsDetails(data){
 
     var table = document.getElementById("detailTablesContainer");
     table.innerHTML = ourGeneratedHTML;
-}
 
+    rawTemplate = document.getElementById("modalWindowsTemplate").innerHTML;
+    compiledTemplate = Handlebars.compile(rawTemplate);
+    ourGeneratedHTML = compiledTemplate(data);
+
+    table = document.getElementById("modalWindowsContainer");
+    table.innerHTML = ourGeneratedHTML;
+}
 
 function fillCalendar(){
     var ourRequest = new XMLHttpRequest();
 
     ourRequest.open('GET', 'http://localhost:8076/heck/doctors/' + JSON.parse(sessionStorage.getItem('user')).id + '/appointments');
+   // ourRequest.open('GET', 'http://localhost:8076/heck/doctors/appointments?idDoc='+ JSON.parse(sessionStorage.getItem('user')).id);
     ourRequest.setRequestHeader("Authorization", "Bearer " + JSON.parse(sessionStorage.getItem('user')).token);
 
     ourRequest.onload = function () {
         if (ourRequest.status == 200) {
             var data = JSON.parse(ourRequest.responseText);
             console.log(data);
-//                        canceled : false
-//                        doctor :
-//                            firstName : "dddd"
-//                            id : 22
-//                            lastName : "sssss"
-//                            office : "kllkj"
-//                        from : "2017-08-05 10:00:00"
-//                        holiday : false
-//                        id : 1
-//                        note : "Note1"
-//                        occupied : false
-//                        patient : "Johny"
-//                        subject : "Kontrola"
-//                        to : "2017-08-05 10:30:00"
             fillCalendarModals(data);
             var e = [];
 
@@ -713,6 +744,7 @@ function fillCalendar(){
                 });
 
             });
+            $('#calendar').fullCalendar('destroy');
             $('#calendar').fullCalendar({
                 header: {
                     left: 'prev,next today',
@@ -726,12 +758,6 @@ function fillCalendar(){
                 events: e,
                 eventClick: function(calEvent, jsEvent, view) {
                     $('#detailViewDialog' + calEvent.id).modal();
-                    //alert('Event: ' + calEvent.title + '---' + calEvent.id);
-
-
-                    // change the border color just for fun
-                    $(this).css('border-color', 'red');
-
                 }
 
             });
@@ -758,4 +784,79 @@ function fillCalendarModals(data){
     //TODO prerobit na jqurey
     var table = document.getElementById("calendarModals");
     table.innerHTML = ourGeneratedHTML;
+}
+
+function setActive(type, id, value){
+    var url = type == 'doctor' ? 'http://localhost:8076/heck/doctors/' : 'http://localhost:8076/heck/users/';
+    var ourRequest = new XMLHttpRequest();
+
+    ourRequest.open('PUT', url + id);
+    ourRequest.setRequestHeader("Content-Type", "application/json");
+    ourRequest.setRequestHeader("Authorization", "Bearer " + JSON.parse(sessionStorage.getItem('user')).token);
+
+    ourRequest.onload = function () {
+        if (ourRequest.status == 200) {
+            console.log("Update successful.");
+            if(value) {
+                var button = $('#isActiveButton' + id);
+                button.removeClass('hiddenButton');
+                button.addClass('visibleButton');
+                button = $('#isDeactiveButton' + id);
+                button.removeClass('visibleButton');
+                button.addClass('hiddenButton');
+            } else {
+                var button = $('#isDeactiveButton' + id);
+                button.removeClass('hiddenButton');
+                button.addClass('visibleButton');
+                button = $('#isActiveButton' + id);
+                button.removeClass('visibleButton');
+                button.addClass('hiddenButton');
+            }
+        } else if (ourRequest.status == 401) {
+            var url = 'SignIn.html';
+            window.location.href = url;
+        } else {
+            console.log("We connected to the server, but it returned an error.");
+        }
+    };
+
+    ourRequest.onerror = function () {
+        console.log("Connection error");
+    };
+
+    ourRequest.send(JSON.stringify({
+        isActive: value,
+        active: value
+    }));
+}
+function updateAppointment(id, isHoliday, isCanceled) {
+    var ourRequest = new XMLHttpRequest();
+
+    ourRequest.open('POST', 'http://localhost:8076/heck/appointments/update');
+    ourRequest.setRequestHeader("Content-Type", "application/json");
+    ourRequest.setRequestHeader("Authorization", "Bearer " + JSON.parse(sessionStorage.getItem('user')).token);
+
+    ourRequest.onload = function () {
+        if (ourRequest.status == 200) {
+            console.log("Update successful.");
+            fillCalendar();
+            //temporaryEvent.color = 'red';
+            //console.log(temporaryEvent);
+        } else if (ourRequest.status == 401) {
+            var url = 'SignIn.html';
+            window.location.href = url;
+        } else {
+            console.log("We connected to the server, but it returned an error.");
+        }
+    };
+
+    ourRequest.onerror = function () {
+        console.log("Connection error");
+    };
+
+    ourRequest.send(JSON.stringify({
+        id: id,
+        canceled: isCanceled,
+        holiday: isHoliday
+    }));
 }

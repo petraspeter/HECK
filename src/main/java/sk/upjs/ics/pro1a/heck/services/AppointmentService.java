@@ -57,9 +57,9 @@ public class AppointmentService {
     
     public AppointmentDto updateAppointment(AppointmentDto appointmentDto) {
         Appointment appointment = appointmentDao.findAppointmentById(appointmentDto.getIdAppointment());
-        appointment.setCanceledAppointment(appointmentDto.getCanceledAppointment());
-        appointment.setOccupiedAppointment(appointmentDto.getOccupiedAppointment());
-        appointment.setHolidayAppointment(appointmentDto.getHolidayAppointment());
+        if(appointmentDto.getCanceledAppointment() != null) appointment.setCanceledAppointment(appointmentDto.getCanceledAppointment());
+        if(appointmentDto.getOccupiedAppointment() != null) appointment.setOccupiedAppointment(appointmentDto.getOccupiedAppointment());
+        if(appointmentDto.getHolidayAppointment() != null) appointment.setHolidayAppointment(appointmentDto.getHolidayAppointment());
         appointmentDao.update(appointment);
         return appointmentDao.createAppointmentDtoFromDao(appointment);
     }

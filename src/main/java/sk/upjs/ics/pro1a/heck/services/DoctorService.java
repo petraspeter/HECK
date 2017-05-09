@@ -208,17 +208,19 @@ public class DoctorService {
      */
     public void updateDoctor(Long id, DoctorDto doctorDto) {
         Doctor doctor = doctorDao.findById(id);
-        doctor.setFirstNameDoctor(doctorDto.getFirstName());
-        doctor.setLastNameDoctor(doctorDto.getLastName());
-        doctor.setEmailDoctor(doctorDto.getEmail());
-        doctor.setBusinessNameDoctor(doctorDto.getOffice());
-        doctor.setAddressDoctor(doctorDto.getAddress());
-        doctor.setCityDoctor(doctorDto.getCity());
-        doctor.setPostalCodeDoctor(doctorDto.getPostalCode());
-        doctor.setPhoneNumberDoctor(doctorDto.getPhoneNumber());
-        doctor.setActiveDoctor(doctorDto.getActive() == null ? doctor.getActiveDoctor() : doctorDto.getActive());
-        if (!doctor.getSpecializationDoctor().getId().equals(doctorDto.getSpecialization())) {
-            doctor.setSpecializationDoctor(specializationDao.findById(doctorDto.getSpecialization()));
+        if (doctorDto.getFirstName() != null) doctor.setFirstNameDoctor(doctorDto.getFirstName());
+        if (doctorDto.getLastName() != null) doctor.setLastNameDoctor(doctorDto.getLastName());
+        if (doctorDto.getEmail() != null) doctor.setEmailDoctor(doctorDto.getEmail());
+        if (doctorDto.getOffice() != null) doctor.setBusinessNameDoctor(doctorDto.getOffice());
+        if (doctorDto.getAddress() != null) doctor.setAddressDoctor(doctorDto.getAddress());
+        if (doctorDto.getCity() != null) doctor.setCityDoctor(doctorDto.getCity());
+        if (doctorDto.getPostalCode() != null) doctor.setPostalCodeDoctor(doctorDto.getPostalCode());
+        if (doctorDto.getPhoneNumber() != null) doctor.setPhoneNumberDoctor(doctorDto.getPhoneNumber());
+        if (doctorDto.getActive() != null) doctor.setActiveDoctor(doctorDto.getActive());
+        if (doctorDto.getSpecialization() != null) {
+            if (!doctor.getSpecializationDoctor().getId().equals(doctorDto.getSpecialization())) {
+                doctor.setSpecializationDoctor(specializationDao.findById(doctorDto.getSpecialization()));
+            }
         }
         doctorDao.update(doctor);
     }

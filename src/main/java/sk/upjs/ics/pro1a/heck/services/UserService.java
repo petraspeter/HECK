@@ -121,15 +121,15 @@ public class UserService {
     
     public void updateUser(Long id, UserDto userDto) {
         User user = userDao.findById(id);
-        user.setAddressUser(userDto.getAddress());
-        user.setCityUser(userDto.getCity());
-        user.setEmailUser(userDto.getEmail());
-        user.setFirstNameUser(userDto.getFirstName());
-        user.setLastNameUser(userDto.getLastName());
-        user.setLoginUser(userDto.getLogin());
-        user.setPhoneUser(userDto.getPhoneNumber());
-        user.setPostalCodeUser(userDto.getPostalCode());
-        user.setActiveUser(userDto.isActive() == null ? user.getActiveUser() : userDto.isActive());
+        if(userDto.getAddress() != null) user.setAddressUser(userDto.getAddress());
+        if(userDto.getCity() != null) user.setCityUser(userDto.getCity());
+        if(userDto.getEmail() != null) user.setEmailUser(userDto.getEmail());
+        if(userDto.getFirstName() != null) user.setFirstNameUser(userDto.getFirstName());
+        if(userDto.getLastName() != null) user.setLastNameUser(userDto.getLastName());
+        if(userDto.getLogin() != null) user.setLoginUser(userDto.getLogin());
+        if(userDto.getPhoneNumber() != null) user.setPhoneUser(userDto.getPhoneNumber());
+        if(userDto.getPostalCode() != null) user.setPostalCodeUser(userDto.getPostalCode());
+        if(userDto.isActive() != null) user.setActiveUser(userDto.isActive());
         userDao.update(user);
     }
     
