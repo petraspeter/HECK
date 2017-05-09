@@ -33,6 +33,25 @@ public class AppointmentService {
         this.tokenSecret = tokenSecret;
     }
     
+    public List<AppointmentDto> getUserAppointment(Long id) {
+        List<AppointmentDto> appointmentDtos = new ArrayList<>();
+        for (Appointment appointment : appointmentDao.findUserAppointment(id)) {
+            AppointmentDto appointmentDto = appointmentDao.createAppointmentDtoFromDao(appointment);
+            appointmentDtos.add(appointmentDto);
+        }
+        return appointmentDtos;        
+    }
+    
+    public List<AppointmentDto> getFutureUserAppointment(Long id) {
+        List<AppointmentDto> appointmentDtos = new ArrayList<>();
+        for (Appointment appointment : appointmentDao.findFutureUserAppointment(id)) {
+            AppointmentDto appointmentDto = appointmentDao.createAppointmentDtoFromDao(appointment);
+            appointmentDtos.add(appointmentDto);
+        }
+        return appointmentDtos;                
+        
+    }
+    
     public List<AppointmentDto> findForPage(int page, int pageSize) {
         List<AppointmentDto> appointmentDtos = new ArrayList<>();
         for (Appointment appointment : appointmentDao.findForPage(page, pageSize)) {
@@ -47,7 +66,7 @@ public class AppointmentService {
         return appointmentDao.generateUserAppointmentForDays(idDoc, idUser, from, to);
     }
     
-       public List<AppointmentDto> generateDoctorAppointmentForDays(Long idDoc, Long idUser, Timestamp from,
+    public List<AppointmentDto> generateDoctorAppointmentForDays(Long idDoc, Long idUser, Timestamp from,
             Timestamp to) {
         return appointmentDao.generateDoctorAppointmentForDays(idDoc, idUser, from, to);
     }
@@ -74,12 +93,12 @@ public class AppointmentService {
         return appointmentDao.createAppointmentDtoFromDao(appointment);
     }
     
-        public void deleteAppointment(Long id) {
-            appointmentDao.deleteAppointment(id);
-        }
-        
-        public  Appointment getById(Long id) {
-            return appointmentDao.findById(id);
-        }
-            
+    public void deleteAppointment(Long id) {
+        appointmentDao.deleteAppointment(id);
+    }
+    
+    public  Appointment getById(Long id) {
+        return appointmentDao.findById(id);
+    }
+    
 }

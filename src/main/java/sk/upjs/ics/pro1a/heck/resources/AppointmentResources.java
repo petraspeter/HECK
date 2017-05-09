@@ -189,4 +189,26 @@ public class AppointmentResources {
         return Response.status(Response.Status.EXPECTATION_FAILED).build();
     }
     
+    @GET
+    @Path("/users/appointments/{id}")
+    @UnitOfWork
+    public Response getUserAppointment(@Auth AuthorizedUserDto user, @PathParam("id") Long id) {
+        List<AppointmentDto> appointments = appointmentService.getUserAppointment(id);
+        if (appointments == null) {
+            return Response.status(Response.Status.NOT_FOUND).build();
+        }
+        return Response.ok(appointments).build();
+    }
+    
+    @GET
+    @Path("/users/future/{id}")
+    @UnitOfWork
+    public Response getFutureUserAppointment(@Auth AuthorizedUserDto user, @PathParam("id") Long id) {
+        List<AppointmentDto> appointments = appointmentService.getFutureUserAppointment(id);
+        if (appointments == null) {
+            return Response.status(Response.Status.NOT_FOUND).build();
+        }
+        return Response.ok(appointments).build();
+    }
+    
 }

@@ -316,4 +316,19 @@ public class AppointmentDao extends AbstractDAO<Appointment> {
         return get(id);
     }
     
+    public List<Appointment> findUserAppointment(Long id) {
+        return sessionFactory.getCurrentSession().createCriteria(Appointment.class)
+                .setFetchMode("appointmentUser", FetchMode.JOIN)
+                .add(Restrictions.eq("appointmentUser.idUser", id))
+                .list();
+    }
+    
+    public List<Appointment> findFutureUserAppointment(Long id) {
+        return sessionFactory.getCurrentSession().createCriteria(Appointment.class)
+                .setFetchMode("appointmentUser", FetchMode.JOIN)
+                .add(Restrictions.eq("appointmentUser.idUser", id))
+                .add(Restrictions.ge("dateFromAppointment", new Timestamp(System.currentTimeMillis())))
+                .list();
+    }
+    
 }
