@@ -1,6 +1,7 @@
 package sk.upjs.ics.pro1a.heck.services;
 
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.List;
 import sk.upjs.ics.pro1a.heck.db.AppointmentDao;
 import sk.upjs.ics.pro1a.heck.db.DoctorDao;
@@ -30,6 +31,15 @@ public class AppointmentService {
         this.doctorDao = appointmentDoctorDao;
         this.workingTimeDao = workingTimeDao;
         this.tokenSecret = tokenSecret;
+    }
+    
+    public List<AppointmentDto> findForPage(int page, int pageSize) {
+        List<AppointmentDto> appointmentDtos = new ArrayList<>();
+        for (Appointment appointment : appointmentDao.findForPage(page, pageSize)) {
+            AppointmentDto appointmentDto = appointmentDao.createAppointmentDtoFromDao(appointment);
+            appointmentDtos.add(appointmentDto);
+        }
+        return appointmentDtos;
     }
     
     public List<AppointmentDto> generateUserAppointmentForDays(Long idDoc, Long idUser, Timestamp from,

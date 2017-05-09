@@ -12,6 +12,7 @@ import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
@@ -162,6 +163,17 @@ public class AppointmentResources {
             return  Response.ok(appointments).build();
         }
         return Response.status(Response.Status.NOT_FOUND).build();
-    }    
+    }
+    
+    @GET
+    @Path("/appointments/{page}/{size}")
+    @UnitOfWork
+    public Response getPage(@Auth AuthorizedUserDto user, @PathParam("page") int page, @PathParam("size") int size) {
+        List<AppointmentDto> appointments = appointmentService.findForPage(page, size);
+        if (appointments == null) {
+            return Response.status(Response.Status.NOT_FOUND).build();
+        }
+        return Response.ok(appointments).build();
+    }
     
 }

@@ -10,9 +10,7 @@ import java.math.BigInteger;
 import java.security.SecureRandom;
 import java.sql.Time;
 import java.sql.Timestamp;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import org.jose4j.jwt.NumericDate;
 import sk.upjs.ics.pro1a.heck.db.AppointmentDao;
@@ -52,6 +50,15 @@ public class DoctorService {
     public List<DoctorDto> getAllDoctors() {
         List<DoctorDto> doctors = new ArrayList<>();
         for (Doctor doctor : doctorDao.findAll()) {
+            DoctorDto doctorDto = createDoctorDtoFromDoctorDaoWithoutPassword(doctor);
+            doctors.add(doctorDto);
+        }
+        return doctors;
+    }
+    
+    public List<DoctorDto> getAllDoctorsForPage(int page, int pageSize) {
+        List<DoctorDto> doctors = new ArrayList<>();
+        for (Doctor doctor : doctorDao.findForPage(page, pageSize)) {
             DoctorDto doctorDto = createDoctorDtoFromDoctorDaoWithoutPassword(doctor);
             doctors.add(doctorDto);
         }
@@ -417,4 +424,6 @@ public class DoctorService {
         appointmentDto.setSubjectAppointment(appointment.getSubjectAppointment());
         return appointmentDto;
     }
+    
+    
 }

@@ -1,6 +1,5 @@
 package sk.upjs.ics.pro1a.heck.services;
 
-import sk.upjs.ics.pro1a.heck.db.core.Doctor;
 import sk.upjs.ics.pro1a.heck.services.dto.ChangePasswordDto;
 import sk.upjs.ics.pro1a.heck.services.dto.IsValidDto;
 import sk.upjs.ics.pro1a.heck.utils.ServiceUtils;
@@ -230,4 +229,14 @@ public class UserService {
         }
         throw new IllegalStateException("Change password DTO is not valid.");
     }
+    
+     public List<UserDto> getAllUsersForPage(int page, int pageSize) {
+        List<UserDto> usersDto = new ArrayList<>();
+        for (User user : userDao.findForPage(page, pageSize)) {
+            UserDto userDto = createUserDtoFromUserDaoWithoutPassword(user);
+            usersDto.add(userDto);
+        }
+        return usersDto;
+    }
+    
 }

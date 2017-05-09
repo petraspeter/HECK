@@ -15,14 +15,14 @@ import sk.upjs.ics.pro1a.heck.services.dto.*;
  */
 @Path("/heck")
 @Produces(MediaType.APPLICATION_JSON)
-public class UserResources {    
+public class UserResources {
     
     private final UserService userService;
-
+    
     public UserResources(UserService userService) {
         this.userService = userService;
     }
-
+    
     @POST
     @Path("/users")
     @Consumes(MediaType.APPLICATION_JSON)
@@ -61,13 +61,25 @@ public class UserResources {
     }
     
     @GET
+    @Path("/users/{page}/{size}")
+    @UnitOfWork
+    public Response getPage(@Auth AuthorizedUserDto user, 
+            @PathParam("page") int page, @PathParam("size") int size) {
+        List<UserDto> users = userService.getAllUsersForPage(page, size);
+        if (users == null) {
+            return Response.status(Response.Status.NOT_FOUND).build();
+        }
+        return Response.ok(users).build();
+    }
+    
+    @GET
     @Path("/users")
     @UnitOfWork
     public Response getAllUsers(@Auth AuthorizedUserDto user) {
         List<UserDto> users = userService.getAllUsers();
         return Response.ok(users).build();
     }
-
+    
     @PUT
     @Path("/users/{id}")
     @UnitOfWork
@@ -75,7 +87,7 @@ public class UserResources {
         userService.updateUser(id, userDto);
         return  Response.ok().build();
     }
-
+    
     @POST
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Path("/users/{id}/checkPassword")
@@ -85,7 +97,7 @@ public class UserResources {
             @FormParam("currentModalPassword") String password) {
         return Response.ok(userService.checkUserPassword(id, password)).build();
     }
-
+    
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Path("/users/{id}/changePassword")

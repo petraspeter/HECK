@@ -292,8 +292,15 @@ public class AppointmentDao extends AbstractDAO<Appointment> {
         }
         return appointments;
     }
-
+    
     public List<Appointment> findByDoctorId(long doctorId) {
         return list(currentSession().createCriteria(Appointment.class).add(Restrictions.eq("appointmentDoctor.idDoctor",doctorId)));
+    }
+    
+    public List<Appointment> findForPage(int page, int pageSize) {
+        int start = (page - 1) * pageSize;
+        return list(currentSession().createCriteria(Appointment.class)
+                .setFirstResult(start)
+                .setMaxResults(start+pageSize));
     }
 }

@@ -86,6 +86,17 @@ public class DoctorResources {
     }
     
     @GET
+    @Path("/doctors/{page}/{size}")
+    @UnitOfWork
+    public Response getPage(@Auth AuthorizedUserDto user, @PathParam("page") int page, @PathParam("size") int size) {
+        List<DoctorDto> doctors = doctorService.getAllDoctorsForPage(page, size);
+        if (doctors == null) {
+            return Response.status(Response.Status.NOT_FOUND).build();
+        }
+        return Response.ok(doctors).build();
+    }
+    
+    @GET
     @Path("/doctors")
     @UnitOfWork
     public Response getAllDoctors(
