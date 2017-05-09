@@ -73,5 +73,13 @@ public class AppointmentService {
         appointmentDao.update(appointment);
         return appointmentDao.createAppointmentDtoFromDao(appointment);
     }
-      
+    
+        public void deleteAppointment(Long id) {
+            appointmentDao.deleteAppointment(id);
+        }
+        
+        public  Appointment getById(Long id) {
+            return appointmentDao.findById(id);
+        }
+            
 }

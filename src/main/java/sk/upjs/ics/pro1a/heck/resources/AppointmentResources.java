@@ -18,6 +18,7 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import org.apache.commons.lang3.time.DateUtils;
+import sk.upjs.ics.pro1a.heck.db.core.Appointment;
 import sk.upjs.ics.pro1a.heck.services.AppointmentService;
 import sk.upjs.ics.pro1a.heck.services.dto.AppointmentDto;
 import sk.upjs.ics.pro1a.heck.services.dto.AuthorizedUserDto;
@@ -174,6 +175,18 @@ public class AppointmentResources {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
         return Response.ok(appointments).build();
+    }
+    
+    @GET
+    @Path("/appointments/delete/{id}")
+    @UnitOfWork
+    public Response deleteAppointment(@Auth AuthorizedUserDto user, @PathParam("id") Long id) {
+        appointmentService.deleteAppointment(id);
+        Appointment appointment = appointmentService.getById(id);
+        if (appointment == null) {
+            return Response.ok("Appointment deleted").build();
+        }
+        return Response.status(Response.Status.EXPECTATION_FAILED).build();
     }
     
 }

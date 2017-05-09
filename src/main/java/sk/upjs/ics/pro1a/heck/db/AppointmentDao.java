@@ -303,4 +303,13 @@ public class AppointmentDao extends AbstractDAO<Appointment> {
                 .setFirstResult(start)
                 .setMaxResults(start+pageSize));
     }
+    
+    public void deleteAppointment(Long id) {
+        sessionFactory.getCurrentSession().delete(findAppointmentById(id));
+    }
+    
+    public  Appointment findById(Long id) {
+        return get(id);
+    }
+    
 }
