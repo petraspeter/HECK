@@ -213,9 +213,7 @@ public class AppointmentDao extends AbstractDAO<Appointment> {
         appointment.setAppointmentDoctor(findDoctorById(appointmentDto.getAppointmentDoctor().getIdDoctor()));
         appointment.setAppointmentUser(findUserById(appointmentDto.getAppointmentUser().getIdUser()));
         appointment.setOccupiedAppointment(appointmentDto.getOccupiedAppointment());
-        appointment.setDateFromAppointment(ServiceUtils.convertStringToTimestamp(appointmentDto.getDateFromAppointment()));
-        System.out.println(appointmentDto.getDateToAppointment());
-        
+        appointment.setDateFromAppointment(ServiceUtils.convertStringToTimestamp(appointmentDto.getDateFromAppointment()));        
         appointment.setDateToAppointment(ServiceUtils.convertStringToTimestamp(appointmentDto.getDateToAppointment()));
         appointment.setHolidayAppointment(appointmentDto.getHolidayAppointment());
         appointment.setCanceledAppointment(appointmentDto.getCanceledAppointment());
