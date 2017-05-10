@@ -3,6 +3,7 @@ package sk.upjs.ics.pro1a.heck.db;
 import io.dropwizard.hibernate.AbstractDAO;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import org.hibernate.FetchMode;
@@ -17,6 +18,7 @@ import sk.upjs.ics.pro1a.heck.db.core.WorkingTime;
 import sk.upjs.ics.pro1a.heck.services.dto.AppointmentDoctorDto;
 import sk.upjs.ics.pro1a.heck.services.dto.AppointmentDto;
 import sk.upjs.ics.pro1a.heck.services.dto.AppointmentUserDto;
+import sk.upjs.ics.pro1a.heck.utils.ServiceUtils;
 
 /**
  *
@@ -204,12 +206,17 @@ public class AppointmentDao extends AbstractDAO<Appointment> {
     }
     
     public Appointment createAppointmentDaoFromDto(AppointmentDto appointmentDto) {
-        Appointment appointment = findAppointmentById(appointmentDto.getIdAppointment());
+        Appointment appointment = new Appointment();
+        if (appointmentDto.getIdAppointment() != null) {
+            appointment.setIdAppointment(appointmentDto.getIdAppointment());
+        }
         appointment.setAppointmentDoctor(findDoctorById(appointmentDto.getAppointmentDoctor().getIdDoctor()));
         appointment.setAppointmentUser(findUserById(appointmentDto.getAppointmentUser().getIdUser()));
         appointment.setOccupiedAppointment(appointmentDto.getOccupiedAppointment());
-        appointment.setDateFromAppointment(new Timestamp(Long.parseLong(appointmentDto.getDateFromAppointment())));
-        appointment.setDateToAppointment(new Timestamp(Long.parseLong(appointmentDto.getDateToAppointment())));
+        appointment.setDateFromAppointment(ServiceUtils.convertStringToTimestamp(appointmentDto.getDateFromAppointment()));
+        System.out.println(appointmentDto.getDateToAppointment());
+        
+        appointment.setDateToAppointment(ServiceUtils.convertStringToTimestamp(appointmentDto.getDateToAppointment()));
         appointment.setHolidayAppointment(appointmentDto.getHolidayAppointment());
         appointment.setCanceledAppointment(appointmentDto.getCanceledAppointment());
         appointment.setPatitentName(appointmentDto.getPatitentName());

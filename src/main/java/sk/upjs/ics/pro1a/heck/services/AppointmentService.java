@@ -9,6 +9,7 @@ import sk.upjs.ics.pro1a.heck.db.UserDao;
 import sk.upjs.ics.pro1a.heck.db.WorkingTimeDao;
 import sk.upjs.ics.pro1a.heck.db.core.Appointment;
 import sk.upjs.ics.pro1a.heck.services.dto.AppointmentDto;
+import sk.upjs.ics.pro1a.heck.utils.ServiceUtils;
 
 /**
  *
@@ -39,7 +40,7 @@ public class AppointmentService {
             AppointmentDto appointmentDto = appointmentDao.createAppointmentDtoFromDao(appointment);
             appointmentDtos.add(appointmentDto);
         }
-        return appointmentDtos;        
+        return appointmentDtos;
     }
     
     public List<AppointmentDto> getFutureUserAppointment(Long id) {
@@ -48,7 +49,7 @@ public class AppointmentService {
             AppointmentDto appointmentDto = appointmentDao.createAppointmentDtoFromDao(appointment);
             appointmentDtos.add(appointmentDto);
         }
-        return appointmentDtos;                
+        return appointmentDtos;
         
     }
     
@@ -74,8 +75,8 @@ public class AppointmentService {
     public AppointmentDto addAppointment(AppointmentDto appointmentDto) {
         Appointment appointment = appointmentDao.findExactAppointmentByDocIdAndDate(
                 appointmentDto.getAppointmentDoctor().getIdDoctor(),
-                new Timestamp(Long.parseLong(appointmentDto.getDateFromAppointment())));
-        if(appointment.getOccupiedAppointment()) {
+                ServiceUtils.convertStringToTimestamp(appointmentDto.getDateFromAppointment()));
+        if(appointment != null) {
             return null;
         } else {
             appointment = appointmentDao.createAppointmentDaoFromDto(appointmentDto);

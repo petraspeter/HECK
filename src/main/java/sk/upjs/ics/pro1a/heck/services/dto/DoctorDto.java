@@ -44,13 +44,13 @@ public class DoctorDto {
     
     @JsonProperty("specialization")
     private Long specialization;
-
+    
     @JsonProperty("specializationName")
     private String specializationName;
-
+    
     @JsonProperty("interval")
     private Short interval;
-
+    
     @JsonProperty("isActive")
     private Boolean isActive;
     
@@ -160,28 +160,46 @@ public class DoctorDto {
     public void setInterval(Short interval) {
         this.interval = interval;
     }
-
+    
     public String getRegistrationTime() {
         return registrationTime;
     }
-
+    
     public void setRegistrationTime(String registrationTime) {
         this.registrationTime = registrationTime;
     }
-
+    
     public Boolean getActive() {
         return isActive;
     }
-
+    
     public void setActive(Boolean active) {
         isActive = active;
     }
-
+    
+    public String getSpecializationName() {
+        return specializationName;
+    }
+    
+    public void setSpecializationName(String specializationName) {
+        this.specializationName = specializationName;
+    }
+    
+    public Boolean getIsActive() {
+        return isActive;
+    }
+    
+    public void setIsActive(Boolean isActive) {
+        this.isActive = isActive;
+    }
+    
+    
+    
     public DoctorDto() {
     }
     
     public DoctorDto(Long id, String login, String password, String firstName, String lastName, String email, String office, String address, String postalCode, String city,
-                     String phoneNumber, Long specialization, String specializationName, Short  interval, Boolean isActive, String registrationTime) {
+            String phoneNumber, Long specialization, String specializationName, Short  interval, Boolean isActive, String registrationTime) {
         this.id = id;
         this.login = login;
         this.password = password;
@@ -201,7 +219,7 @@ public class DoctorDto {
     }
     
     public DoctorDto(Long id, String login, String firstName, String lastName, String email, String office, String address, String postalCode, String city, String phoneNumber,
-                     Long specialization, String specializationName, Short  interval, Boolean isActive, String registrationTime) {
+            Long specialization, String specializationName, Short  interval, Boolean isActive, String registrationTime) {
         this.id = id;
         this.login = login;
         this.firstName = firstName;
