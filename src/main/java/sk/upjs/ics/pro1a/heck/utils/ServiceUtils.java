@@ -18,7 +18,7 @@ public class ServiceUtils {
     }
     
     public static String convertTimestampToString(Timestamp timestamp) {
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
         return dateFormat.format(new Date(timestamp.getTime()));
     }
 }

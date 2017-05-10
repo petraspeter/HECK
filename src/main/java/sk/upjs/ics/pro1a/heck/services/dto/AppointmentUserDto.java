@@ -54,4 +54,9 @@ public class AppointmentUserDto {
     public AppointmentUserDto() {
     }
     
+    @Override
+    public String toString() {
+        return "AppointmentUserDto{" + "idUser=" + idUser + ", firstNameUser=" + firstNameUser + ", lastNameUser=" + lastNameUser + '}';
+    }
+    
 }

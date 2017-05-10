@@ -65,6 +65,11 @@ public class AppointmentDoctorDto {
 
     public AppointmentDoctorDto() {
     }
+
+    @Override
+    public String toString() {
+        return "AppointmentDoctorDto{" + "idDoctor=" + idDoctor + ", firstNameDoctor=" + firstNameDoctor + ", lastNameDoctor=" + lastNameDoctor + ", officeDoctor=" + officeDoctor + '}';
+    }
         
 }
 

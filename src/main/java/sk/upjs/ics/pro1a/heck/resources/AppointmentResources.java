@@ -43,6 +43,7 @@ public class AppointmentResources {
     @Consumes(MediaType.APPLICATION_JSON)
     @UnitOfWork
     public Response addAppointment(AppointmentDto appointmentDto) {
+        System.out.println(appointmentDto.toString());
         AppointmentDto addedAppointment = appointmentService.addAppointment(appointmentDto);
         if(addedAppointment != null) {
             return Response.status(Response.Status.CREATED).entity(addedAppointment).build();
@@ -150,7 +151,7 @@ public class AppointmentResources {
     @Consumes(MediaType.APPLICATION_JSON)
     @UnitOfWork
     public Response findDoctorsAppointmentFromTo(
-      //      @Auth AuthorizedUserDto user,
+            @Auth AuthorizedUserDto user,
             @QueryParam("idDoc") Long id,
             @QueryParam("from") String from,
             @QueryParam("to") String to
@@ -193,7 +194,7 @@ public class AppointmentResources {
     @Path("/users/appointments/{id}")
     @UnitOfWork
     public Response getUserAppointment(
-        //    @Auth AuthorizedUserDto user, 
+            @Auth AuthorizedUserDto user, 
             @PathParam("id") Long id) {
         List<AppointmentDto> appointments = appointmentService.getUserAppointment(id);
         if (appointments == null) {
@@ -206,7 +207,7 @@ public class AppointmentResources {
     @Path("/users/future/{id}")
     @UnitOfWork
     public Response getFutureUserAppointment(
-         //   @Auth AuthorizedUserDto user, 
+            @Auth AuthorizedUserDto user, 
             @PathParam("id") Long id) {
         List<AppointmentDto> appointments = appointmentService.getFutureUserAppointment(id);
         if (appointments == null) {
