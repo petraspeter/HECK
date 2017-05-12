@@ -288,7 +288,7 @@ public class DoctorResources {
     @Path("/users/deleteFavourite")
     @UnitOfWork
     public Response deleteFavourite(
-       //     @Auth AuthorizedUserDto user,
+            @Auth AuthorizedUserDto user,
             @QueryParam("idUser") Long idUser,
             @QueryParam("idDoc") Long idDoc
     ) {
@@ -304,7 +304,7 @@ public class DoctorResources {
     @Path("/users/addFavourite")
     @UnitOfWork
     public Response addFavourite(
-         //   @Auth AuthorizedUserDto user,
+            @Auth AuthorizedUserDto user,
             @QueryParam("idUser") Long idUser,
             @QueryParam("idDoc") Long idDoc
     ) {
