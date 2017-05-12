@@ -83,12 +83,12 @@ public class AppointmentResources {
         try {
             tsFrom = new Timestamp(sdt.parse(dateFrom).getTime());
         } catch (Exception e) {
-            System.err.println("Date from param is missing!");
+            System.err.println("DateFrom param is missing!");
         }
         try {
             tsTo = new Timestamp(sdt.parse(dateTo).getTime());
         } catch (Exception e) {
-            System.err.println("Date to param is missing!");
+            System.err.println("DateTo param is missing!");
         }
         if (tsFrom != null && tsTo != null) {
             appointments = appointmentService

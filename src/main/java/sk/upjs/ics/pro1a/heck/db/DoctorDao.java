@@ -1,6 +1,7 @@
 package sk.upjs.ics.pro1a.heck.db;
 
 import io.dropwizard.hibernate.AbstractDAO;
+import java.sql.Timestamp;
 import org.hibernate.SessionFactory;
 import sk.upjs.ics.pro1a.heck.db.core.Doctor;
 import java.util.List;
@@ -142,5 +143,7 @@ public class DoctorDao extends AbstractDAO<Doctor> {
                 .setFirstResult(start)
                 .setMaxResults(start+pageSize));
     }
+
+  
     
 }

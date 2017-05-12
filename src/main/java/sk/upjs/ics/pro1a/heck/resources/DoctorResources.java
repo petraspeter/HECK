@@ -3,11 +3,8 @@ package sk.upjs.ics.pro1a.heck.resources;
 import io.dropwizard.auth.Auth;
 import io.dropwizard.hibernate.UnitOfWork;
 import java.sql.Timestamp;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
@@ -132,81 +129,6 @@ public class DoctorResources {
     }
     
     @GET
-    @Path("/doctors/searchP")
-    @UnitOfWork
-    public Response getDoctorsBySpecializationAndCityAndDate(
-            @Auth AuthorizedUserDto user,
-            @QueryParam("specialization") String specialization,
-            @QueryParam("city") String city,
-            @QueryParam("from") String from,
-            @QueryParam("to") String to) {
-        SimpleDateFormat sdt = new SimpleDateFormat("yyyy-MM-dd");
-        List<DoctorDto> doctors = null;
-        try {
-            Timestamp tsFrom = new Timestamp(sdt.parse(from).getTime());
-            Timestamp tsTo = new Timestamp(sdt.parse(to).getTime());
-            doctors = doctorService.getDoctorsBySpecializationAndCityAndDate(specialization, city, tsFrom, tsTo);
-        } catch(ParseException e) {
-            Logger.getLogger(DoctorResources.class.getName()).log(Level.SEVERE, null, e);
-        }
-        if (doctors == null) {
-            return Response.status(Response.Status.NOT_FOUND).build();
-        }
-        return Response.ok(doctors).build();
-    }
-    
-    @GET
-    @Path("/doctors/searchN")
-    @UnitOfWork
-    public Response getDoctorsBySpecializationAndNameAndDate(
-            @Auth AuthorizedUserDto user,
-            @QueryParam("specialization") String specialization,
-            @QueryParam("firstName") String firstName,
-            @QueryParam("lastName") String lastName,
-            @QueryParam("from") String from,
-            @QueryParam("to") String to) {
-        SimpleDateFormat sdt = new SimpleDateFormat("yyyy-MM-dd");
-        List<DoctorDto> doctors = null;
-        try {
-            Timestamp tsFrom = new Timestamp(sdt.parse(from).getTime());
-            Timestamp tsTo = new Timestamp(sdt.parse(to).getTime());
-            doctors = doctorService.getDoctorsBySpecializationAndFullNameAndDate(specialization, firstName,
-                    lastName, tsFrom, tsTo);
-        } catch(ParseException e) {
-            Logger.getLogger(DoctorResources.class.getName()).log(Level.SEVERE, null, e);
-        }
-        if (doctors == null) {
-            return Response.status(Response.Status.NOT_FOUND).build();
-        }
-        return Response.ok(doctors).build();
-    }
-    
-    @GET
-    @Path("/doctors/searchL")
-    @UnitOfWork
-    public Response getDoctorsBySpecializationAndLastNameAndDate(
-            @Auth AuthorizedUserDto user,
-            @QueryParam("specialization") String specialization,
-            @QueryParam("lastName") String lastName,
-            @QueryParam("from") String from,
-            @QueryParam("to") String to) {
-        SimpleDateFormat sdt = new SimpleDateFormat("yyyy-MM-dd");
-        List<DoctorDto> doctors = null;
-        try {
-            Timestamp tsFrom = new Timestamp(sdt.parse(from).getTime());
-            Timestamp tsTo = new Timestamp(sdt.parse(to).getTime());
-            doctors = doctorService.getDoctorsBySpecializationAndLastNameAndDate(specialization, lastName,
-                    tsFrom, tsTo);
-        } catch(ParseException e) {
-            Logger.getLogger(DoctorResources.class.getName()).log(Level.SEVERE, null, e);
-        }
-        if (doctors == null) {
-            return Response.status(Response.Status.NOT_FOUND).build();
-        }
-        return Response.ok(doctors).build();
-    }
-    
-    @GET
     @Path("/doctors/search")
     @UnitOfWork
     public Response getDoctorsBySpecializationAndNameAndCityAndDate(
@@ -219,39 +141,42 @@ public class DoctorResources {
             @QueryParam("to") String to) {
         SimpleDateFormat sdt = new SimpleDateFormat("yyyy-MM-dd");
         List<DoctorDto> doctors = null;
+        Timestamp tsFrom = null;
+        Timestamp tsTo = null;
         try {
-            Timestamp tsFrom = new Timestamp(sdt.parse(from).getTime());
-            Timestamp tsTo = new Timestamp(sdt.parse(to).getTime());
+            tsFrom = new Timestamp(sdt.parse(from).getTime());
+        } catch (Exception e) {
+            System.err.println("DateFrom param is missing!");
+        }
+        try {
+            tsTo = new Timestamp(sdt.parse(to).getTime());
+        } catch (Exception e) {
+            System.err.println("DateTo param is missing!");
+        }
+        if (specialization != null && firstName != null && lastName !=  null && city != null && tsFrom != null && tsTo != null) {
             doctors = doctorService.getDoctorsBySpecializationAndFullNameAndCityAndDate(specialization, firstName,
                     lastName, city, tsFrom, tsTo);
-        } catch(ParseException e) {
-            Logger.getLogger(DoctorResources.class.getName()).log(Level.SEVERE, null, e);
-        }
-        if (doctors == null) {
-            return Response.status(Response.Status.NOT_FOUND).build();
-        }
-        return Response.ok(doctors).build();
-    }
-    
-    @GET
-    @Path("/doctors/searchLP")
-    @UnitOfWork
-    public Response getDoctorsBySpecializationAndLastNameAndCityAndDate(
-            @Auth AuthorizedUserDto user,
-            @QueryParam("specialization") String specialization,
-            @QueryParam("lastName") String lastName,
-            @QueryParam("city") String city,
-            @QueryParam("from") String from,
-            @QueryParam("to") String to) {
-        SimpleDateFormat sdt = new SimpleDateFormat("yyyy-MM-dd");
-        List<DoctorDto> doctors = null;
-        try {
-            Timestamp tsFrom = new Timestamp(sdt.parse(from).getTime());
-            Timestamp tsTo = new Timestamp(sdt.parse(to).getTime());
+        } else if(specialization != null && firstName == null && lastName !=  null && city == null && tsFrom != null && tsTo != null)  {
+            doctors = doctorService.getDoctorsBySpecializationAndLastNameAndDate(specialization, lastName,
+                    tsFrom, tsTo);
+        } else if(specialization != null && firstName == null && lastName !=  null && city != null && tsFrom != null && tsTo != null) {
             doctors = doctorService.getDoctorsBySpecializationAndLastNameAndCityAndDate(specialization,
                     lastName, city, tsFrom, tsTo);
-        } catch(ParseException e) {
-            Logger.getLogger(DoctorResources.class.getName()).log(Level.SEVERE, null, e);
+        } else if(specialization != null && firstName != null && lastName !=  null && city == null && tsFrom != null && tsTo != null) {
+            doctors = doctorService.getDoctorsBySpecializationAndFullNameAndDate(specialization, firstName,
+                    lastName, tsFrom, tsTo);
+        } else if(specialization != null && firstName == null && lastName ==  null && city != null && tsFrom != null && tsTo != null) {
+            doctors = doctorService.getDoctorsBySpecializationAndCityAndDate(specialization, city, tsFrom, tsTo);
+        } else if(specialization != null && firstName == null && lastName ==  null && city == null && tsFrom != null && tsTo != null) {
+            doctors = doctorService.getDoctorsBySpecializationAndDate(specialization, tsFrom, tsTo);
+        } else if(specialization != null && firstName == null && lastName ==  null && city == null && tsFrom == null && tsTo != null) {
+            doctors = doctorService.getDoctorsBySpecializationAndDate(specialization, tsTo, tsTo);
+        } else if(specialization != null && firstName == null && lastName ==  null && city == null && tsFrom != null && tsTo == null) {
+            doctors = doctorService.getDoctorsBySpecializationAndDate(specialization, tsFrom, tsFrom);
+        } else if(specialization != null && firstName == null && lastName ==  null && city != null && tsFrom == null && tsTo == null) {
+            doctors = doctorService.getDoctorsBySpecializationAndCity(specialization, city);
+        } else {
+            doctors = doctorService.getDoctorsBySpecialization(specialization);
         }
         if (doctors == null) {
             return Response.status(Response.Status.NOT_FOUND).build();
