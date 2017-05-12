@@ -11,7 +11,9 @@ import java.util.ArrayList;
 import java.util.List;
 import org.jose4j.jwt.NumericDate;
 import sk.upjs.ics.pro1a.heck.db.UserDao;
+import sk.upjs.ics.pro1a.heck.db.core.Doctor;
 import sk.upjs.ics.pro1a.heck.db.core.User;
+import sk.upjs.ics.pro1a.heck.services.dto.DoctorDto;
 import sk.upjs.ics.pro1a.heck.services.dto.LoginResponseDto;
 import sk.upjs.ics.pro1a.heck.services.dto.UserDto;
 import sk.upjs.ics.pro1a.heck.utils.PasswordManager;
@@ -238,5 +240,5 @@ public class UserService {
         }
         return usersDto;
     }
-    
+         
 }

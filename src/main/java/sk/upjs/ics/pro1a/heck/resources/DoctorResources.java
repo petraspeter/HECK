@@ -270,4 +270,50 @@ public class DoctorResources {
         return Response.status(Response.Status.CREATED).build();
     }
     
+    @GET
+    @Path("/users/favourite/{id}")
+    @UnitOfWork
+    public Response getFavourite(
+            @Auth AuthorizedUserDto user,
+            @PathParam("id") long id) {
+        List<DoctorDto> doctorDtos = doctorService.getFavourite(id);
+        if (doctorDtos != null) {
+            return Response.ok(doctorDtos).build();
+        } else {
+            return Response.status(Response.Status.EXPECTATION_FAILED).build();
+        }
+    }
+    
+    @GET
+    @Path("/users/deleteFavourite")
+    @UnitOfWork
+    public Response deleteFavourite(
+       //     @Auth AuthorizedUserDto user,
+            @QueryParam("idUser") Long idUser,
+            @QueryParam("idDoc") Long idDoc
+    ) {
+        Integer request = doctorService.deleteFavourite(idUser, idDoc);
+        if (request == null) {
+            return Response.status(Response.Status.EXPECTATION_FAILED).build();
+        } else {
+            return Response.status(Response.Status.ACCEPTED).build();
+        }
+    }
+    
+    @GET
+    @Path("/users/addFavourite")
+    @UnitOfWork
+    public Response addFavourite(
+         //   @Auth AuthorizedUserDto user,
+            @QueryParam("idUser") Long idUser,
+            @QueryParam("idDoc") Long idDoc
+    ) {
+        Integer request = doctorService.addFavourite(idUser, idDoc);
+        if (request == null) {
+            return Response.status(Response.Status.EXPECTATION_FAILED).build();
+        } else {
+            return Response.status(Response.Status.CREATED).build();
+        }
+    }
+    
 }

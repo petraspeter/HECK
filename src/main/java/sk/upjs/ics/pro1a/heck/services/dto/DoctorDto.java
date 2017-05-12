@@ -3,7 +3,6 @@ package sk.upjs.ics.pro1a.heck.services.dto;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import java.sql.Timestamp;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -235,6 +234,11 @@ public class DoctorDto {
         this.interval = interval;
         this.isActive = isActive;
         this.registrationTime = registrationTime;
+    }
+    
+    @Override
+    public String toString() {
+        return "DoctorDto{" + "id=" + id + ", login=" + login + ", password=" + password + ", firstName=" + firstName + ", lastName=" + lastName + ", email=" + email + ", office=" + office + ", address=" + address + ", postalCode=" + postalCode + ", city=" + city + ", phoneNumber=" + phoneNumber + ", specialization=" + specialization + ", specializationName=" + specializationName + ", interval=" + interval + ", isActive=" + isActive + ", registrationTime=" + registrationTime + '}';
     }
     
     

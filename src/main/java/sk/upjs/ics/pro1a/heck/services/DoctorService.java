@@ -450,4 +450,22 @@ public class DoctorService {
     }
     
     
+    public List<DoctorDto> getFavourite(Long id) {
+        List<DoctorDto> docs = new ArrayList<>();
+        List<Doctor> doctors = doctorDao.findFavourite(id);
+        for (Doctor doctor : doctors) {
+            DoctorDto doctorDto = createDoctorDtoFromDoctorDaoWithoutPassword(doctor);
+            docs.add(doctorDto);
+        }
+        return docs;
+    }
+    
+    public Integer addFavourite(Long idUser, Long idDoc) {
+        return  doctorDao.addFavourite(idUser, idDoc);
+    }
+    
+    public Integer deleteFavourite(Long idUser, Long idDoc) {
+        return  doctorDao.deleteFavourite(idUser, idDoc);
+    }
+    
 }

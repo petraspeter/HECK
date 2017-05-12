@@ -1,11 +1,11 @@
 package sk.upjs.ics.pro1a.heck.db;
 
 import io.dropwizard.hibernate.AbstractDAO;
-import java.sql.Timestamp;
 import org.hibernate.SessionFactory;
 import sk.upjs.ics.pro1a.heck.db.core.Doctor;
 import java.util.List;
 import org.hibernate.FetchMode;
+import org.hibernate.SQLQuery;
 import org.hibernate.criterion.Restrictions;
 
 /**
@@ -143,7 +143,30 @@ public class DoctorDao extends AbstractDAO<Doctor> {
                 .setFirstResult(start)
                 .setMaxResults(start+pageSize));
     }
-
-  
+    
+    
+    public List<Doctor> findFavourite(Long id) {
+        SQLQuery query = currentSession().createSQLQuery("SELECT * FROM doctor JOIN favourite_doctors "
+                + "ON doctor.id_doctor = favourite_doctors.id_doctor AND favourite_doctors.id_user = :id")
+                .addEntity(Doctor.class);
+        query.setParameter("id", id);
+        return query.list();
+    }
+    
+    public Integer addFavourite(Long idUser, Long idDoc) {
+        SQLQuery query = currentSession().createSQLQuery("INSERT INTO favourite_doctors (id_doctor, id_user) "
+                + "VALUES (:idDoc, :idUser)");
+        query.setParameter("idDoc", idDoc)
+                .setParameter("idUser", idUser);
+        return query.executeUpdate();
+    }
+    
+    public Integer deleteFavourite(Long idUser, Long idDoc) {
+        SQLQuery query = currentSession().createSQLQuery("DELETE FROM favourite_doctors "
+                + "WHERE id_doctor = :idDoc AND id_user = :idUser");
+        query.setParameter("idDoc", idDoc)
+                .setParameter("idUser", idUser);
+        return query.executeUpdate();
+    }
     
 }
