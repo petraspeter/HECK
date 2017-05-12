@@ -65,46 +65,6 @@ public class AppointmentResources {
         }
     }
     
-//    @GET
-//    @Path("/appointments/day")
-//    @Consumes(MediaType.APPLICATION_JSON)
-//    @UnitOfWork
-//    public Response findAppointmenstByDoctorIdForDay(
-//            @Auth AuthorizedUserDto user,
-//            @QueryParam("idDoc") Long idDoc,
-//            @QueryParam("idUser") Long idUser,
-//            @QueryParam("date") String date
-//    ) throws ParseException {
-//        SimpleDateFormat sdt = new SimpleDateFormat("yyyy-MM-dd");
-//        Timestamp ts = new Timestamp(sdt.parse(date).getTime());
-//        List<AppointmentDto> appointments = appointmentService.generateUserAppointmentForDays(idDoc,
-//                idUser, ts, ts);
-//        if (appointments.size() > 0) {
-//            return  Response.ok(appointments).build();
-//        }
-//        return Response.status(Response.Status.NOT_FOUND).build();
-//    }
-    
-//    @GET
-//    @Path("/appointments/days")
-//    @Consumes(MediaType.APPLICATION_JSON)
-//    @UnitOfWork
-//    public Response findAppointmenstByDoctorIdForDays(
-//            @Auth AuthorizedUserDto user,
-//            @QueryParam("idDoc") Long idDoc,
-//            @QueryParam("idUser") Long idUser,
-//            @QueryParam("dateFrom") String dateFrom,
-//            @QueryParam("dateTo") String dateTo
-//    ) throws ParseException {
-//
-//        List<AppointmentDto> appointments = appointmentService
-//                .generateUserAppointmentForDays(idDoc, idUser, tsFrom, tsTo);
-//        if (appointments.size() > 0) {
-//            return  Response.ok(appointments).build();
-//        }
-//        return Response.status(Response.Status.NOT_FOUND).build();
-//    }
-    
     @GET
     @Path("/users/appointments")
     @Consumes(MediaType.APPLICATION_JSON)
@@ -151,7 +111,7 @@ public class AppointmentResources {
     }
     
     /*
-    Metoda je len pre doktora, pricom v DB ocakava defaultneho usera s id 0, user
+    Metoda je len pre doktora
     */
     @GET
     @Path("/doctors/appointments")
@@ -182,27 +142,6 @@ public class AppointmentResources {
         }
         return Response.status(Response.Status.NOT_FOUND).build();
     }
-    
-//    @GET
-//    @Path("/doctors/appointmentsDate")
-//    @Consumes(MediaType.APPLICATION_JSON)
-//    @UnitOfWork
-//    public Response findDoctorsAppointmentFromTo(
-//            @Auth AuthorizedUserDto user,
-//            @QueryParam("idDoc") Long id,
-//            @QueryParam("from") String from,
-//            @QueryParam("to") String to
-//    ) throws ParseException {
-//        SimpleDateFormat sdt = new SimpleDateFormat("yyyy-MM-dd");
-//        Timestamp tsFrom = new Timestamp(sdt.parse(from).getTime());
-//        Timestamp tsTo = new Timestamp(sdt.parse(to).getTime());
-//        List<AppointmentDto> appointments = appointmentService
-//                .generateDoctorAppointmentForDays(id, 0L, tsFrom, tsTo);
-//        if (appointments.size() > 0) {
-//            return  Response.ok(appointments).build();
-//        }
-//        return Response.status(Response.Status.NOT_FOUND).build();
-//    }
     
     @GET
     @Path("/appointments/{page}/{size}")
