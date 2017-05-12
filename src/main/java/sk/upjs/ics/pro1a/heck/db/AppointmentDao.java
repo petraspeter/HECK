@@ -52,7 +52,6 @@ public class AppointmentDao extends AbstractDAO<Appointment> {
         while (appointments.size() < 30) {
             appointments.addAll(generateUserAppointmentForDay(idDoc, idUser, day));
             day = new Timestamp(day.getTime()+(24*60*60*1000));
-            System.out.println(appointments.size() + "\t" + day.toString());
         }
         return appointments.subList(0, NUMBER_OF_RETURNED_APPOINTMENTS);
     }
@@ -121,15 +120,17 @@ public class AppointmentDao extends AbstractDAO<Appointment> {
     public List<AppointmentDto> generateUserAppointmentForDays(Long idDoc, Long idUser, Timestamp from,
             Timestamp to) {
         List<Timestamp> timestamps = generateTimestamps(from, to);
-        List<Appointment> appointments = generateBasicAppointmentForDays(idDoc, idUser, timestamps);
-        List<AppointmentDto> appointmentDtos = new ArrayList<>();
-        for (Appointment appointment : appointments) {
-            appointmentDtos.add(createAppointmentDtoFromDao(appointment));
+        List<AppointmentDto> appointments = new ArrayList<>();
+        for (Timestamp timestamp : timestamps) {
+            appointments.addAll(generateUserAppointmentForDay(idDoc, idUser, timestamp));
+            if (appointments.size() > 30) {
+                break;
+            }
         }
-        if (appointmentDtos.size() > NUMBER_OF_RETURNED_APPOINTMENTS) {
-            return appointmentDtos.subList(0, NUMBER_OF_RETURNED_APPOINTMENTS);
+        if (appointments.size() > NUMBER_OF_RETURNED_APPOINTMENTS) {
+            return appointments.subList(0, NUMBER_OF_RETURNED_APPOINTMENTS);
         } else {
-            return appointmentDtos;
+            return appointments;
         }
     }
     
