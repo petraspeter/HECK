@@ -3,9 +3,11 @@ package sk.upjs.ics.pro1a.heck.db;
 import io.dropwizard.hibernate.AbstractDAO;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import org.apache.commons.lang3.time.DateUtils;
 import org.hibernate.FetchMode;
 import org.hibernate.SessionFactory;
 import org.hibernate.criterion.Restrictions;
@@ -41,6 +43,18 @@ public class AppointmentDao extends AbstractDAO<Appointment> {
     
     public Appointment update(Appointment appointment) {
         return this.persist(appointment);
+    }
+    
+    public List<AppointmentDto> generateDefaultAppointments(Long idDoc, Long idUser) {
+        List<AppointmentDto> appointments = new ArrayList<>();
+        Long actualDay = DateUtils.truncate(new Date(), Calendar.DATE).getTime();
+        Timestamp day = new Timestamp(actualDay);
+        while (appointments.size() < 30) {
+            appointments.addAll(generateUserAppointmentForDay(idDoc, idUser, day));
+            day = new Timestamp(day.getTime()+(24*60*60*1000));
+            System.out.println(appointments.size() + "\t" + day.toString());
+        }
+        return appointments.subList(0, NUMBER_OF_RETURNED_APPOINTMENTS);
     }
     
     public List<AppointmentDto> generateUserAppointmentForDay(Long idDoc, Long idUser, Timestamp date) {
@@ -107,28 +121,30 @@ public class AppointmentDao extends AbstractDAO<Appointment> {
     public List<AppointmentDto> generateUserAppointmentForDays(Long idDoc, Long idUser, Timestamp from,
             Timestamp to) {
         List<Timestamp> timestamps = generateTimestamps(from, to);
-        List<AppointmentDto> appointments = generateBasicAppointmentForDays(idDoc, idUser, timestamps);
-        for (Timestamp timestamp : timestamps) {
-            appointments.addAll(generateUserAppointmentForDay(idDoc, idUser, timestamp));
+        List<Appointment> appointments = generateBasicAppointmentForDays(idDoc, idUser, timestamps);
+        List<AppointmentDto> appointmentDtos = new ArrayList<>();
+        for (Appointment appointment : appointments) {
+            appointmentDtos.add(createAppointmentDtoFromDao(appointment));
         }
-        if (appointments.size() > NUMBER_OF_RETURNED_APPOINTMENTS) {
-            return appointments.subList(0, NUMBER_OF_RETURNED_APPOINTMENTS);
+        if (appointmentDtos.size() > NUMBER_OF_RETURNED_APPOINTMENTS) {
+            return appointmentDtos.subList(0, NUMBER_OF_RETURNED_APPOINTMENTS);
         } else {
-            return appointments;
+            return appointmentDtos;
         }
     }
     
-    public List<AppointmentDto> generateDoctorAppointmentForDays(Long idDoc, Long idUser, Timestamp from,
+    public List<AppointmentDto> generateDoctorAppointmentForDays(Long idDoc,Timestamp from,
             Timestamp to) {
         List<Timestamp> timestamps = generateTimestamps(from, to);
-        List<AppointmentDto> appointments = generateBasicAppointmentForDays(idDoc, idUser, timestamps);
-        for (Timestamp timestamp : timestamps) {
-            appointments.addAll(generateDoctorAppointmentForDay(idDoc, idUser, timestamp));
+        List<Appointment> appointments = generateBasicAppointmentForDays(idDoc, null, timestamps);
+        List<AppointmentDto> appointmentDtos = new ArrayList<>();
+        for (Appointment appointment : appointments) {
+            appointmentDtos.add(createAppointmentDtoFromDao(appointment));
         }
-        if (appointments.size() > NUMBER_OF_RETURNED_APPOINTMENTS) {
-            return appointments.subList(0, NUMBER_OF_RETURNED_APPOINTMENTS);
+        if (appointmentDtos.size() > NUMBER_OF_RETURNED_APPOINTMENTS) {
+            return appointmentDtos.subList(0, NUMBER_OF_RETURNED_APPOINTMENTS);
         } else {
-            return appointments;
+            return appointmentDtos;
         }
     }
     
@@ -187,7 +203,9 @@ public class AppointmentDao extends AbstractDAO<Appointment> {
         Appointment appointment = new Appointment();
         appointment.setDateFromAppointment(start);
         appointment.setDateToAppointment(end);
-        appointment.setAppointmentUser(findUserById(idUser));
+        if(idUser != null) {
+            appointment.setAppointmentUser(findUserById(idUser));
+        }
         appointment.setAppointmentDoctor(findDoctorById(idDoc));
         appointment.setCanceledAppointment(false);
         appointment.setHolidayAppointment(false);
@@ -213,7 +231,7 @@ public class AppointmentDao extends AbstractDAO<Appointment> {
         appointment.setAppointmentDoctor(findDoctorById(appointmentDto.getAppointmentDoctor().getIdDoctor()));
         appointment.setAppointmentUser(findUserById(appointmentDto.getAppointmentUser().getIdUser()));
         appointment.setOccupiedAppointment(appointmentDto.getOccupiedAppointment());
-        appointment.setDateFromAppointment(ServiceUtils.convertStringToTimestamp(appointmentDto.getDateFromAppointment()));        
+        appointment.setDateFromAppointment(ServiceUtils.convertStringToTimestamp(appointmentDto.getDateFromAppointment()));
         appointment.setDateToAppointment(ServiceUtils.convertStringToTimestamp(appointmentDto.getDateToAppointment()));
         appointment.setHolidayAppointment(appointmentDto.getHolidayAppointment());
         appointment.setCanceledAppointment(appointmentDto.getCanceledAppointment());
@@ -249,6 +267,7 @@ public class AppointmentDao extends AbstractDAO<Appointment> {
     }
     
     public AppointmentUserDto createAppointmentUserDto(User user) {
+        if(user == null) return null;
         return new AppointmentUserDto(
                 user.getIdUser(),
                 user.getFirstNameUser(),
@@ -257,14 +276,14 @@ public class AppointmentDao extends AbstractDAO<Appointment> {
     }
     
     
-    private List<AppointmentDto> generateBasicAppointmentForDays(Long idDoc, Long idUser,
+    private List<Appointment> generateBasicAppointmentForDays(Long idDoc, Long idUser,
             List<Timestamp> timestamps) {
         List<Holiday> holidays = findHolidays();
-        List<AppointmentDto> appointments = new ArrayList<>();
+        List<Appointment> appointments = new ArrayList<>();
         for (int i = 0; i < timestamps.size(); i++) {
             for (Holiday holiday : holidays) {
-                if(timestamps.get(i).equals(holiday.getDate())) {
-                    timestamps.remove(timestamps.get(i));
+                if(!timestamps.get(i).equals(holiday.getDate())) {
+                    appointments.addAll(generateBasicAppointmentForDay(idDoc, idUser, timestamps.get(i)));
                 }
             }
         }
@@ -283,8 +302,7 @@ public class AppointmentDao extends AbstractDAO<Appointment> {
         List<WorkingTime> docHours = findWorkingTimeByDoctorIdAndDay(idDoc, jodaDate.getDayOfWeek() - 1);
         for (WorkingTime docHour : docHours) {
             /**
-             * posun o jednu hodinu je 3600000 ms, na vstupe webservici primam format YYYY-MM-DD, ktory parsujem
-             * cez simple date format tak ten sice berie do uvahy casove pasmo, ale nie casovy posun zimny/letny cas
+             * posun o jednu hodinu je 3600000 ms
              */
             Timestamp start = new Timestamp(docHour.getStartingHour().getTime()+date.getTime()+3600000);
             Timestamp end = new Timestamp((start.getTime() + ((period * 60) * 1000)));
@@ -292,7 +310,7 @@ public class AppointmentDao extends AbstractDAO<Appointment> {
             while (end.before(ending)) {    // aby sme vratili aj termin, ktory konci presne na konci pracovnej doby provnavame cas o 1ms neskor
                 appointments.add(generateAppointment(idDoc, idUser, start, end));
                 start = end;
-                end = new Timestamp((start.getTime() + ((period * 60) * 1000)));    //convert period from minutes to miliseconds
+                end = new Timestamp((start.getTime() + ((period * 60) * 1000)));    // konvertacia z minut do ms
             }
         }
         return appointments;

@@ -67,9 +67,9 @@ public class AppointmentService {
         return appointmentDao.generateUserAppointmentForDays(idDoc, idUser, from, to);
     }
     
-    public List<AppointmentDto> generateDoctorAppointmentForDays(Long idDoc, Long idUser, Timestamp from,
+    public List<AppointmentDto> generateDoctorAppointmentForDays(Long idDoc, Timestamp from,
             Timestamp to) {
-        return appointmentDao.generateDoctorAppointmentForDays(idDoc, idUser, from, to);
+        return appointmentDao.generateDoctorAppointmentForDays(idDoc, from, to);
     }
     
     public AppointmentDto addAppointment(AppointmentDto appointmentDto) {
@@ -87,9 +87,12 @@ public class AppointmentService {
     
     public AppointmentDto updateAppointment(AppointmentDto appointmentDto) {
         Appointment appointment = appointmentDao.findAppointmentById(appointmentDto.getIdAppointment());
-        if(appointmentDto.getCanceledAppointment() != null) appointment.setCanceledAppointment(appointmentDto.getCanceledAppointment());
-        if(appointmentDto.getOccupiedAppointment() != null) appointment.setOccupiedAppointment(appointmentDto.getOccupiedAppointment());
-        if(appointmentDto.getHolidayAppointment() != null) appointment.setHolidayAppointment(appointmentDto.getHolidayAppointment());
+        if(appointmentDto.getCanceledAppointment() != null) appointment
+                .setCanceledAppointment(appointmentDto.getCanceledAppointment());
+        if(appointmentDto.getOccupiedAppointment() != null) appointment
+                .setOccupiedAppointment(appointmentDto.getOccupiedAppointment());
+        if(appointmentDto.getHolidayAppointment() != null) appointment
+                .setHolidayAppointment(appointmentDto.getHolidayAppointment());
         appointmentDao.update(appointment);
         return appointmentDao.createAppointmentDtoFromDao(appointment);
     }
@@ -100,6 +103,10 @@ public class AppointmentService {
     
     public  Appointment getById(Long id) {
         return appointmentDao.findById(id);
+    }
+    
+    public List<AppointmentDto> generateDefaultAppointments(Long idDoc, Long idUser) {
+        return  appointmentDao.generateDefaultAppointments(idDoc, idUser);
     }
     
 }
