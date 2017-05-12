@@ -153,28 +153,32 @@ public class DoctorResources {
         } catch (Exception e) {
             System.err.println("DateTo param is missing!");
         }
-        if (specialization != null && firstName != null && lastName !=  null && city != null && tsFrom != null && tsTo != null) {
+        if (specialization != null && firstName != null && lastName !=  null && city != null && from != null && to != null) {
             doctors = doctorService.getDoctorsBySpecializationAndFullNameAndCityAndDate(specialization, firstName,
                     lastName, city, tsFrom, tsTo);
-        } else if(specialization != null && firstName == null && lastName !=  null && city == null && tsFrom != null && tsTo != null)  {
+        } else if(specialization != null && firstName == null && lastName !=  null && city == null && from != null && to != null)  {
             doctors = doctorService.getDoctorsBySpecializationAndLastNameAndDate(specialization, lastName,
                     tsFrom, tsTo);
-        } else if(specialization != null && firstName == null && lastName !=  null && city != null && tsFrom != null && tsTo != null) {
+        } else if(specialization != null && firstName == null && lastName !=  null && city != null && from != null && to != null) {
             doctors = doctorService.getDoctorsBySpecializationAndLastNameAndCityAndDate(specialization,
                     lastName, city, tsFrom, tsTo);
-        } else if(specialization != null && firstName != null && lastName !=  null && city == null && tsFrom != null && tsTo != null) {
+        } else if(specialization != null && firstName != null && lastName !=  null && city == null && from != null && to != null) {
             doctors = doctorService.getDoctorsBySpecializationAndFullNameAndDate(specialization, firstName,
                     lastName, tsFrom, tsTo);
-        } else if(specialization != null && firstName == null && lastName ==  null && city != null && tsFrom != null && tsTo != null) {
+        } else if(specialization != null && firstName == null && lastName ==  null && city != null && from != null && to != null) {
             doctors = doctorService.getDoctorsBySpecializationAndCityAndDate(specialization, city, tsFrom, tsTo);
-        } else if(specialization != null && firstName == null && lastName ==  null && city == null && tsFrom != null && tsTo != null) {
+        } else if(specialization != null && firstName == null && lastName ==  null && city == null && from != null && to != null) {
             doctors = doctorService.getDoctorsBySpecializationAndDate(specialization, tsFrom, tsTo);
-        } else if(specialization != null && firstName == null && lastName ==  null && city == null && tsFrom == null && tsTo != null) {
+        } else if(specialization != null && firstName == null && lastName ==  null && city == null && from == null && to != null) {
             doctors = doctorService.getDoctorsBySpecializationAndDate(specialization, tsTo, tsTo);
-        } else if(specialization != null && firstName == null && lastName ==  null && city == null && tsFrom != null && tsTo == null) {
+        } else if(specialization != null && firstName == null && lastName ==  null && city == null && from != null && to == null) {
             doctors = doctorService.getDoctorsBySpecializationAndDate(specialization, tsFrom, tsFrom);
-        } else if(specialization != null && firstName == null && lastName ==  null && city != null && tsFrom == null && tsTo == null) {
+        } else if(specialization != null && firstName == null && lastName ==  null && city != null && from == null && to == null) {
             doctors = doctorService.getDoctorsBySpecializationAndCity(specialization, city);
+        }  else if(specialization != null && firstName == null && lastName ==  null && city != null && from != null && to == null) {
+            doctors = doctorService.getDoctorsBySpecializationAndCityAndDate(specialization, city, tsFrom, tsFrom);
+        }  else if(specialization != null && firstName == null && lastName ==  null && city != null && from == null && to != null) {
+            doctors = doctorService.getDoctorsBySpecializationAndCityAndDate(specialization, city, tsTo, tsTo);
         } else {
             doctors = doctorService.getDoctorsBySpecialization(specialization);
         }
