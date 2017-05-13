@@ -422,14 +422,19 @@ public class DoctorService {
                 appointment.getAppointmentDoctor().getIdDoctor(),
                 appointment.getAppointmentDoctor().getFirstNameDoctor(),
                 appointment.getAppointmentDoctor().getLastNameDoctor(),
-                appointment.getAppointmentDoctor().getBusinessNameDoctor()));
+                appointment.getAppointmentDoctor().getBusinessNameDoctor(),
+                appointment.getAppointmentDoctor().getSpecializationDoctor().getSpecializationName()
+        ));
         appointmentDto.setAppointmentUser(new AppointmentUserDto(
                 appointment.getAppointmentUser().getIdUser(),
                 appointment.getAppointmentUser().getFirstNameUser(),
-                appointment.getAppointmentUser().getLastNameUser()));
+                appointment.getAppointmentUser().getLastNameUser()
+        ));
         appointmentDto.setCanceledAppointment(appointment.getCanceledAppointment());
-        appointmentDto.setDateFromAppointment(ServiceUtils.convertTimestampToString(appointment.getDateFromAppointment()));
-        appointmentDto.setDateToAppointment(ServiceUtils.convertTimestampToString(appointment.getDateToAppointment()));
+        appointmentDto.setDateFromAppointment(ServiceUtils
+                .convertTimestampToString(appointment.getDateFromAppointment()));
+        appointmentDto.setDateToAppointment(ServiceUtils
+                .convertTimestampToString(appointment.getDateToAppointment()));
         appointmentDto.setHolidayAppointment(appointment.getHolidayAppointment());
         appointmentDto.setIdAppointment(appointment.getIdAppointment());
         appointmentDto.setNoteAppointment(appointment.getNoteAppointment());

@@ -263,7 +263,8 @@ public class AppointmentDao extends AbstractDAO<Appointment> {
                 doc.getIdDoctor(),
                 doc.getFirstNameDoctor(),
                 doc.getLastNameDoctor(),
-                doc.getBusinessNameDoctor()
+                doc.getBusinessNameDoctor(),
+                doc.getSpecializationDoctor().getSpecializationName()
         );
     }
     
