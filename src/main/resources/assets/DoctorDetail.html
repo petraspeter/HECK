@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>About doctor</title>
+    <title>My profile</title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
           integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css"
@@ -21,19 +21,18 @@
 
     <script id="detailTableTemplate" type="text/x-handlebars-template">
         <form id="myForm" class="form-horizontal">
-
             <fieldset id="fieldset">
                 <div class="form-group">
-                    <label class="col-md-2 control-label nameLabel" for="login">Login name: </label>
-                    <div class="col-md-3">
-                        <input id="login" name="login" type="text" placeholder="login" class="form-control input-md" value="{{login}}" disabled>
+                    <label class="col-md-5 control-label nameLabel" for="login">Login name: </label>
+                    <div class="col-md-4">
+                        <input id="login" name="login" type="text" placeholder="login name" class="form-control input-md" value="{{login}}" disabled>
                     </div>
                 </div>
 
                 <!-- Text input-->
                 <div class="form-group">
-                    <label class="col-md-2 control-label nameLabel" for="firstName">First name: </label>
-                    <div class="col-md-3">
+                    <label class="col-md-5 control-label nameLabel" for="firstName">First name: </label>
+                    <div class="col-md-4">
                         <input id="firstName" name="firstName" type="text" placeholder="first name" class="form-control input-md myInputs" value="{{firstName}}" disabled>
                     </div>
                 </div>
@@ -41,65 +40,65 @@
 
                 <!-- Text input-->
                 <div class="form-group">
-                    <label class="col-md-2 control-label nameLabel" for="lastName">Last name: </label>
-                    <div class="col-md-3">
+                    <label class="col-md-5 control-label nameLabel" for="lastName">Last name: </label>
+                    <div class="col-md-4">
                         <input id="lastName" name="lastName" type="text" placeholder="last name" class="form-control input-md myInputs" value="{{lastName}}" disabled>
                     </div>
                 </div>
 
                 <div class="form-group">
-                    <label class="col-md-2 control-label nameLabel" for="email">Email: </label>
-                    <div class="col-md-3">
+                    <label class="col-md-5 control-label nameLabel" for="email">Email: </label>
+                    <div class="col-md-4">
                         <input id="email" name="email" type="text" placeholder="email" class="form-control input-md myInputs" value="{{email}}" disabled required>
                     </div>
                 </div>
 
                 <div class="form-group">
-                    <label class="col-md-2 control-label nameLabel" for="specialization">Specialization: </label>
-                    <div class="col-md-3" id="specializationContainer">
+                    <label class="col-md-5 control-label nameLabel" for="specialization">Specialization: </label>
+                    <div class="col-md-4" id="specializationContainer">
                     </div>
                 </div>
 
                 <div class="form-group">
-                    <label class="col-md-2 control-label nameLabel" for="office">Business name: </label>
-                    <div class="col-md-3">
+                    <label class="col-md-5 control-label nameLabel" for="office">Business name: </label>
+                    <div class="col-md-4">
                         <input id="office" name="office" type="text" placeholder="office" class="form-control input-md myInputs" value="{{office}}" disabled required>
                     </div>
                 </div>
 
 
                 <div class="form-group">
-                    <label class="col-md-2 control-label nameLabel" for="address">Address: </label>
-                    <div class="col-md-3">
+                    <label class="col-md-5 control-label nameLabel" for="address">Address: </label>
+                    <div class="col-md-4">
                         <input id="address" name="address" type="text" placeholder="address" class="form-control input-md myInputs" value="{{address}}" disabled required>
                     </div>
                 </div>
 
                 <div class="form-group">
-                    <label class="col-md-2 control-label nameLabel" for="city">City: </label>
-                    <div class="col-md-3">
+                    <label class="col-md-5 control-label nameLabel" for="city">City: </label>
+                    <div class="col-md-4">
                         <input id="city" name="city" type="text" placeholder="city" class="form-control input-md myInputs" value="{{city}}" disabled required>
                     </div>
                 </div>
 
                 <div class="form-group">
-                    <label class="col-md-2 control-label nameLabel" for="city">Postal code: </label>
-                    <div class="col-md-3">
+                    <label class="col-md-5 control-label nameLabel" for="city">Postal code: </label>
+                    <div class="col-md-4">
                         <input id="postalCode" name="postalCode" type="text" placeholder="postal code" class="form-control input-md myInputs" value="{{postalCode}}" disabled
                                required>
                     </div>
                 </div>
 
                 <div class="form-group">
-                    <label class="col-md-2 control-label nameLabel" for="phoneNumber">Phone number: </label>
-                    <div class="col-md-3">
+                    <label class="col-md-5 control-label nameLabel" for="phoneNumber">Phone number: </label>
+                    <div class="col-md-4">
                         <input id="phoneNumber" name="phoneNumber" type="text" placeholder="Phone" class="form-control input-md myInputs" value="{{phoneNumber}}" disabled required>
                     </div>
                 </div>
 
                 <!-- Button -->
                 <div class="form-group">
-                    <div class="col-md-4" id="buttons">
+                    <div id="buttons">
                         <input type="button" class="btn btn-primary" id="editButton" onclick="startEditableDoctorInputs()" value="Edit"></input>
                         <input type="submit" class="btn btn-success" id="saveButton" onclick="saveEditableDoctorInputs();  updateDoctor();" value="Save"></input>
                         <input type="button" class="btn btn-danger" id="cancelButton" onclick="cancelEditableDoctorInputs()" value="Cancel"></input>
@@ -143,20 +142,14 @@
 
 <div class="container">
 
-
-    <!--modal window-->
+    <!--modal window change password-->
     <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="Login" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
                     <h3 class="modal-title">Change password</h3>
                 </div>
-
                 <div class="modal-body">
-                    <!-- The form is placed inside the body of modal -->
                     <form id="changePasswordForm" class="form-horizontal">
                         <div class="form-group">
                             <label class="col-xs-5 control-label">Current password</label>
@@ -164,7 +157,6 @@
                                 <input type="password" class="form-control" name="currentModalPassword" id="currentModalPassword"/>
                             </div>
                         </div>
-
                         <div class="form-group">
                             <label class="col-xs-5 control-label">New password</label>
                             <div class="col-xs-5">
@@ -180,18 +172,14 @@
                         </div>
 
                         <div class="modal-footer">
-                            <button href="#" class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
-                            <button href="#" class="btn btn-primary" id="myModal_save" onclick="changePassword()">Save changes</button>
-
+                            <button href="#" class="btn btn-danger" data-dismiss="modal" aria-hidden="true">Close</button>
+                            <button href="#" class="btn btn-primary" id="myModal_save" onclick="changePassword()"  type="submit" disabled>Save changes</button>
                         </div>
                     </form>
                 </div>
             </div>
         </div>
     </div>
-
-    <!--END modal window-->
-
     <div id="detailTableContainer">
     </div>
 </div>
@@ -207,9 +195,9 @@
 
 <script type="text/javascript">
     $(document).ready(function () {
-        document.getElementById('logged-user').innerHTML = JSON.parse(sessionStorage.getItem('user')).login;
-        getDoctorDetail();
-        initializeChangePassword();
+        $("#logged-user").html(JSON.parse(sessionStorage.getItem('user')).login);
     });
+    getDoctorDetail();
+    initializeChangePassword();
 </script>
 </html>

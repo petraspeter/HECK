@@ -11,7 +11,6 @@ body {
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     box-sizing: border-box;
-    margin-bottom: 10px;
 }
 
 .new-account {
@@ -19,13 +18,11 @@ body {
     margin-top: 10px;
 }
 
-.account-wall {
-    margin-top: 150px;
-}
-
 #wrongData {
     color: red;
     visibility: hidden;
+    padding-bottom: 0px;
+    padding-left: 22px;
 }
 
 /* doctors*/
@@ -54,8 +51,8 @@ body {
 }
 
 .pagination>li.paginate_button:first-child, .pagination>li.paginate_button:last-child{
-     display: inline;
- }
+    display: inline;
+}
 
 #myPagination {
     text-align: center;
@@ -75,7 +72,7 @@ input#login {
 }
 
 #saveButton, #cancelButton {
-    visibility: hidden;
+    display: none;
 }
 
 .myInputs:disabled {
@@ -89,7 +86,7 @@ input#login {
 
 .myInputs:not([disabled]), #specialization:not([disabled]) {
     height: 24px;
-    padding: 3px 0px 3px 0px;
+    padding: 3px 0px 3px 3px;
     margin: 4px 0px 4px 0px;
     border: 1px solid #ccc;
     width: initial;
@@ -104,7 +101,7 @@ input#login {
 
 .control-label.nameLabel {
     margin: 0px;
-    padding: 7px 15px 7px 15px;
+    padding: 8px 15px 6px 15px;
 }
 
 .modal-body input {
@@ -146,16 +143,12 @@ select {
 
 #inputTimeInterval {
     max-width: 50px;
+    text-align: end;
 }
 
 .disabledButton {
     opacity: 0.65;
     cursor: not-allowed;
-}
-
-#main_container {
-    margin: auto;
-
 }
 
 .my-add-button {
@@ -187,17 +180,13 @@ p {
 }
 
 .label-day {
-    width: 215px;
+    width: 217px;
     font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-
     margin-top: 10px;
 
 }
 
-#calendar {
-    max-width: 900px;
-    margin: 0 auto;
-}
+
 
 .visibleButton {
     display: table-cell;
@@ -206,3 +195,169 @@ p {
 .hiddenButton {
     display: none;
 }
+
+.form-group.has-feedback
+{
+    margin-bottom: 5px;
+}
+
+.form-control.input-md.myInputs
+{
+    margin-bottom: 0px;
+    margin-top: 0px;
+}
+
+.titleRow
+{
+    font-weight: bold;
+}
+
+#saveButtonWorkingHours
+{
+    border-left-width: 0px;
+    padding-left: 1px;
+    width: 80%;
+    margin-left: 35px;
+    margin-top: 20px;
+}
+
+#lgn.form-control.signInForm, #psw.form-control.signInForm
+{
+    margin-bottom: 10px;
+    margin-top: 10px;
+
+}
+
+#signInForm
+{
+    border: 3px double #ccc;
+    padding-top: 20px;
+    padding-bottom: 30px;
+    margin-top: 120px;
+    background-color: white;
+    opacity: 0.92;
+}
+body{
+    background-image: url(chodba.jpg);
+    background-position: top center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    margin: auto;
+}
+
+.containerMainPage
+{
+    background: white;
+    opacity: 0.92;
+    min-height: 500px;
+    margin-top: 20px;
+    border: 3px double #ccc;
+}
+
+#fieldset
+{
+    max-width: 500px;
+    margin: auto;
+    background-color: white;
+    padding: 30px 30px 10px 30px;
+    opacity: 0.92;
+    border: 3px double #ccc;
+    margin-top: 20px;
+}
+
+#editButton, #saveButton, #cancelButton
+{
+    width: 80%;
+    margin: 4px 0px 5px 45px; 
+
+}
+
+#editButton, #saveButton
+{
+    margin-top: 25px;
+}
+
+.input#login.form-control.input-md
+{
+    padding-right: 0px;
+}
+
+
+#calendar.fc.fc-unthemed.fc-ltr
+{
+    background: white;
+    padding: 20px 30px 0px 30px;
+
+    border-right-width: 30px;
+    opacity: 0.92;
+    max-width: 1100px;
+    border: 3px double #ccc;
+    margin:20px auto;
+    font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
+    font-size: 16px;
+}
+
+#doctorOfficeHourFields
+{
+    background-color: white;
+    width: 400px;
+    margin: auto;
+    margin-top: 20px;
+    padding: 30px 30px 20px 40px;
+    border: 3px double #ccc;
+    opacity: 0.92;
+}
+
+#timeInterval
+{
+    text-align: center;
+    padding-bottom: 7px;
+    margin-bottom: 10px;
+    font-weight: bold;
+    border-bottom: 1px solid;
+}
+
+button[disabled], html input[disabled]{
+    border: none;
+    background-color: white;
+}
+
+.notDisplayButton
+{
+    display: none;
+}
+
+.fc-day-number
+{
+    color: black;
+}
+
+th > a
+{
+    color: black;
+}
+#myTable_wrapper
+{
+    background-color: white;
+    margin-top: 30px;
+    padding: 30px 30px 0px 30px;
+    border: 3px double #ccc;
+    opacity: 0.92;
+    text-align: center;
+}
+
+.sorting, .sorting_asc, .sorting_desc
+{
+    text-align: center;
+}
+
+.dataTables_info, .dataTables_paginate.paging_simple_numbers
+{
+    text-align: initial;
+}
+
+.navbar.navbar-default.navbar-fixed-top
+{
+    background: white;
+}
+

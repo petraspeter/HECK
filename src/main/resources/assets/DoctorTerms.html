@@ -13,7 +13,6 @@
 </head>
 <body>
 
-
 <nav class="navbar navbar-default navbar-fixed-top">
     <div class="container">
         <div class="navbar-header">
@@ -49,14 +48,10 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
                 <h3 class="modal-title">Change password</h3>
             </div>
 
             <div class="modal-body">
-                <!-- The form is placed inside the body of modal -->
                 <form id="changePasswordForm" class="form-horizontal">
                     <div class="form-group">
                         <label class="col-xs-5 control-label">Current password</label>
@@ -80,8 +75,8 @@
                     </div>
 
                     <div class="modal-footer">
-                        <button href="#" class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
-                        <button href="#" class="btn btn-primary" id="myModal_save" onclick="changePassword()">Save changes</button>
+                        <button href="#" class="btn btn-danger" data-dismiss="modal" aria-hidden="true">Close</button>
+                        <button href="#" class="btn btn-primary" id="myModal_save" onclick="changePassword()" type="submit" disabled>Save changes</button>
                     </div>
                 </form>
             </div>
@@ -90,6 +85,7 @@
 </div>
 
 <script id="detailTermTableTemplate" type="text/x-handlebars-template">
+  
     {{#each this}}
     <div class="modal fade" id="detailViewDialog{{id}}" tabindex="-1" role="dialog" aria-labelledby="edit" aria-hidden="true">
         <div class="modal-dialog">
@@ -104,6 +100,7 @@
 
                         <tr><td>Patient: <td>{{patient}} </td></tr>
                         <tr><td>Date and time: <td>{{from}}</td></tr>
+                        <tr><td>Time: <td>{{to}}</td></tr>
                         <tr><td>Subject: <td>{{subject}}</td></tr>
                         </tbody>
                     </table>
@@ -111,10 +108,10 @@
                 </div>
                 <div class="modal-footer ">
                     {{#unless holiday}}
-                    <button type="button" class="btn btn-default" data-dismiss="modal" onclick="updateAppointment({{id}}, true, false)">Is holiday</button>
+                    <button type="button" class="btn btn-primary" data-dismiss="modal" onclick="updateAppointment({{id}}, true, false)">Is holiday</button>
                     {{/unless}}
                     {{#unless canceled}}
-                    <button type="button" class="btn btn-default" data-dismiss="modal" onclick="updateAppointment({{id}}, false, true)">Cancel term</button>
+                    <button type="button" class="btn btn-danger" data-dismiss="modal" onclick="updateAppointment({{id}}, false, true)">Cancel term</button>
                     {{/unless}}
                     <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
                 </div>
@@ -144,10 +141,10 @@
 <script src="validacia.js"></script>
 <script type="text/javascript">
     $(document).ready(function () {
-        document.getElementById('logged-user').innerHTML = JSON.parse(sessionStorage.getItem('user')).login;
-        fillCalendar();
-        initializeChangePassword();
+        $("#logged-user").html(JSON.parse(sessionStorage.getItem('user')).login);
     });
+    fillCalendar();
+    initializeChangePassword();
 </script>
 </html>
 

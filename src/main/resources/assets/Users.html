@@ -11,10 +11,8 @@
           integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
     <link rel="stylesheet" href="myStyle.css">
 
-
     <script id="tableTemplate" type="text/x-handlebars-template">
         {{#each this}}
-
         <tr>
             <td data-toggle="modal" data-target="#detailViewDialog{{id}}">{{lastName}} {{firstName}}</td>
             <td data-toggle="modal" data-target="#detailViewDialog{{id}}">{{email}}</td>
@@ -40,8 +38,8 @@
     </script>
 
     <script id="modalWindowsTemplate" type="text/x-handlebars-template">
+        
         {{#each this}}
-
         <div class="modal fade" id="activateDialog{{id}}" tabindex="-1" role="dialog" aria-labelledby="edit" aria-hidden="true">
             <div class="modal-dialog">
                 <div class="modal-content">
@@ -95,7 +93,7 @@
                         <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
                             <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
                         </button>
-                        <h4 class="modal-title custom_align" id="headTitle">Details</h4>
+                        <h3 class="modal-title custom_align" id="headTitle">Details</h3>
                     </div>
                     <div class="modal-body">
 
@@ -103,31 +101,31 @@
                             <tbody>
 
                             <tr>
-                                <td>Login:
+                                <td class="titleRow">Login name:
                                 <td>{{login}}</td>
                             </tr>
                             <tr>
-                                <td>First name:
+                                <td class="titleRow">First name:
                                 <td>{{firstName}}</td>
                             </tr>
                             <tr>
-                                <td>Last name:
+                                <td class="titleRow">Last name:
                                 <td>{{lastName}}</td>
                             </tr>
                             <tr>
-                                <td>Email:
+                                <td class="titleRow">Email:
                                 <td>{{email}}</td>
                             </tr>
                             <tr>
-                                <td>Adress:
+                                <td class="titleRow">Address:
                                 <td>{{address}}</td>
                             </tr>
                             <tr>
-                                <td>Phone:
+                                <td class="titleRow">Phone:
                                 <td>{{phoneNumber}}</td>
                             </tr>
                             <tr>
-                                <td>Registration from:
+                                <td class="titleRow">Registration from:
                                 <td>{{registrationTime}}</td>
                             </tr>
 
@@ -136,7 +134,7 @@
 
                     </div>
                     <div class="modal-footer ">
-                        <button type="button" class="btn btn-default" data-dismiss="modal"><span class="glyphicon glyphicon-remove"></span> Close</button>
+                        <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
                     </div>
                 </div>
             </div>
@@ -185,14 +183,9 @@
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                    <h5 class="modal-title">Change password</h5>
+                    <h3 class="modal-title">Change password</h3>
                 </div>
-
                 <div class="modal-body">
-                    <!-- The form is placed inside the body of modal -->
                     <form id="changePasswordForm" class="form-horizontal">
                         <div class="form-group">
                             <label class="col-xs-5 control-label">Current password</label>
@@ -216,9 +209,8 @@
                         </div>
 
                         <div class="modal-footer">
-                            <button href="#" class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
-                            <button href="#" class="btn btn-primary" id="myModal_save" onclick="changePassword()">Save changes</button>
-
+                            <button href="#" class="btn btn-danger" data-dismiss="modal" aria-hidden="true">Close</button>
+                            <button href="#" class="btn btn-primary" id="myModal_save" onclick="changePassword()" type="submit" disabled>Save changes</button>
                         </div>
                     </form>
                 </div>
@@ -229,7 +221,6 @@
     <div class="row">
 
         <table id="myTable" class="table table-bordred table-striped">
-
             <thead>
             <th>Name</th>
             <th>Email</th>
@@ -263,7 +254,7 @@
 
 <script type="text/javascript">
     $(document).ready(function () {
-        document.getElementById('logged-user').innerHTML = JSON.parse(sessionStorage.getItem('user')).login;
+        $("#logged-user").html(JSON.parse(sessionStorage.getItem('user')).login);
     });
     getUsers();
     initializeChangePassword();

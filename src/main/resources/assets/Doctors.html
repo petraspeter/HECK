@@ -10,6 +10,7 @@
     <link rel="stylesheet" href="myStyle.css">
 
     <script id="tableTemplate" type="text/x-handlebars-template">
+     
         {{#each this}}
         <tr>
             <td data-toggle="modal" data-target="#detailViewDialog{{id}}">{{lastName}} {{firstName}}</td>
@@ -36,8 +37,8 @@
     </script>
 
     <script id="modalWindowsTemplate" type="text/x-handlebars-template">
+                                                                                        
         {{#each this}}
-
         <div class="modal fade" id="activateDialog{{id}}" tabindex="-1" role="dialog" aria-labelledby="edit" aria-hidden="true">
             <div class="modal-dialog">
                 <div class="modal-content">
@@ -83,12 +84,11 @@
 
     <script id="detailTableTemplate" type="text/x-handlebars-template">
         {{#each this}}
-
         <div class="modal fade" id="detailViewDialog{{id}}" tabindex="-1" role="dialog" aria-labelledby="edit" aria-hidden="true">
             <div class="modal-dialog">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h4 class="modal-title custom_align" id="headTitle">Details</h4>
+                        <h3 class="modal-title custom_align" id="headTitle">Details</h3>
                     </div>
                     <div class="modal-body">
 
@@ -96,35 +96,35 @@
                             <tbody>
 
                             <tr>
-                                <td>Login:
+                                <td class="titleRow">Login name:
                                 <td>{{login}}</td>
                             </tr>
                             <tr>
-                                <td>First name:
+                                <td class="titleRow">First name:
                                 <td>{{firstName}}</td>
                             </tr>
                             <tr>
-                                <td>Last name:
+                                <td class="titleRow">Last name:
                                 <td>{{lastName}}</td>
                             </tr>
                             <tr>
-                                <td>Email:
+                                <td class="titleRow">Email:
                                 <td>{{email}}</td>
                             </tr>
                             <tr>
-                                <td>Specialization:
+                                <td class="titleRow">Specialization:
                                 <td>{{specializationName}}</td>
                             </tr>
                             <tr>
-                                <td>Adress:
+                                <td class="titleRow">Adress:
                                 <td>{{address}}</td>
                             </tr>
                             <tr>
-                                <td>Phone:
+                                <td class="titleRow">Phone:
                                 <td>{{phoneNumber}}</td>
                             </tr>
                             <tr>
-                                <td>Registration from:
+                                <td class="titleRow">Registration from:
                                 <td>{{registrationTime}}</td>
                             </tr>
 
@@ -133,7 +133,7 @@
 
                     </div>
                     <div class="modal-footer ">
-                        <button type="button" class="btn btn-default" data-dismiss="modal"><span class="glyphicon glyphicon-remove"></span> Close</button>
+                        <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
                     </div>
                 </div>
             </div>
@@ -175,56 +175,48 @@
 
 <div class="container">
 
-    <!--modal window-->
-    <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="Login" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                    <h3 class="modal-title">Change password</h3>
-                </div>
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="Login" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Change password</h3>
+            </div>
 
-                <div class="modal-body">
-                    <!-- The form is placed inside the body of modal -->
-                    <form id="changePasswordForm" class="form-horizontal">
-                        <div class="form-group">
-                            <label class="col-xs-5 control-label">Current password</label>
-                            <div class="col-xs-5">
-                                <input type="password" class="form-control" name="currentModalPassword" id="currentModalPassword"/>
-                            </div>
+            <div class="modal-body">
+                <form id="changePasswordForm" class="form-horizontal">
+                    <div class="form-group">
+                        <label class="col-xs-5 control-label">Current password</label>
+                        <div class="col-xs-5">
+                            <input type="password" class="form-control" name="currentModalPassword" id="currentModalPassword"/>
                         </div>
+                    </div>
 
-                        <div class="form-group">
-                            <label class="col-xs-5 control-label">New password</label>
-                            <div class="col-xs-5">
-                                <input type="password" class="form-control" name="newModalPassword" id="newModalPassword"/>
-                            </div>
+                    <div class="form-group">
+                        <label class="col-xs-5 control-label">New password</label>
+                        <div class="col-xs-5">
+                            <input type="password" class="form-control" name="newModalPassword" id="newModalPassword"/>
                         </div>
+                    </div>
 
-                        <div class="form-group">
-                            <label class="col-xs-5 control-label">Confirm password</label>
-                            <div class="col-xs-5">
-                                <input type="password" class="form-control" name="newModalConfirmPassword" id="newModalConfirmPassword"/>
-                            </div>
+                    <div class="form-group">
+                        <label class="col-xs-5 control-label">Confirm password</label>
+                        <div class="col-xs-5">
+                            <input type="password" class="form-control" name="newModalConfirmPassword" id="newModalConfirmPassword"/>
                         </div>
+                    </div>
 
-                        <div class="modal-footer">
-                            <button href="#" class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
-                            <button href="#" class="btn btn-primary" id="myModal_save" onclick="changePassword()">Save changes</button>
-
-                        </div>
-                    </form>
-                </div>
+                    <div class="modal-footer">
+                        <button href="#" class="btn btn-danger" data-dismiss="modal" aria-hidden="true">Close</button>
+                        <button href="#" class="btn btn-primary" id="myModal_save" onclick="changePassword()" type="submit" disabled>Save changes</button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
+</div>
 
     <div class="row">
-
         <table id="myTable" class="table table-bordred table-striped">
-
             <thead>
             <th>Name</th>
             <th>Email</th>
@@ -256,9 +248,9 @@
 
 <script type="text/javascript">
     $(document).ready(function () {
-        document.getElementById('logged-user').innerHTML = JSON.parse(sessionStorage.getItem('user')).login;
-        initializeChangePassword();
+        $("#logged-user").html(JSON.parse(sessionStorage.getItem('user')).login);
     });
+    initializeChangePassword();
     getDoctors();
 </script>
 </html>                                     

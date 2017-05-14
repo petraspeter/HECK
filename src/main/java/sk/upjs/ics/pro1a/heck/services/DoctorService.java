@@ -34,7 +34,7 @@ public class DoctorService {
     private final byte[] tokenSecret;
     private Tokenizer tokenizer;
 
-    public DoctorService(DoctorDao doctorDao, SpecializationDao specializationDao, 
+    public DoctorService(DoctorDao doctorDao, SpecializationDao specializationDao,
             WorkingTimeDao workingTimeDao, AppointmentDao appointmentDao, byte[] tokenSecret) {
         this.doctorDao = doctorDao;
         this.specializationDao = specializationDao;
@@ -55,7 +55,7 @@ public class DoctorService {
         }
         return doctors;
     }
-    
+
     public List<DoctorDto> getAllDoctorsForPage(int page, int pageSize) {
         List<DoctorDto> doctors = new ArrayList<>();
         for (Doctor doctor : doctorDao.findForPage(page, pageSize)) {
@@ -91,7 +91,7 @@ public class DoctorService {
         }
         return doctorsDto;
     }
-    
+
     public List<DoctorDto> getDoctorsBySpecialization(String specialization) {
         List<DoctorDto> doctorsDto = new ArrayList<>();
         for (Doctor doctor : doctorDao.findDoctorsBySpecialization(specialization)) {
@@ -215,15 +215,33 @@ public class DoctorService {
      */
     public void updateDoctor(Long id, DoctorDto doctorDto) {
         Doctor doctor = doctorDao.findById(id);
-        if (doctorDto.getFirstName() != null) doctor.setFirstNameDoctor(doctorDto.getFirstName());
-        if (doctorDto.getLastName() != null) doctor.setLastNameDoctor(doctorDto.getLastName());
-        if (doctorDto.getEmail() != null) doctor.setEmailDoctor(doctorDto.getEmail());
-        if (doctorDto.getOffice() != null) doctor.setBusinessNameDoctor(doctorDto.getOffice());
-        if (doctorDto.getAddress() != null) doctor.setAddressDoctor(doctorDto.getAddress());
-        if (doctorDto.getCity() != null) doctor.setCityDoctor(doctorDto.getCity());
-        if (doctorDto.getPostalCode() != null) doctor.setPostalCodeDoctor(doctorDto.getPostalCode());
-        if (doctorDto.getPhoneNumber() != null) doctor.setPhoneNumberDoctor(doctorDto.getPhoneNumber());
-        if (doctorDto.getActive() != null) doctor.setActiveDoctor(doctorDto.getActive());
+        if (doctorDto.getFirstName() != null) {
+            doctor.setFirstNameDoctor(doctorDto.getFirstName());
+        }
+        if (doctorDto.getLastName() != null) {
+            doctor.setLastNameDoctor(doctorDto.getLastName());
+        }
+        if (doctorDto.getEmail() != null) {
+            doctor.setEmailDoctor(doctorDto.getEmail());
+        }
+        if (doctorDto.getOffice() != null) {
+            doctor.setBusinessNameDoctor(doctorDto.getOffice());
+        }
+        if (doctorDto.getAddress() != null) {
+            doctor.setAddressDoctor(doctorDto.getAddress());
+        }
+        if (doctorDto.getCity() != null) {
+            doctor.setCityDoctor(doctorDto.getCity());
+        }
+        if (doctorDto.getPostalCode() != null) {
+            doctor.setPostalCodeDoctor(doctorDto.getPostalCode());
+        }
+        if (doctorDto.getPhoneNumber() != null) {
+            doctor.setPhoneNumberDoctor(doctorDto.getPhoneNumber());
+        }
+        if (doctorDto.getActive() != null) {
+            doctor.setActiveDoctor(doctorDto.getActive());
+        }
         if (doctorDto.getSpecialization() != null) {
             if (!doctor.getSpecializationDoctor().getId().equals(doctorDto.getSpecialization())) {
                 doctor.setSpecializationDoctor(specializationDao.findById(doctorDto.getSpecialization()));
@@ -305,8 +323,8 @@ public class DoctorService {
         for (WorkingTime workingTime : workingTimes) {
             WorkingDayDto workingDayDto = new WorkingDayDto();
             workingDayDto.setDay(workingTime.getDayOfTheWeek());
-            workingDayDto.setEnd(workingTime.getStartingHour().toString());
-            workingDayDto.setStart(workingTime.getEndingHour().toString());
+            workingDayDto.setEnd(workingTime.getEndingHour().toString());
+            workingDayDto.setStart(workingTime.getStartingHour().toString());
             workingDaysDto.add(workingDayDto);
         }
         workingTimeDto.setWorkingTimes(workingDaysDto);
@@ -395,7 +413,7 @@ public class DoctorService {
 
     public List<AppointmentDto> getDoctorAppointments(long id) {
         List<AppointmentDto> appointmentDtoList = new ArrayList<>();
-        for (Appointment app : appointmentDao.findByDoctorId(id)){
+        for (Appointment app : appointmentDao.findByDoctorId(id)) {
             appointmentDtoList.add(createAppointmentDtoFromAppointmentDao(app));
         }
         return appointmentDtoList;
@@ -424,6 +442,5 @@ public class DoctorService {
         appointmentDto.setSubjectAppointment(appointment.getSubjectAppointment());
         return appointmentDto;
     }
-    
-    
+
 }

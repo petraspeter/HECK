@@ -13,26 +13,26 @@
 
     <script id="specializationTemplate" type="text/x-handlebars-template">
         <select disabled="true" id="specialization" name="specialization" class="form-control input-md" contentEditable="false">
-            {{#each this}}
-            <option value="{{id}}">{{name}}</option>
-            {{/each}}
+                {{#each this}}
+                <option value="{{id}}">{{name}}</option>
+                {{/each}}
         </select>
     </script>
 
     <script id="detailTableTemplate" type="text/x-handlebars-template">
+        
         <form id="myForm" class="form-horizontal">
-
             <fieldset id="fieldset">
                 <div class="form-group">
-                    <label class="col-md-2 control-label nameLabel" for="login">Login name: </label>
+                    <label class="col-md-5 control-label nameLabel" for="login">Login name: </label>
                     <div class="col-md-3">
-                        <input id="login" name="login" type="text" placeholder="login" class="form-control input-md" value="{{login}}" disabled>
+                        <input id="login" name="login" type="text" placeholder="login name" class="form-control input-md" value="{{login}}" disabled>
                     </div>
                 </div>
 
                 <!-- Text input-->
                 <div class="form-group">
-                    <label class="col-md-2 control-label nameLabel" for="firstName">First name: </label>
+                    <label class="col-md-5 control-label nameLabel" for="firstName">First name: </label>
                     <div class="col-md-3">
                         <input id="firstName" name="firstName" type="text" placeholder="first name" class="form-control input-md myInputs" value="{{firstName}}" disabled>
                     </div>
@@ -41,14 +41,14 @@
 
                 <!-- Text input-->
                 <div class="form-group">
-                    <label class="col-md-2 control-label nameLabel" for="lastName">Last name: </label>
+                    <label class="col-md-5 control-label nameLabel" for="lastName">Last name: </label>
                     <div class="col-md-3">
                         <input id="lastName" name="lastName" type="text" placeholder="last name" class="form-control input-md myInputs" value="{{lastName}}" disabled>
                     </div>
                 </div>
 
                 <div class="form-group">
-                    <label class="col-md-2 control-label nameLabel" for="email">Email: </label>
+                    <label class="col-md-5 control-label nameLabel" for="email">Email: </label>
                     <div class="col-md-3">
                         <input id="email" name="email" type="text" placeholder="email" class="form-control input-md myInputs" value="{{email}}" disabled required>
                     </div>
@@ -56,29 +56,28 @@
 
 
                 <div class="form-group">
-                    <label class="col-md-2 control-label nameLabel" for="address">Address: </label>
+                    <label class="col-md-5 control-label nameLabel" for="address">Address: </label>
                     <div class="col-md-3">
                         <input id="address" name="address" type="text" placeholder="address" class="form-control input-md myInputs" value="{{address}}" disabled required>
                     </div>
                 </div>
 
                 <div class="form-group">
-                    <label class="col-md-2 control-label nameLabel" for="city">City: </label>
+                    <label class="col-md-5 control-label nameLabel" for="city">City: </label>
                     <div class="col-md-3">
                         <input id="city" name="city" type="text" placeholder="city" class="form-control input-md myInputs" value="{{city}}" disabled required>
                     </div>
                 </div>
 
                 <div class="form-group">
-                    <label class="col-md-2 control-label nameLabel" for="city">Postal code: </label>
+                    <label class="col-md-5 control-label nameLabel" for="city">Postal code: </label>
                     <div class="col-md-3">
-                        <input id="postalCode" name="postalCode" type="text" placeholder="postal code" class="form-control input-md myInputs" value="{{postalCode}}" disabled
-                               required>
+                        <input id="postalCode" name="postalCode" type="text" placeholder="postal code" class="form-control input-md myInputs" value="{{postalCode}}" disabled required>
                     </div>
                 </div>
 
                 <div class="form-group">
-                    <label class="col-md-2 control-label nameLabel" for="phoneNumber">Phone number: </label>
+                    <label class="col-md-5 control-label nameLabel" for="phoneNumber">Phone number: </label>
                     <div class="col-md-3">
                         <input id="phoneNumber" name="phoneNumber" type="text" placeholder="Phone" class="form-control input-md myInputs" value="{{phoneNumber}}" disabled required>
                     </div>
@@ -86,7 +85,7 @@
 
                 <!-- Button -->
                 <div class="form-group">
-                    <div class="col-md-4" id="buttons">
+                    <div id="buttons">
                         <input type="button" class="btn btn-primary" id="editButton" onclick="startEditableAdminInputs()" value="Edit">
                         <input type="submit" class="btn btn-success" id="saveButton" onclick="saveEditableAdminInputs();  updateAdmin();" value="Save">
                         <input type="button" class="btn btn-danger" id="cancelButton" onclick="cancelEditableAdminInputs()" value="Cancel">
@@ -96,21 +95,12 @@
         </form>
     </script>
 
-    <style type="text/css">
-
-
-    </style>
-
 </head>
 <body>
 <nav class="navbar navbar-default navbar-fixed-top">
     <div class="container">
         <div class="navbar-header">
-            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-            </button>
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar"></button>
             <a class="navbar-brand" href="#">HECK</a>
         </div>
         <div class="collapse navbar-collapse" id="myNavbar">
@@ -139,20 +129,14 @@
 
 <div class="container">
 
-
-    <!--modal window-->
+    <!--modal window change password-->
     <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="Login" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
                     <h3 class="modal-title">Change password</h3>
                 </div>
-
                 <div class="modal-body">
-                    <!-- The form is placed inside the body of modal -->
                     <form id="changePasswordForm" class="form-horizontal">
                         <div class="form-group">
                             <label class="col-xs-5 control-label">Current password</label>
@@ -174,11 +158,9 @@
                                 <input type="password" class="form-control" name="newModalConfirmPassword" id="newModalConfirmPassword"/>
                             </div>
                         </div>
-
                         <div class="modal-footer">
-                            <button href="#" class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
-                            <button href="#" class="btn btn-primary" id="myModal_save" onclick="changePassword()">Save changes</button>
-
+                            <button href="#" class="btn btn-danger" data-dismiss="modal" aria-hidden="true">Close</button>
+                            <button href="#" class="btn btn-primary" id="myModal_save" onclick="changePassword()" type="submit" disabled>Save changes</button>
                         </div>
                     </form>
                 </div>
@@ -201,9 +183,9 @@
 
 <script type="text/javascript">
     $(document).ready(function () {
-        document.getElementById('logged-user').innerHTML = JSON.parse(sessionStorage.getItem('user')).login;
-        getAdminDetail();
-        initializeChangePassword();
+        $("#logged-user").html(JSON.parse(sessionStorage.getItem('user')).login);
     });
+    getAdminDetail();
+    initializeChangePassword();
 </script>
 </html>

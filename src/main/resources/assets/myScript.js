@@ -1,7 +1,7 @@
 function signIn() {
 
-    var login = document.getElementById('lgn').value;
-    var password = document.getElementById('psw').value;
+    var login = $("#lgn").val();  
+    var password = $("#psw").val();
     var ourRequest = new XMLHttpRequest();
     ourRequest.open('POST', 'http://localhost:8076/heck/login/doctor');
     ourRequest.setRequestHeader("Content-Type", "application/json");
@@ -208,9 +208,9 @@ function startEditableDoctorInputs() {
         editableInputs[i].disabled = false;
     }
 
-    document.getElementById("saveButton").style.visibility = "visible";
-    document.getElementById("cancelButton").style.visibility = "visible";
-    document.getElementById("editButton").style.visibility = "hidden";
+    document.getElementById("saveButton").style.display = "inline-block";
+    document.getElementById("cancelButton").style.display = "inline-block";
+    document.getElementById("editButton").style.display = "none";
 }
 
 var oldValues = {};
@@ -226,9 +226,9 @@ function startEditableAdminInputs() {
         editableInputs[i].disabled = false;
     }
 
-    document.getElementById("saveButton").style.visibility = "visible";
-    document.getElementById("cancelButton").style.visibility = "visible";
-    document.getElementById("editButton").style.visibility = "hidden";
+    document.getElementById("saveButton").style.display = "inline-block";
+    document.getElementById("cancelButton").style.display = "inline-block";
+    document.getElementById("editButton").style.display = "none";
 }
 
 function clearValidationMarkers(element) {
@@ -277,9 +277,9 @@ function cancelEditableDoctorInputs() {
         inputs[i].disabled = true;
     }
 
-    document.getElementById("saveButton").style.visibility = "hidden";
-    document.getElementById("cancelButton").style.visibility = "hidden";
-    document.getElementById("editButton").style.visibility = "visible";
+    document.getElementById("saveButton").style.display = "none";
+    document.getElementById("cancelButton").style.display = "none";
+    document.getElementById("editButton").style.display = "inline-block";
     clearValidationMarkers($('#myForm'));
 }
 
@@ -301,9 +301,9 @@ function cancelEditableAdminInputs() {
         inputs[i].disabled = true;
     }
 
-    document.getElementById("saveButton").style.visibility = "hidden";
-    document.getElementById("cancelButton").style.visibility = "hidden";
-    document.getElementById("editButton").style.visibility = "visible";
+    document.getElementById("saveButton").style.display = "none";
+    document.getElementById("cancelButton").style.display = "none";
+    document.getElementById("editButton").style.display = "inline-block";
     clearValidationMarkers($('#myForm'));
 }
 
@@ -315,9 +315,9 @@ function saveEditableDoctorInputs() {
         editableInputs[i].disabled = true;
     }
     //TODO vymysliet funkciu
-    document.getElementById("saveButton").style.visibility = "hidden";
-    document.getElementById("cancelButton").style.visibility = "hidden";
-    document.getElementById("editButton").style.visibility = "visible";
+    document.getElementById("saveButton").style.display = "none";
+    document.getElementById("cancelButton").style.display = "none";
+    document.getElementById("editButton").style.display = "inline-block";
     clearValidationMarkers($('#myForm'));
 }
 
@@ -327,9 +327,9 @@ function saveEditableAdminInputs() {
         editableInputs[i].disabled = true;
     }
     //TODO vymysliet funkciu
-    document.getElementById("saveButton").style.visibility = "hidden";
-    document.getElementById("cancelButton").style.visibility = "hidden";
-    document.getElementById("editButton").style.visibility = "visible";
+    document.getElementById("saveButton").style.display = "none";
+    document.getElementById("cancelButton").style.display = "none";
+    document.getElementById("editButton").style.display = "inline-block";
     clearValidationMarkers($('#myForm'));
 }
 
@@ -407,7 +407,6 @@ function updateAdmin() {
 
     var ids = {};
     $inputs.each(function (index) {
-        //console.log(index + ': ' + $(this).attr('id')) ;
         ids[$(this).attr('id')] = $(this).val();
     });
 
@@ -437,6 +436,7 @@ function updateAdmin() {
 
 function addButton(day) {
     var newTextBoxDiv = $(document.createElement('div'));
+    
 
     newTextBoxDiv.after().html(
         '<input class="text-field-from" type="text" placeholder="from">' +
@@ -520,7 +520,7 @@ function getDaysValues() {
 }
 
 function disableAllButtonsAndTextFields(data) {
-    if(data!= undefined) {
+    if(data!== undefined) {
         $('#inputTimeInterval').val(data.interval);
         var newTextField;
         data.workingTimes.forEach(function(e) {
@@ -558,8 +558,8 @@ function disableAllButtonsAndTextFields(data) {
             newTextField[newTextField.size()-1].value = e.end.slice(0, -3);
         });
     }
-    $.each($(':button'), function (index, item) {
-        $(item).addClass("disabledButton");
+    $.each($('#allTimes').find(':button'), function (index, item) {
+        $(item).addClass("notDisplayButton");
         $(item).removeAttr('onclick');
     });
     $('#inputTimeInterval').prop('disabled', true);
@@ -716,7 +716,6 @@ function fillCalendar(){
     var ourRequest = new XMLHttpRequest();
 
     ourRequest.open('GET', 'http://localhost:8076/heck/doctors/' + JSON.parse(sessionStorage.getItem('user')).id + '/appointments');
-   // ourRequest.open('GET', 'http://localhost:8076/heck/doctors/appointments?idDoc='+ JSON.parse(sessionStorage.getItem('user')).id);
     ourRequest.setRequestHeader("Authorization", "Bearer " + JSON.parse(sessionStorage.getItem('user')).token);
 
     ourRequest.onload = function () {
@@ -726,14 +725,17 @@ function fillCalendar(){
             fillCalendarModals(data);
             var e = [];
 
-            data.forEach(function myFunction(item, index, arr) {
+            data.forEach(function myFunction(item) {
                 var color = 'green';
                 if (item.holiday) {
-                    color = 'blue';
+                    //gray
+                    color = '#bcbcb7';
                 } else if (item.occupied) {
-                    color = 'red';
+                    //blue
+                    color = '#7aa2e2';
+                    //red
                 } else if (item.canceled) {
-                    color = 'purple';
+                    color = '#fc053e';
                 }
                 e.push({
                     id: item.id,
@@ -749,7 +751,7 @@ function fillCalendar(){
                 header: {
                     left: 'prev,next today',
                     center: 'title',
-                    right: 'month,basicWeek,basicDay'
+                    right: 'basicDay,basicWeek,month'
                 },
                 defaultDate: '2017-05-12',
                 navLinks: true, // can click day/week names to navigate views
@@ -781,7 +783,7 @@ function fillCalendarModals(data){
     var compiledTemplate = Handlebars.compile(rawTemplate);
     var ourGeneratedHTML = compiledTemplate(data);
 
-    //TODO prerobit na jqurey
+    //TODO prerobit na jquery
     var table = document.getElementById("calendarModals");
     table.innerHTML = ourGeneratedHTML;
 }

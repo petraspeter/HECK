@@ -13,7 +13,7 @@ var validator = {
           message: 'The login can consist of alphabetical characters and digits'
         },
         stringLength: {
-          min: 5
+          min: 1
         },
         notEmpty: {
           message: 'Please supply your login'
@@ -32,7 +32,7 @@ var validator = {
           message: 'The first name can consist of alphabetical characters only'
         },
         stringLength: {
-          min: 3
+          min: 1
         },
         notEmpty: {
           message: 'Please supply your first name'
@@ -47,7 +47,7 @@ var validator = {
           message: 'The last name can consist of alphabetical characters only'
         },
         stringLength: {
-          min: 3
+          min: 1
         },
         notEmpty: {
           message: 'Please supply your last name'
@@ -93,11 +93,7 @@ var validator = {
           url: 'http://localhost:8076/heck/doctors/checkEmail',
           type: 'POST',
           data: function(validator, $field, value) {
-            // validator is FormValidation instance
-            // $field is the field element
-            // value is the field value
 
-            // Return an object
             return {
               email: value,
               userEmail: (sessionStorage.getItem('user') != undefined) ? JSON.parse(sessionStorage.getItem('user')).email : undefined
@@ -138,7 +134,7 @@ var validator = {
     city: {
       validators: {
         stringLength: {
-          min: 3
+          min: 1
         },
         notEmpty: {
           message: 'Please supply your city'
@@ -148,7 +144,7 @@ var validator = {
     office: {
       validators: {
         stringLength: {
-          min: 3
+          min: 1
         },
         notEmpty: {
           message: 'Please supply your office'
@@ -184,7 +180,7 @@ if(JSON.parse(sessionStorage.getItem('user'))!= null) {
             message: 'Please supply your current password'
           },
           remote: {
-            message: 'The current password is incorrect',
+          //  message: 'The current password is incorrect',
             url: (JSON.parse(sessionStorage.getItem('user')).role == 'doctor' ?
                 'http://localhost:8076/heck/doctors/' : 'http://localhost:8076/heck/users/') + JSON.parse(sessionStorage.getItem('user')).id + '/checkPassword',
             type: 'POST'
