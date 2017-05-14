@@ -663,28 +663,50 @@ function getUsers() {
     ourRequest.send();
 }
 
+function disableChangePasswordValidation(){
+    var changePassForm = $('#changePasswordForm');
+    changePassForm.data('bootstrapValidator').enableFieldValidators('currentModalPassword', false);
+    changePassForm.data('bootstrapValidator').enableFieldValidators('newModalPassword', false);
+    changePassForm.data('bootstrapValidator').enableFieldValidators('newModalConfirmPassword', false);
+}
+
+function enableChangePasswordValidation(){
+    var changePassForm = $('#changePasswordForm');
+    changePassForm.data('bootstrapValidator').enableFieldValidators('currentModalPassword', true);
+    changePassForm.data('bootstrapValidator').enableFieldValidators('newModalPassword', true);
+    changePassForm.data('bootstrapValidator').enableFieldValidators('newModalConfirmPassword', true);
+}
+
     function initializeChangePassword() {
-        $('#changePasswordForm').bootstrapValidator(changePasswordValidator)
-            .on('success.form.bv', function (e) {
-                $('#success_message').slideDown({opacity: "show"}, "slow");
-                $('#changePasswordForm').data('bootstrapValidator').resetForm();
-
-                // Get the form instance
-                var $form = $(e.target);
-
-                // Get the BootstrapValidator instance
-                var bv = $form.data('bootstrapValidator');
-
-                // Use Ajax to submit form data
-                $.post($form.attr('action'), $form.serialize(), function (result) {
-                    console.log("validacia" + result);
-                }, 'json');
-            });
+        $('#changePasswordForm').bootstrapValidator(changePasswordValidator);
+        disableChangePasswordValidation();
         $("#myModal_save").click(function () {
-            console.log($('#changePasswordForm').bootstrapValidator('validate'));
+            enableChangePasswordValidation();
+            setTimeout(function(){
+                if(rgb2hex($('#currentModalPassword').css("border-color")) != '#a94442' &&
+                    rgb2hex($('#newModalPassword').css("border-color")) != '#a94442' &&
+                    rgb2hex($('#newModalConfirmPassword').css("border-color")) != '#a94442'){
+                    changePassword();
+                    disableChangePasswordValidation();
+                    $('#myModal').modal('toggle');
+                    $('#changePasswordForm').trigger('reset');
+                }
+            }, 400);
         });
 
     }
+
+var hexDigits = ["0","1","2","3","4","5","6","7","8","9","a","b","c","d","e","f"];
+
+//Function to convert rgb color to hex format
+function rgb2hex(rgb) {
+    rgb = rgb.match(/^rgb\((\d+),\s*(\d+),\s*(\d+)\)$/);
+    return "#" + hex(rgb[1]) + hex(rgb[2]) + hex(rgb[3]);
+}
+
+function hex(x) {
+    return isNaN(x) ? "00" : hexDigits[(x - x % 16) / 16] + hexDigits[x % 16];
+}
 
 function fillTable(rows){
 
@@ -726,25 +748,15 @@ function fillCalendar(){
             var e = [];
 
             data.forEach(function myFunction(item) {
-                var color = 'green';
-                if (item.holiday) {
-                    //gray
-                    color = '#bcbcb7';
-                } else if (item.occupied) {
-                    //blue
-                    color = '#7aa2e2';
-                    //red
-                } else if (item.canceled) {
-                    color = '#fc053e';
+                if(!item.holiday && !item.occupied && !item.canceled) {
+                    e.push({
+                        id: item.id,
+                        title: item.patient,
+                        start: item.from,
+                        end: item.to,
+                        color: 'green'
+                    });
                 }
-                e.push({
-                    id: item.id,
-                    title: item.patient,
-                    start: item.from,
-                    end: item.to,
-                    color: color
-                });
-
             });
             $('#calendar').fullCalendar('destroy');
             $('#calendar').fullCalendar({

@@ -113,11 +113,11 @@ var validator = {
     phoneNumber: {
       validators: {
         regexp: {
-          regexp: /^(\+)([0-9]{12})$/,
-          message: 'The phone number should start with + and contains 12 digits'
+          regexp: /^(\+)([0-9]{2,})$/,
+          message: 'The phone number should start with + and contains only digits'
         },
         notEmpty: {
-          message: 'Please supply your phone number (+421xxxxxxxxx)'
+          message: 'Please supply your phone number (+xxxxxxxxxxxx)'
         }
       }
     },
@@ -189,6 +189,9 @@ if(JSON.parse(sessionStorage.getItem('user'))!= null) {
       },
       newModalPassword: {
         validators: {
+          notEmpty: {
+            message: 'Please supply new password'
+          },
           stringLength: {
             min: 6
           },
@@ -204,6 +207,9 @@ if(JSON.parse(sessionStorage.getItem('user'))!= null) {
       },
       newModalConfirmPassword: {
         validators: {
+          notEmpty: {
+            message: 'Please supply new confirm password'
+          },
           identical: {
             field: 'newModalPassword',
             message: 'The new password and its confirm are not the same'

@@ -317,7 +317,8 @@ body{
     border-bottom: 1px solid;
 }
 
-button[disabled], html input[disabled]{
+.text-field-to[disabled], .text-field-from[disabled], #inputTimeInterval[disabled]
+{
     border: none;
     background-color: white;
 }

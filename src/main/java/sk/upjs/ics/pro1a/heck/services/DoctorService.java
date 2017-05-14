@@ -198,6 +198,7 @@ public class DoctorService {
                 loginResponse.setId(doctor.getIdDoctor());
                 loginResponse.setLogin(doctor.getLoginDoctor());
                 loginResponse.setRole("doctor");
+                loginResponse.setEmail(doctor.getEmailDoctor());
                 loginResponse.setToken(tokenizer.generateToken(login, loginResponse.getRole()));
                 return loginResponse;
             }
@@ -221,6 +222,7 @@ public class DoctorService {
         loginResponse.setId(doctor.getIdDoctor());
         loginResponse.setLogin(doctor.getLoginDoctor());
         loginResponse.setRole("doctor");
+        loginResponse.setEmail(doctor.getEmailDoctor());
         loginResponse.setToken(tokenizer.generateToken(doctor.getLoginDoctor(), "doctor"));
         return loginResponse;
     }

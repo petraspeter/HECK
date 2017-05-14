@@ -79,6 +79,7 @@ public class UserService {
                 } else {
                     loginResponse.setRole("user");
                 }
+                loginResponse.setEmail(user.getEmailUser());
                 loginResponse.setToken(tokenizer.generateToken(login, loginResponse.getRole()));
                 return loginResponse;
             }
@@ -98,6 +99,7 @@ public class UserService {
         loginResponse.setId(user.getIdUser());
         loginResponse.setLogin(user.getLoginUser());
         loginResponse.setRole("user");
+        loginResponse.setEmail(user.getEmailUser());
         loginResponse.setToken(tokenizer.generateToken(user.getLoginUser(), "user"));
         return loginResponse;
     }

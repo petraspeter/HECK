@@ -149,31 +149,33 @@
                 <div class="modal-header">
                     <h3 class="modal-title">Change password</h3>
                 </div>
+
                 <div class="modal-body">
                     <form id="changePasswordForm" class="form-horizontal">
                         <div class="form-group">
                             <label class="col-xs-5 control-label">Current password</label>
                             <div class="col-xs-5">
-                                <input type="password" class="form-control" name="currentModalPassword" id="currentModalPassword"/>
+                                <input type="password" onfocus="disableChangePasswordValidation()" class="form-control" name="currentModalPassword" id="currentModalPassword"/>
                             </div>
                         </div>
+
                         <div class="form-group">
                             <label class="col-xs-5 control-label">New password</label>
                             <div class="col-xs-5">
-                                <input type="password" class="form-control" name="newModalPassword" id="newModalPassword"/>
+                                <input type="password" onfocus="disableChangePasswordValidation()" class="form-control" name="newModalPassword" id="newModalPassword"/>
                             </div>
                         </div>
 
                         <div class="form-group">
                             <label class="col-xs-5 control-label">Confirm password</label>
                             <div class="col-xs-5">
-                                <input type="password" class="form-control" name="newModalConfirmPassword" id="newModalConfirmPassword"/>
+                                <input type="password" onfocus="disableChangePasswordValidation()" class="form-control" name="newModalConfirmPassword" id="newModalConfirmPassword"/>
                             </div>
                         </div>
 
                         <div class="modal-footer">
                             <button href="#" class="btn btn-danger" data-dismiss="modal" aria-hidden="true">Close</button>
-                            <button href="#" class="btn btn-primary" id="myModal_save" onclick="changePassword()"  type="submit" disabled>Save changes</button>
+                            <button href="#" class="btn btn-primary" id="myModal_save">Save changes</button>
                         </div>
                     </form>
                 </div>
