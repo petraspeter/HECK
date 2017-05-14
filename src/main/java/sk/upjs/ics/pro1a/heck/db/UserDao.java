@@ -47,7 +47,7 @@ public class UserDao extends AbstractDAO<User> {
         int start = (page - 1) * pageSize;
         return list(currentSession().createCriteria(User.class)
                 .setFirstResult(start)
-                .setMaxResults(start+pageSize));        
+                .setMaxResults(start+pageSize));
     }
     
 }

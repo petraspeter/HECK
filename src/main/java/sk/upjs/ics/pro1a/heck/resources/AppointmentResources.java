@@ -5,6 +5,7 @@ import io.dropwizard.hibernate.UnitOfWork;
 import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -37,12 +38,12 @@ public class AppointmentResources {
         this.appointmentService = appointmentService;
     }
     
-    
     @POST
     @Path("/appointments")
     @Consumes(MediaType.APPLICATION_JSON)
     @UnitOfWork
     public Response addAppointment(AppointmentDto appointmentDto) {
+        System.out.println(appointmentDto.toString());
         AppointmentDto addedAppointment = appointmentService.addAppointment(appointmentDto);
         if(addedAppointment != null) {
             return Response.status(Response.Status.CREATED).entity(addedAppointment).build();
@@ -65,101 +66,77 @@ public class AppointmentResources {
     }
     
     @GET
-    @Path("/appointments/day")
+    @Path("/users/appointments")
     @Consumes(MediaType.APPLICATION_JSON)
     @UnitOfWork
-    public Response findAppointmenstByDoctorIdForDay(
-            @Auth AuthorizedUserDto user,
-            @QueryParam("idDoc") Long idDoc,
-            @QueryParam("idUser") Long idUser,
-            @QueryParam("date") String date
-    ) throws ParseException {
-        SimpleDateFormat sdt = new SimpleDateFormat("yyyy-MM-dd");
-        Timestamp ts = new Timestamp(sdt.parse(date).getTime());
-        List<AppointmentDto> appointments = appointmentService.generateUserAppointmentForDays(idDoc,
-                idUser, ts, ts);
-        if (appointments.size() > 0) {
-            return  Response.ok(appointments).build();
-        }
-        return Response.status(Response.Status.NOT_FOUND).build();
-    }
-    
-    @GET
-    @Path("/appointments/days")
-    @Consumes(MediaType.APPLICATION_JSON)
-    @UnitOfWork
-    public Response findAppointmenstByDoctorIdForDays(
-            @Auth AuthorizedUserDto user,
+    public Response findAppointmenstByDoctorId(
+         //   @Auth AuthorizedUserDto user,
             @QueryParam("idDoc") Long idDoc,
             @QueryParam("idUser") Long idUser,
             @QueryParam("dateFrom") String dateFrom,
             @QueryParam("dateTo") String dateTo
     ) throws ParseException {
+        List<AppointmentDto> appointments = new ArrayList<>();
+        Timestamp tsFrom = null;
+        Timestamp tsTo = null;
         SimpleDateFormat sdt = new SimpleDateFormat("yyyy-MM-dd");
-        Timestamp tsFrom = new Timestamp(sdt.parse(dateFrom).getTime());
-        Timestamp tsTo = new Timestamp(sdt.parse(dateTo).getTime());
-        List<AppointmentDto> appointments = appointmentService
-                .generateUserAppointmentForDays(idDoc, idUser, tsFrom, tsTo);
+        try {
+            tsFrom = new Timestamp(sdt.parse(dateFrom).getTime());
+        } catch (Exception e) {
+            System.err.println("DateFrom param is missing!");
+        }
+        try {
+            tsTo = new Timestamp(sdt.parse(dateTo).getTime());
+        } catch (Exception e) {
+            System.err.println("DateTo param is missing!");
+        }
+        if (tsFrom != null && tsTo != null) {
+            appointments = appointmentService
+                    .generateUserAppointmentForDays(idDoc, idUser, tsFrom, tsTo);
+        } else if(tsFrom == null && tsTo == null) {
+            appointments = appointmentService.generateDefaultAppointments(idDoc, idUser);
+        } else {
+            if (tsFrom != null) {
+                appointments = appointmentService
+                        .generateUserAppointmentForDays(idDoc, idUser, tsFrom, tsFrom);
+            } else {
+                appointments = appointmentService
+                        .generateUserAppointmentForDays(idDoc, idUser, tsTo, tsTo);
+            }
+        }
         if (appointments.size() > 0) {
             return  Response.ok(appointments).build();
         }
         return Response.status(Response.Status.NOT_FOUND).build();
     }
     
-    @GET
-    @Path("/appointments")
-    @Consumes(MediaType.APPLICATION_JSON)
-    @UnitOfWork
-    public Response findAppointmenstByDoctorId(
-            @Auth AuthorizedUserDto user,
-            @QueryParam("idDoc") Long idDoc,
-            @QueryParam("idUser") Long idUser
-    ) throws ParseException {
-        Long actualDay = DateUtils.truncate(new Date(), Calendar.DATE).getTime();
-        Timestamp tsFrom = new Timestamp(actualDay);
-        Timestamp tsTo = new Timestamp(actualDay+(6*24*60*60*1000));
-        List<AppointmentDto> appointments = appointmentService
-                .generateUserAppointmentForDays(idDoc, idUser, tsFrom, tsTo);
-        if (appointments.size() > 0) {
-            return  Response.ok(appointments).build();
-        }
-        return Response.status(Response.Status.NOT_FOUND).build();
-    }
-    
+    /*
+    Metoda je len pre doktora
+    */
     @GET
     @Path("/doctors/appointments")
     @Consumes(MediaType.APPLICATION_JSON)
     @UnitOfWork
     public Response findDoctorsAppointment(
             @Auth AuthorizedUserDto user,
-            @QueryParam("idDoc") Long idDoc
-    ) {
-        Long actualDay = DateUtils.truncate(new Date(), Calendar.DATE).getTime();
-        Timestamp tsFrom = new Timestamp(actualDay);
-        Timestamp tsTo = new Timestamp(actualDay+(6*24*60*60*1000));
-        List<AppointmentDto> appointments = appointmentService
-                .generateDoctorAppointmentForDays(idDoc, 0L, tsFrom, tsTo);
-        if (appointments.size() > 0) {
-            return  Response.ok(appointments).build();
-        }
-        return Response.status(Response.Status.NOT_FOUND).build();
-    }
-    
-    @GET
-    @Path("/doctors/appointmentsDate")
-    @Consumes(MediaType.APPLICATION_JSON)
-    @UnitOfWork
-    public Response findDoctorsAppointmentFromTo(
-            @Auth AuthorizedUserDto user,
-            @QueryParam("idDoc") Long id,
+            @QueryParam("idDoc") Long idDoc,
             @QueryParam("from") String from,
             @QueryParam("to") String to
-    ) throws ParseException {
-        SimpleDateFormat sdt = new SimpleDateFormat("yyyy-MM-dd");
-        Timestamp tsFrom = new Timestamp(sdt.parse(from).getTime());
-        Timestamp tsTo = new Timestamp(sdt.parse(to).getTime());
-        List<AppointmentDto> appointments = appointmentService
-                .generateDoctorAppointmentForDays(id, 0L, tsFrom, tsTo);
+    )  throws ParseException{
+        List<AppointmentDto> appointments = new ArrayList<>();
+        Timestamp tsTo = null;
+        Timestamp tsFrom = null;
+        if(from == null || to == null) {
+            Long actualDay = DateUtils.truncate(new Date(), Calendar.DATE).getTime();
+            tsFrom = new Timestamp(actualDay);
+            tsTo = new Timestamp(actualDay+(6*24*60*60*1000));
+        } else {
+            SimpleDateFormat sdt = new SimpleDateFormat("yyyy-MM-dd");
+            tsFrom = new Timestamp(sdt.parse(from).getTime());
+            tsTo= new Timestamp(sdt.parse(to).getTime());
+        }
+        appointments = appointmentService
+                .generateDoctorAppointmentForDays(idDoc, tsFrom, tsTo);
         if (appointments.size() > 0) {
             return  Response.ok(appointments).build();
         }
@@ -183,10 +160,36 @@ public class AppointmentResources {
     public Response deleteAppointment(@Auth AuthorizedUserDto user, @PathParam("id") Long id) {
         appointmentService.deleteAppointment(id);
         Appointment appointment = appointmentService.getById(id);
-        if (appointment == null) {
+        if (appointment.getIdAppointment() == null) {
             return Response.ok("Appointment deleted").build();
         }
         return Response.status(Response.Status.EXPECTATION_FAILED).build();
+    }
+    
+    @GET
+    @Path("/users/appointments/{id}")
+    @UnitOfWork
+    public Response getUserAppointment(
+      //      @Auth AuthorizedUserDto user,
+            @PathParam("id") Long id) {
+        List<AppointmentDto> appointments = appointmentService.getUserAppointment(id);
+        if (appointments == null) {
+            return Response.status(Response.Status.NOT_FOUND).build();
+        }
+        return Response.ok(appointments).build();
+    }
+    
+    @GET
+    @Path("/users/future/{id}")
+    @UnitOfWork
+    public Response getFutureUserAppointment(
+            @Auth AuthorizedUserDto user,
+            @PathParam("id") Long id) {
+        List<AppointmentDto> appointments = appointmentService.getFutureUserAppointment(id);
+        if (appointments == null) {
+            return Response.status(Response.Status.NOT_FOUND).build();
+        }
+        return Response.ok(appointments).build();
     }
     
 }

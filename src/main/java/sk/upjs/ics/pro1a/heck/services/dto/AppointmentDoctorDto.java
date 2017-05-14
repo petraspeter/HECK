@@ -23,6 +23,9 @@ public class AppointmentDoctorDto {
         
     @JsonProperty("office")
     private String officeDoctor;
+    
+    @JsonProperty("specialization")
+    private String specializationDoctor;
 
     public Long getIdDoctor() {
         return idDoctor;
@@ -56,14 +59,28 @@ public class AppointmentDoctorDto {
         this.officeDoctor = officeDoctor;
     }
 
-    public AppointmentDoctorDto(Long id, String firstName, String lastName, String office) {
-        this.idDoctor = id;
-        this.firstNameDoctor = firstName;
-        this.lastNameDoctor = lastName;
-        this.officeDoctor = office;
+    public String getSpecializationDoctor() {
+        return specializationDoctor;
     }
 
+    public void setSpecializationDoctor(String specializationDoctor) {
+        this.specializationDoctor = specializationDoctor;
+    }
+    
+    public AppointmentDoctorDto(Long idDoctor, String firstNameDoctor, String lastNameDoctor, String officeDoctor, String specializationDoctor) {
+        this.idDoctor = idDoctor;
+        this.firstNameDoctor = firstNameDoctor;
+        this.lastNameDoctor = lastNameDoctor;
+        this.officeDoctor = officeDoctor;
+        this.specializationDoctor = specializationDoctor;
+    }  
+
     public AppointmentDoctorDto() {
+    }
+
+    @Override
+    public String toString() {
+        return "AppointmentDoctorDto{" + "idDoctor=" + idDoctor + ", firstNameDoctor=" + firstNameDoctor + ", lastNameDoctor=" + lastNameDoctor + ", officeDoctor=" + officeDoctor + ", specializationDoctor=" + specializationDoctor + '}';
     }
         
 }
