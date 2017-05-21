@@ -160,7 +160,7 @@ public class AppointmentResources {
     public Response deleteAppointment(@Auth AuthorizedUserDto user, @PathParam("id") Long id) {
         appointmentService.deleteAppointment(id);
         Appointment appointment = appointmentService.getById(id);
-        if (appointment.getIdAppointment() == null) {
+        if (appointment.getCanceledAppointment()) {
             return Response.ok("Appointment deleted").build();
         }
         return Response.status(Response.Status.EXPECTATION_FAILED).build();
