@@ -179,6 +179,8 @@ public class DoctorResources {
             doctors = doctorService.getDoctorsBySpecializationAndCityAndDate(specialization, city, tsFrom, tsFrom);
         }  else if(specialization != null && firstName == null && lastName ==  null && city != null && from == null && to != null) {
             doctors = doctorService.getDoctorsBySpecializationAndCityAndDate(specialization, city, tsTo, tsTo);
+        } else if(specialization != null && firstName == null && lastName !=  null && city == null && from == null && to == null) {
+            doctors = doctorService.getDoctorsBySpecializationAndLastName(specialization, lastName);
         } else {
             doctors = doctorService.getDoctorsBySpecialization(specialization);
         }

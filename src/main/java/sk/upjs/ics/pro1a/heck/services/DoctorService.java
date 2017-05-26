@@ -33,7 +33,7 @@ public class DoctorService {
     private AppointmentDao appointmentDao;
     private final byte[] tokenSecret;
     private Tokenizer tokenizer;
-
+    
     public DoctorService(DoctorDao doctorDao, SpecializationDao specializationDao,
             WorkingTimeDao workingTimeDao, AppointmentDao appointmentDao, byte[] tokenSecret) {
         this.doctorDao = doctorDao;
@@ -55,7 +55,7 @@ public class DoctorService {
         }
         return doctors;
     }
-
+    
     public List<DoctorDto> getAllDoctorsForPage(int page, int pageSize) {
         List<DoctorDto> doctors = new ArrayList<>();
         for (Doctor doctor : doctorDao.findForPage(page, pageSize)) {
@@ -91,7 +91,7 @@ public class DoctorService {
         }
         return doctorsDto;
     }
-
+    
     public List<DoctorDto> getDoctorsBySpecialization(String specialization) {
         List<DoctorDto> doctorsDto = new ArrayList<>();
         for (Doctor doctor : doctorDao.findDoctorsBySpecialization(specialization)) {
@@ -170,6 +170,15 @@ public class DoctorService {
             }
         }
         return doctors;
+    }
+    
+    public List<DoctorDto> getDoctorsBySpecializationAndLastName(String specialization, String lastName) {
+        List<DoctorDto> doctorsDto = new ArrayList<>();
+        for (Doctor doctor : doctorDao.findDoctorsBySpecializationAndLastName(specialization, lastName)) {
+            DoctorDto doctorDto = createDoctorDtoFromDoctorDaoWithoutPassword(doctor);
+            doctorsDto.add(doctorDto);
+        }
+        return doctorsDto;
     }
     
     public List<DoctorDto> getDoctorsBySpecializationAndLastNameAndCityAndDate(String specialization, String lastName,
