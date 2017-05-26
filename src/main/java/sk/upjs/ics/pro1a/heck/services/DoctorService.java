@@ -92,7 +92,7 @@ public class DoctorService {
         return doctorsDto;
     }
     
-    public List<DoctorDto> getDoctorsBySpecialization(String specialization) {
+    public List<DoctorDto> getDoctorsBySpecializationToDoctorDTO(String specialization) {
         List<DoctorDto> doctorsDto = new ArrayList<>();
         for (Doctor doctor : doctorDao.findDoctorsBySpecialization(specialization)) {
             DoctorDto doctorDto = createDoctorDtoFromDoctorDaoWithoutPassword(doctor);
@@ -101,100 +101,85 @@ public class DoctorService {
         return doctorsDto;
     }
     
+    public List<Doctor> getDoctorsBySpecialization(String specialization) {
+        return doctorDao.findDoctorsBySpecialization(specialization);
+    }
     
-    public List<DoctorDto> getDoctorsBySpecializationAndDate(String specialization, Timestamp from,
+    
+    public List<Doctor> getDoctorsBySpecializationAndDate(String specialization, Timestamp from,
             Timestamp to) {
-        List<DoctorDto> doctors = new ArrayList<>();
+        List<Doctor> doctors = new ArrayList<>();
         for (Doctor doctor : doctorDao.findDoctorsBySpecialization(specialization)) {
             List<AppointmentDto> appointments = appointmentDao.generateUserAppointmentForDays(
                     doctor.getIdDoctor(), 0L, from, to);
             if (appointments.size() > 0) {
-                DoctorDto doctorDto = createDoctorDtoFromDoctorDaoWithoutPassword(doctor);
-                doctors.add(doctorDto);
+                doctors.add(doctor);
             }
         }
         return doctors;
     }
     
-    public List<DoctorDto> getDoctorsBySpecializationAndCityAndDate(String specialization, String city, Timestamp from,
-            Timestamp to) {
-        List<DoctorDto> doctors = new ArrayList<>();
-        for (Doctor doctor : doctorDao.findDoctorsBySpecializationAndCity(specialization, city)) {
-            List<AppointmentDto> appointments = appointmentDao.generateUserAppointmentForDays(
-                    doctor.getIdDoctor(), 0L, from, to);
-            if (appointments.size() > 0) {
-                DoctorDto doctorDto = createDoctorDtoFromDoctorDaoWithoutPassword(doctor);
-                doctors.add(doctorDto);
-            }
-        }
-        return doctors;
+    public List<Doctor> getDoctorsBySpecializationAndCity(String specialization, String city) {
+        return doctorDao.findDoctorsBySpecializationAndCity(specialization, city);
+        
     }
     
-    public List<DoctorDto> getDoctorsBySpecializationAndFullNameAndDate(String specialization, String firstname,
-            String lastName, Timestamp from, Timestamp to) {
-        List<DoctorDto> doctors = new ArrayList<>();
-        for (Doctor doctor : doctorDao.findDoctorsBySpecializationAndName(specialization, firstname, lastName)) {
-            List<AppointmentDto> appointments = appointmentDao
-                    .generateUserAppointmentForDays(doctor.getIdDoctor(), 0L, from, to);
-            if (appointments.size() > 0) {
-                DoctorDto doctorDto = createDoctorDtoFromDoctorDaoWithoutPassword(doctor);
-                doctors.add(doctorDto);
-            }
-        }
-        return doctors;
+    public List<Doctor> getDoctorsBySpecializationAndFullName(String specialization, String firstname,
+            String lastName) {
+        return doctorDao.findDoctorsBySpecializationAndName(specialization, firstname, lastName);
     }
     
-    public List<DoctorDto> getDoctorsBySpecializationAndFullNameAndCityAndDate(String specialization, String firstname,
-            String lastName, String city, Timestamp from, Timestamp to) {
-        List<DoctorDto> doctors = new ArrayList<>();
-        for (Doctor doctor : doctorDao.findDoctorsBySpecializationAndNameAndCity(specialization, firstname, lastName, city)) {
-            List<AppointmentDto> appointments = appointmentDao.generateUserAppointmentForDays(
-                    doctor.getIdDoctor(), 0L, from, to);
-            if (appointments.size() > 0) {
-                DoctorDto doctorDto = createDoctorDtoFromDoctorDaoWithoutPassword(doctor);
-                doctors.add(doctorDto);
-            }
-        }
-        return doctors;
+    public List<Doctor> getDoctorsBySpecializationAndFullNameAndCity(String specialization, String firstname,
+            String lastName, String city) {
+        return doctorDao.findDoctorsBySpecializationAndNameAndCity(specialization, firstname, lastName, city);
     }
     
-    public List<DoctorDto> getDoctorsBySpecializationAndLastNameAndDate(String specialization, String lastName,
+    public List<Doctor> getDoctorsBySpecializationAndLastNameAndDate(String specialization, String lastName,
             Timestamp from, Timestamp to) {
-        List<DoctorDto> doctors = new ArrayList<>();
+        List<Doctor> doctors = new ArrayList<>();
         for (Doctor doctor : doctorDao.findDoctorsBySpecializationAndLastName(specialization, lastName)) {
             List<AppointmentDto> appointments = appointmentDao.generateUserAppointmentForDays(
                     doctor.getIdDoctor(), 0L, from, to);
             if (appointments.size() > 0) {
-                DoctorDto doctorDto = createDoctorDtoFromDoctorDaoWithoutPassword(doctor);
-                doctors.add(doctorDto);
+                doctors.add(doctor);
             }
         }
         return doctors;
     }
     
-    public List<DoctorDto> getDoctorsBySpecializationAndLastName(String specialization, String lastName) {
-        List<DoctorDto> doctorsDto = new ArrayList<>();
+    public List<Doctor> getDoctorsBySpecializationAndLastName(String specialization, String lastName) {
+        List<Doctor> doctorsDto = new ArrayList<>();
         for (Doctor doctor : doctorDao.findDoctorsBySpecializationAndLastName(specialization, lastName)) {
-            DoctorDto doctorDto = createDoctorDtoFromDoctorDaoWithoutPassword(doctor);
-            doctorsDto.add(doctorDto);
+            doctorsDto.add(doctor);
         }
         return doctorsDto;
     }
     
-    public List<DoctorDto> getDoctorsBySpecializationAndLastNameAndCityAndDate(String specialization, String lastName,
+    public List<Doctor> getDoctorsBySpecializationAndLastNameAndCityAndDate(String specialization, String lastName,
             String city, Timestamp from, Timestamp to) {
-        List<DoctorDto> doctors = new ArrayList<>();
+        List<Doctor> doctors = new ArrayList<>();
         for (Doctor doctor : doctorDao.findDoctorsBySpecializationAndLastNameAndCity(specialization, lastName, city)) {
             List<AppointmentDto> appointments = appointmentDao.generateUserAppointmentForDays(
                     doctor.getIdDoctor(), 0L, from, to);
             if (appointments.size() > 0) {
-                DoctorDto doctorDto = createDoctorDtoFromDoctorDaoWithoutPassword(doctor);
-                doctors.add(doctorDto);
+                doctors.add(doctor);
             }
         }
         return doctors;
     }
     
+    public List<DoctorDto> getDoctorsByDateFromDoctors(List<Doctor> doctors, Timestamp from, Timestamp to) {
+        List<DoctorDto> doctorsDto = new ArrayList<>();
+        for (Doctor doctor : doctors) {
+            List<AppointmentDto> appointments = appointmentDao.generateUserAppointmentForDays(
+                    doctor.getIdDoctor(), 0L, from, to);
+            if (appointments.size() > 0) {
+                DoctorDto doctorDto = createDoctorDtoFromDoctorDaoWithoutPassword(doctor);
+                doctorsDto.add(doctorDto);
+            }
+        }
+        return doctorsDto;
+    }
     /*
     Login and registration methods
     */
@@ -473,16 +458,16 @@ public class DoctorService {
         appointmentDto.setSubjectAppointment(appointment.getSubjectAppointment());
         return appointmentDto;
     }
-    
+    /*
     public List<DoctorDto> getDoctorsBySpecializationAndCity(String specialization, String city) {
-        List<DoctorDto> doctorsDto = new ArrayList<>();
-        for (Doctor doctor : doctorDao.findDoctorsBySpecializationAndCity(specialization, city)) {
-            DoctorDto doctorDto = createDoctorDtoFromDoctorDaoWithoutPassword(doctor);
-            doctorsDto.add(doctorDto);
-        }
-        return doctorsDto;
+    List<DoctorDto> doctorsDto = new ArrayList<>();
+    for (Doctor doctor : doctorDao.findDoctorsBySpecializationAndCity(specialization, city)) {
+    DoctorDto doctorDto = createDoctorDtoFromDoctorDaoWithoutPassword(doctor);
+    doctorsDto.add(doctorDto);
     }
-    
+    return doctorsDto;
+    }
+    */
     
     public List<DoctorDto> getFavourite(Long id) {
         List<DoctorDto> docs = new ArrayList<>();
@@ -500,6 +485,15 @@ public class DoctorService {
     
     public Integer deleteFavourite(Long idUser, Long idDoc) {
         return  doctorDao.deleteFavourite(idUser, idDoc);
+    }
+    
+    public List<DoctorDto> makeDoctorsDtoFromDoctors(List<Doctor> doctors) {
+        List<DoctorDto> doctorsDto = new ArrayList<>();
+        for (Doctor doctor : doctors) {
+            DoctorDto doctorDto = createDoctorDtoFromDoctorDaoWithoutPassword(doctor);
+            doctorsDto.add(doctorDto);
+        }
+        return doctorsDto;
     }
     
 }
