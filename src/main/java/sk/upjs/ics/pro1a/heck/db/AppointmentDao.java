@@ -331,8 +331,6 @@ public class AppointmentDao extends AbstractDAO<Appointment> {
     
     public void deleteAppointment(Long id) {
         Appointment appointment = findAppointmentById(id);
-        appointment.setAppointmentDoctor(null);
-        appointment.setAppointmentUser(null);
         appointment.setCanceledAppointment(true);
         appointment.setHolidayAppointment(false);
         appointment.setOccupiedAppointment(false);

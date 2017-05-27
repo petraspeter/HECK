@@ -154,8 +154,7 @@ public class DoctorResources {
             tsTo = new Timestamp(sdt.parse(to).getTime());
         } catch (Exception e) {
             System.err.println("DateTo param is missing!");
-        }
-                
+        }                
         if(firstName != null && lastName != null && city != null ) {
             doctors = doctorService.getDoctorsBySpecializationAndFullNameAndCity(specialization, firstName, lastName, city);
         } else if(firstName != null && lastName != null && city == null) {            
@@ -172,8 +171,7 @@ public class DoctorResources {
             doctors = doctorService.getDoctorsBySpecializationAndCity(specialization, city);
         } else {
             doctors = doctorService.getDoctorsBySpecialization(specialization);
-        }
-        
+        }        
         if(tsFrom != null) {
             doctorsDto = doctorService.getDoctorsByDateFromDoctors(doctors, tsFrom, tsTo);
         } else {
