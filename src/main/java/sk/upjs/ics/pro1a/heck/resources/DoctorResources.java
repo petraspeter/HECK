@@ -154,15 +154,15 @@ public class DoctorResources {
             tsTo = new Timestamp(sdt.parse(to).getTime());
         } catch (Exception e) {
             System.err.println("DateTo param is missing!");
-        }                
+        }
         if(firstName != null && lastName != null && city != null ) {
             doctors = doctorService.getDoctorsBySpecializationAndFullNameAndCity(specialization, firstName, lastName, city);
-        } else if(firstName != null && lastName != null && city == null) {            
+        } else if(firstName != null && lastName != null && city == null) {
             doctors = doctorService.getDoctorsBySpecializationAndFullName(specialization, firstName, lastName);
         } else if(firstName != null && lastName == null && city != null) {
-            doctors = doctorService.getDoctorsBySpecializationAndFullNameAndCity(specialization, firstName, "%", city);            
+            doctors = doctorService.getDoctorsBySpecializationAndFullNameAndCity(specialization, firstName, "%", city);
         } else if(firstName != null && lastName == null && city == null) {
-            doctors = doctorService.getDoctorsBySpecializationAndFullName(specialization, firstName, "%");            
+            doctors = doctorService.getDoctorsBySpecializationAndFullName(specialization, firstName, "%");
         } else if(firstName == null && lastName != null && city != null) {
             doctors = doctorService.getDoctorsBySpecializationAndCity(specialization, city);
         } else if(firstName == null && lastName != null && city == null) {
@@ -171,12 +171,12 @@ public class DoctorResources {
             doctors = doctorService.getDoctorsBySpecializationAndCity(specialization, city);
         } else {
             doctors = doctorService.getDoctorsBySpecialization(specialization);
-        }        
+        }
         if(tsFrom != null) {
             doctorsDto = doctorService.getDoctorsByDateFromDoctors(doctors, tsFrom, tsTo);
         } else {
             doctorsDto = doctorService.makeDoctorsDtoFromDoctors(doctors);
-        }        
+        }
         if (doctorsDto == null) {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
@@ -308,6 +308,22 @@ public class DoctorResources {
             return Response.status(Response.Status.EXPECTATION_FAILED).build();
         } else {
             return Response.status(Response.Status.CREATED).build();
+        }
+    }
+    
+    @GET
+    @Path("/users/checkFavourite")
+    @UnitOfWork
+    public Response checkFavourite(
+            @Auth AuthorizedUserDto user,
+            @QueryParam("idUser") Long idUser,
+            @QueryParam("idDoc") Long idDoc
+    ) {
+        try {
+            boolean isFavourite = doctorService.checkFavourite(idUser, idDoc);
+            return Response.ok(isFavourite).build();
+        } catch (Exception e) {
+            return Response.status(Response.Status.FORBIDDEN).build();
         }
     }
     

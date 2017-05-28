@@ -151,9 +151,6 @@ public class UserService {
     }
     
     /*
-    Private "query"methods
-    */
-    /*
     Methods for convertation between DTO and DAO
     */
     private User createUserDaoFromUserDto(UserDto userDto, String password, String salt) {

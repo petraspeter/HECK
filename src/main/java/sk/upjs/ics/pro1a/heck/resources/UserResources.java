@@ -83,7 +83,7 @@ public class UserResources {
     @PUT
     @Path("/users/{id}")
     @UnitOfWork
-    public Response updateDoctor(@Auth AuthorizedUserDto user, @PathParam("id") Long id, UserDto userDto){
+    public Response updateUser(@Auth AuthorizedUserDto user, @PathParam("id") Long id, UserDto userDto){
         userService.updateUser(id, userDto);
         return  Response.ok().build();
     }

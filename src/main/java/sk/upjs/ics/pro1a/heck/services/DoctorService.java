@@ -458,20 +458,10 @@ public class DoctorService {
         appointmentDto.setSubjectAppointment(appointment.getSubjectAppointment());
         return appointmentDto;
     }
-    /*
-    public List<DoctorDto> getDoctorsBySpecializationAndCity(String specialization, String city) {
-    List<DoctorDto> doctorsDto = new ArrayList<>();
-    for (Doctor doctor : doctorDao.findDoctorsBySpecializationAndCity(specialization, city)) {
-    DoctorDto doctorDto = createDoctorDtoFromDoctorDaoWithoutPassword(doctor);
-    doctorsDto.add(doctorDto);
-    }
-    return doctorsDto;
-    }
-    */
     
-    public List<DoctorDto> getFavourite(Long id) {
+    public List<DoctorDto> getFavourite(Long idUser) {
         List<DoctorDto> docs = new ArrayList<>();
-        List<Doctor> doctors = doctorDao.findFavourite(id);
+        List<Doctor> doctors = doctorDao.findFavourite(idUser);
         for (Doctor doctor : doctors) {
             DoctorDto doctorDto = createDoctorDtoFromDoctorDaoWithoutPassword(doctor);
             docs.add(doctorDto);
@@ -494,6 +484,16 @@ public class DoctorService {
             doctorsDto.add(doctorDto);
         }
         return doctorsDto;
+    }
+    
+    public Boolean checkFavourite(Long idUser, Long idDoctor) {
+        Doctor doc = doctorDao.checkFavourite(idUser, idDoctor);
+        if (doc != null) {
+            return true;
+        } else {
+            return false;
+        }
+        
     }
     
 }
