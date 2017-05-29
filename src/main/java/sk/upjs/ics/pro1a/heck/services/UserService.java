@@ -204,17 +204,14 @@ public class UserService {
                 user.getAdmin());
     }
 
-    public IsValidDto checkUserPassword(Long id, String password) {
-            IsValidDto isValidDto = new IsValidDto();
+    public Boolean checkUserPassword(Long id, String password) {
             User user = userDao.findById(id);
             if (user != null) {
                 if (user.getPasswordUser().equals(PasswordManager.encryptPassword(user.getSaltUser(), password))) {
-                    isValidDto.setValid(true);
-                    return isValidDto;
+                    return true;
                 }
             }
-            isValidDto.setValid(false);
-            return isValidDto;
+            return false;
     }
 
     public void changeUserPassword(Long id, ChangePasswordDto changePasswordDto) {
