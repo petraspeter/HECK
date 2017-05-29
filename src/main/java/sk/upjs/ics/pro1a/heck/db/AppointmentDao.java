@@ -10,6 +10,7 @@ import java.util.concurrent.TimeUnit;
 import org.apache.commons.lang3.time.DateUtils;
 import org.hibernate.FetchMode;
 import org.hibernate.SessionFactory;
+import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 import org.joda.time.LocalDate;
 import sk.upjs.ics.pro1a.heck.db.core.Appointment;
@@ -299,7 +300,7 @@ public class AppointmentDao extends AbstractDAO<Appointment> {
         int period = doc.getAppointmentInterval();
         LocalDate jodaDate = new org.joda.time.LocalDate(date.getTime());
         /*
-        den v tyzdni je v intervale 1-7, preco znizujem o 1
+        den v tyzdni je v intervale 1-7, preto znizujem o 1
         */
         List<WorkingTime> docHours = findWorkingTimeByDoctorIdAndDay(idDoc, jodaDate.getDayOfWeek() - 1);
         for (WorkingTime docHour : docHours) {
@@ -344,7 +345,8 @@ public class AppointmentDao extends AbstractDAO<Appointment> {
     public List<Appointment> findUserAppointment(Long id) {
         return sessionFactory.getCurrentSession().createCriteria(Appointment.class)
                 .setFetchMode("appointmentUser", FetchMode.JOIN)
-                .add(Restrictions.eq("appointmentUser.idUser", id))
+                .add(Restrictions.eq("appointmentUser.idUser", id))    
+                .addOrder(Order.asc("dateFromAppointment"))
                 .list();
     }
     
@@ -353,6 +355,7 @@ public class AppointmentDao extends AbstractDAO<Appointment> {
                 .setFetchMode("appointmentUser", FetchMode.JOIN)
                 .add(Restrictions.eq("appointmentUser.idUser", id))
                 .add(Restrictions.ge("dateFromAppointment", new Timestamp(System.currentTimeMillis())))
+                .addOrder(Order.asc("dateFromAppointment"))           
                 .list();
     }
     
