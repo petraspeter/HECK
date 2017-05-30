@@ -112,4 +112,17 @@ public class UserResources {
             return Response.status(Response.Status.BAD_REQUEST).build();
         }
     }
+    
+    @POST
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    @Path("/user/checkLogin/{login}")
+    @UnitOfWork
+    public Response isLoginValid(
+            @PathParam("login") String login) {
+        if (login == null) {
+            return Response.status(Response.Status.BAD_REQUEST).build();
+        }
+        return Response.ok(userService.isLoginValid(login)).build();
+    }
+    
 }

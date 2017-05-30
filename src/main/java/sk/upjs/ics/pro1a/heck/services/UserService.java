@@ -203,17 +203,17 @@ public class UserService {
                 user.getActiveUser(),
                 user.getAdmin());
     }
-
+    
     public Boolean checkUserPassword(Long id, String password) {
-            User user = userDao.findById(id);
-            if (user != null) {
-                if (user.getPasswordUser().equals(PasswordManager.encryptPassword(user.getSaltUser(), password))) {
-                    return true;
-                }
+        User user = userDao.findById(id);
+        if (user != null) {
+            if (user.getPasswordUser().equals(PasswordManager.encryptPassword(user.getSaltUser(), password))) {
+                return true;
             }
-            return false;
+        }
+        return false;
     }
-
+    
     public void changeUserPassword(Long id, ChangePasswordDto changePasswordDto) {
         if (changePasswordDto.getNewPassword().equals(changePasswordDto.getConfirmPassword())) {
             User user = userDao.findById(id);
@@ -228,7 +228,7 @@ public class UserService {
         throw new IllegalStateException("Change password DTO is not valid.");
     }
     
-     public List<UserDto> getAllUsersForPage(int page, int pageSize) {
+    public List<UserDto> getAllUsersForPage(int page, int pageSize) {
         List<UserDto> usersDto = new ArrayList<>();
         for (User user : userDao.findForPage(page, pageSize)) {
             UserDto userDto = createUserDtoFromUserDaoWithoutPassword(user);
@@ -236,5 +236,13 @@ public class UserService {
         }
         return usersDto;
     }
-         
+    
+    public Boolean isLoginValid(String login) {
+        if (userDao.findByLogin(login) == null) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+    
 }
