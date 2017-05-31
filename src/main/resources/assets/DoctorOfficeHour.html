@@ -193,9 +193,12 @@
                             </div>
                         </div>
                     </div>
-
+                    <div>
+                        <label id="wrongIntervalData" class="errorLabel">Time interval should contain only digits!</label>
+                        <label id="wrongWorkingHoursData" class="errorLabel">One or more working hours do not match format HH:MM!</label>
+                    </div>
                     <div id="my-save-button">
-                        <button id="saveButtonWorkingHours"class="btn btn-success" data-title="Save" onclick="sendValues()">
+                        <button id="saveButtonWorkingHours"class="btn btn-success" data-title="Save" onclick="validateAndSendWorkingDataValues()">
                             Save&nbsp&nbsp
                         </button>
                     </div>

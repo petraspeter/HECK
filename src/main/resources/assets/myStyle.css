@@ -25,6 +25,14 @@ body {
     padding-left: 22px;
 }
 
+.errorLabel {
+    text-align: center;
+    color: red;
+    visibility: hidden;
+    padding-bottom: 0px;
+    padding-left: 22px;
+}
+
 /* doctors*/
 #detailTable > tbody > tr > td, #detailTable > tbody > tr > th {
     padding: 8px;
@@ -237,7 +245,7 @@ p {
     background-color: white;
     opacity: 0.92;
 }
-body{
+body{   
     background-image: url(chodba.jpg);
     background-position: top center;
     background-repeat: no-repeat;
@@ -362,3 +370,7 @@ th > a
     background: white;
 }
 
+.form-horizontal .has-feedback .form-control-feedback
+{
+        left: 110%;
+}

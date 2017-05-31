@@ -20,7 +20,7 @@
     </script>
 
     <script id="detailTableTemplate" type="text/x-handlebars-template">
-        <form id="myForm" class="form-horizontal">
+        <form id="myForm" class="form-horizontal" onkeyup="checkFormAndPreventFromSubmit()" onchange="checkFormAndPreventFromSubmit()">
             <fieldset id="fieldset">
                 <div class="form-group">
                     <label class="col-md-5 control-label nameLabel" for="login">Login name: </label>

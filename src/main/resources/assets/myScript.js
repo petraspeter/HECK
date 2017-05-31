@@ -1,58 +1,61 @@
 function signIn() {
 
-    var login = $("#lgn").val();  
+    var login = $("#lgn").val();
     var password = $("#psw").val();
-    var ourRequest = new XMLHttpRequest();
-    ourRequest.open('POST', 'http://localhost:8076/heck/login/doctor');
-    ourRequest.setRequestHeader("Content-Type", "application/json");
 
-    ourRequest.onload = function () {
-        if (ourRequest.status == 200) {
-            var data = JSON.parse(ourRequest.responseText);
+    $.ajax ({
+        type: 'POST',
+        url: 'http://localhost:8076/heck/login/doctor',
+        dataType: 'json',
+        headers: {
+            "Content-Type" : 'application/json'
+        },
+        data: JSON.stringify({
+            login: login,
+            password: password
+        }),
+        success: function (data,textStatus, jqXHR){
             console.log(data);
             sessionStorage.setItem('user', JSON.stringify(data));
             window.location.href = 'DoctorMainPage.html';
-        } else if (ourRequest.status == 401) {
-            //ked nie su spravne udaje skusime prihlasit admina
-            var ourRequest2 = new XMLHttpRequest();
-            ourRequest2.open('POST', 'http://localhost:8076/heck/login/user');
-            ourRequest2.setRequestHeader("Content-Type", "application/json");
-
-            ourRequest2.onload = function () {
-                if (ourRequest2.status == 200) {
-                    var data = JSON.parse(ourRequest2.responseText);
-                    console.log(data);
-                    if (data.role == "admin") {
-                        sessionStorage.setItem('user', JSON.stringify(data));
-                        window.location.href = 'AdminMainPage.html';
-                    } else {
-                        document.getElementById("wrongData").style.visibility = "visible";
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+            console.log(xhr);
+            if (xhr.status == 401) {
+                $.ajax ({
+                    type: 'POST',
+                    url: 'http://localhost:8076/heck/login/user',
+                    dataType: 'json',
+                    headers: {
+                        "Content-Type" : 'application/json'
+                    },
+                    data: JSON.stringify({
+                        login: login,
+                        password: password
+                    }),
+                    success: function (data,textStatus, jqXHR){
+                        console.log(data);
+                        if (data.role == "admin") {
+                            sessionStorage.setItem('user', JSON.stringify(data));
+                            window.location.href = 'AdminMainPage.html';
+                        } else {
+                            $('#wrongData').css('visibility', 'visible');
+                        }
+                    },
+                    error: function (xhr, ajaxOptions, thrownError) {
+                        console.log(xhr);
+                        if (xhr.status == 401) {
+                            $('#wrongData').css('visibility', 'visible');
+                        } else {
+                            console.log("We connected to the server, but it returned an error.");
+                        }
                     }
-                } else if (ourRequest2.status == 401) {
-                    document.getElementById("wrongData").style.visibility = "visible";
-                } else {
-                    console.log("We connected to the server, but it returned an error.");
-                }
-            };
-
-            ourRequest2.onerror = function () {
-                console.log("Connection error");
-            };
-            ourRequest2.send(JSON.stringify({
-                login: login,
-                password: password
-            }));
-        } else {
-            console.log("We connected to the server, but it returned an error.");
+                });
+            } else {
+                console.log("We connected to the server, but it returned an error.");
+            }
         }
-    };
-    ourRequest.onerror = function () {
-        console.log("Connection error");
-    };
-    ourRequest.send(JSON.stringify({
-        login: login,
-        password: password
-    }));
+    });
 }
 
 function logout() {
@@ -64,33 +67,28 @@ function changePassword() {
     var newPassword = $('#newModalPassword').val();
     var newConfirmPassword = $('#newModalConfirmPassword').val();
 
-    var ourRequest = new XMLHttpRequest();
-    ourRequest.open('POST',
-        (JSON.parse(sessionStorage.getItem('user')).role == 'doctor' ?
-        'http://localhost:8076/heck/doctors/' : 'http://localhost:8076/heck/users/') + JSON.parse(sessionStorage.getItem('user')).id + '/changePassword');
-    ourRequest.setRequestHeader("Content-Type", "application/json");
-
-    ourRequest.onload = function () {
-        if (ourRequest.status == 200) {
-            console.log("Password changed.");
-            $('#myModal').modal('hide');
-        } else {
-            console.log("We connected to the server, but it returned an error.");
-        }
-    };
-
-    ourRequest.onerror = function () {
-        console.log("Connection error");
-    };
-
-    ourRequest.send(JSON.stringify(
-        {
+    $.ajax ({
+        type: 'POST',
+        url: (JSON.parse(sessionStorage.getItem('user')).role == 'doctor' ?
+            'http://localhost:8076/heck/doctors/' : 'http://localhost:8076/heck/users/') + JSON.parse(sessionStorage.getItem('user')).id + '/changePassword',
+        headers: {
+            "Content-Type" : 'application/json'
+        },
+        data: JSON.stringify({
             password: currentPassword,
             newPassword: newPassword,
             confirmPassword: newConfirmPassword
+        }),
+        success: function (data,textStatus, jqXHR){
+            console.log("Password changed.");
+            $('#myModal').modal('hide');
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+            console.log(xhr);
+            console.log(thrownError);
+            console.log("We connected to the server, but it returned an error.")
         }
-    ));
-
+    });
 }
 
 function signUp() {
@@ -101,82 +99,79 @@ function signUp() {
         ids[$(this).attr('id')] = $(this).val();
     });
 
-    var ourRequest = new XMLHttpRequest();
-    ourRequest.open('POST', 'http://localhost:8076/heck/doctors');
-    ourRequest.setRequestHeader("Content-Type", "application/json");
-
-    ourRequest.onload = function () {
-        if (ourRequest.status == 201) {
-            var data = JSON.parse(ourRequest.responseText);
-            var url = 'DoctorMainPage.html';
-            sessionStorage.setItem('user', JSON.stringify(data));
-            window.location.href = url;
-        } else if ((ourRequest.status == 412)) {
-            alert("Vyplnte vsetky polia oznacene *");
-        } else {
-            console.log("We connected to the server, but it returned an error.");
+    $.ajax ({
+        type: 'POST',
+        url: 'http://localhost:8076/heck/doctors',
+        dataType: 'json',
+        headers: {
+            "Content-Type" : 'application/json'
+        },
+        data: JSON.stringify(ids),
+        success: function (data,textStatus, jqXHR){
+            if (jqXHR.status == 201) {
+                var url = 'DoctorMainPage.html';
+                sessionStorage.setItem('user', JSON.stringify(data));
+                window.location.href = url;
+            } else {
+                console.log("Sign up request was successful, but it should return HTTP 201 status.");
+            }
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+            if ((xhr.status == 412)) {
+                alert("Vyplnte vsetky polia oznacene *");
+            } else {
+                console.log("We connected to the server, but it returned an error.");
+            }
         }
-    };
-
-    ourRequest.onerror = function () {
-        console.log("Connection error");
-    };
-
-    ourRequest.send(JSON.stringify(ids));
+    });
 }
 
 function getDoctorDetail() {
-    var ourRequest = new XMLHttpRequest();
-
-    ourRequest.open('GET', 'http://localhost:8076/heck/doctors/' + JSON.parse(sessionStorage.getItem('user')).id);
-    ourRequest.setRequestHeader("Authorization", "Bearer " + JSON.parse(sessionStorage.getItem('user')).token);
-
-    ourRequest.onload = function () {
-        if (ourRequest.status == 200) {
-            var data = JSON.parse(ourRequest.responseText);
+    $.ajax ({
+        type: 'GET',
+        url: 'http://localhost:8076/heck/doctors/' + JSON.parse(sessionStorage.getItem('user')).id,
+        dataType: 'json',
+        headers: {
+            "Authorization" : 'Bearer ' + JSON.parse(sessionStorage.getItem('user')).token
+        },
+        success: function (data,textStatus, jqXHR){
             console.log(data);
             fillDetailTable(data);
             loadSpecialization(data.specialization);
-        } else if (ourRequest.status == 401) {
-            var url = 'SignIn.html';
-            window.location.href = url;
-        } else {
-            console.log("We connected to the server, but it returned an error.");
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+            if (xhr.status == 401) {
+                var url = 'SignIn.html';
+                window.location.href = url;
+            } else {
+                console.log("We connected to the server, but it returned an error.");
+            }
         }
-    };
-
-    ourRequest.onerror = function () {
-        console.log("Connection error");
-    };
-
-    ourRequest.send();
+    });
 }
 
 function getAdminDetail() {
-    var ourRequest = new XMLHttpRequest();
-
-    ourRequest.open('GET', 'http://localhost:8076/heck/users/' + JSON.parse(sessionStorage.getItem('user')).id);
-    ourRequest.setRequestHeader("Authorization", "Bearer " + JSON.parse(sessionStorage.getItem('user')).token);
-
-    ourRequest.onload = function () {
-        if (ourRequest.status == 200) {
-            var data = JSON.parse(ourRequest.responseText);
+    $.ajax ({
+        type: 'GET',
+        url: 'http://localhost:8076/heck/users/' + JSON.parse(sessionStorage.getItem('user')).id,
+        dataType: 'json',
+        headers: {
+            "Authorization" : 'Bearer ' + JSON.parse(sessionStorage.getItem('user')).token
+        },
+        success: function (data,textStatus, jqXHR){
             console.log(data);
             fillDetailTable(data);
             setUpValidation();
-        } else if (ourRequest.status == 401) {
-            var url = 'SignIn.html';
-            window.location.href = url;
-        } else {
-            console.log("We connected to the server, but it returned an error.");
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+            if (xhr.status == 401) {
+                var url = 'SignIn.html';
+                window.location.href = url;
+            } else {
+                console.log("We connected to the server, but it returned an error.");
+            }
         }
-    };
-
-    ourRequest.onerror = function () {
-        console.log("Connection error");
-    };
-
-    ourRequest.send();
+    });
 }
 
 function fillDetailTable(rows) {
@@ -184,9 +179,8 @@ function fillDetailTable(rows) {
     var compiledTemplate = Handlebars.compile(rawTemplate);
     var ourGeneratedHTML = compiledTemplate(rows);
 
-    //TODO prerobit na jqurey
-    var table = document.getElementById("detailTableContainer");
-    table.innerHTML = ourGeneratedHTML;
+    var table = $('#detailTableContainer');
+    table.html(ourGeneratedHTML);
 }
 
 var oldValues = {};
@@ -197,9 +191,8 @@ function startEditableDoctorInputs() {
     });
     console.log(oldValues);
 
-    //TODO Jquery
-    if(document.getElementById("specialization")!= null) {
-        document.getElementById("specialization").disabled = false;
+    if($('#specialization')!= null) {
+        $('#specialization').prop('disabled', false);
     }
 
     var editableInputs = $('.myInputs');
@@ -208,12 +201,11 @@ function startEditableDoctorInputs() {
         editableInputs[i].disabled = false;
     }
 
-    document.getElementById("saveButton").style.display = "inline-block";
-    document.getElementById("cancelButton").style.display = "inline-block";
-    document.getElementById("editButton").style.display = "none";
+    $('#saveButton').css("display", "inline-block");
+    $('#cancelButton').css("display", "inline-block");
+    $('#editButton').css("display", "none");
 }
 
-var oldValues = {};
 function startEditableAdminInputs() {
     var $inputs = $(':input:not(button)');
     $inputs.each(function () {
@@ -226,9 +218,9 @@ function startEditableAdminInputs() {
         editableInputs[i].disabled = false;
     }
 
-    document.getElementById("saveButton").style.display = "inline-block";
-    document.getElementById("cancelButton").style.display = "inline-block";
-    document.getElementById("editButton").style.display = "none";
+    $('#saveButton').css("display", "inline-block");
+    $('#cancelButton').css("display", "inline-block");
+    $('#editButton').css("display", "none");
 }
 
 function clearValidationMarkers(element) {
@@ -255,69 +247,60 @@ function clearValidationMarkers(element) {
 }
 
 function cancelEditableDoctorInputs() {
-    document.getElementById("specialization").disabled = true;
-
-    //TODO nacitat polia z objektu
-
-    document.getElementById("firstName").value = oldValues["firstName"];
-    document.getElementById("lastName").value = oldValues["lastName"];
-    document.getElementById("email").value = oldValues["email"];
-    document.getElementById("specialization").value = oldValues["specialization"];
-    document.getElementById("firstName").value = oldValues["firstName"];
-    document.getElementById("address").value = oldValues["address"];
-    document.getElementById("phoneNumber").value = oldValues["phoneNumber"];
-    document.getElementById("city").value = oldValues["city"];
-    document.getElementById("postalCode").value = oldValues["postalCode"];
-    document.getElementById("office").value = oldValues["office"];
+    $('#specialization').prop('disabled', true);
+    $('#firstName').val(oldValues["firstName"]);
+    $('#lastName').val(oldValues["lastName"]);
+    $('#email').val(oldValues["email"]);
+    $('#specialization').val(oldValues["specialization"]);
+    $('#address').val(oldValues["address"]);
+    $('#phoneNumber').val(oldValues["phoneNumber"]);
+    $('#city').val(oldValues["city"]);
+    $('#postalCode').val(oldValues["postalCode"]);
+    $('#office').val(oldValues["office"]);
 
 
-    var inputs = document.getElementsByClassName('myInputs');
+    var inputs = $('.myInputs');
 
     for (var i = 0; i < inputs.length; ++i) {
         inputs[i].disabled = true;
     }
-
-    document.getElementById("saveButton").style.display = "none";
-    document.getElementById("cancelButton").style.display = "none";
-    document.getElementById("editButton").style.display = "inline-block";
+    $('#saveButton').css("display", "none");
+    $('#cancelButton').css("display", "none");
+    $('#editButton').css("display", "inline-block");
     clearValidationMarkers($('#myForm'));
 }
 
 function cancelEditableAdminInputs() {
 
-    document.getElementById("firstName").value = oldValues["firstName"];
-    document.getElementById("lastName").value = oldValues["lastName"];
-    document.getElementById("email").value = oldValues["email"];
-    document.getElementById("firstName").value = oldValues["firstName"];
-    document.getElementById("address").value = oldValues["address"];
-    document.getElementById("phoneNumber").value = oldValues["phoneNumber"];
-    document.getElementById("city").value = oldValues["city"];
-    document.getElementById("postalCode").value = oldValues["postalCode"];
+    $('#firstName').val(oldValues["firstName"]);
+    $('#lastName').val(oldValues["lastName"]);
+    $('#email').val(oldValues["email"]);
+    $('#address').val(oldValues["address"]);
+    $('#phoneNumber').val(oldValues["phoneNumber"]);
+    $('#city').val(oldValues["city"]);
+    $('#postalCode').val(oldValues["postalCode"]);
 
 
-    var inputs = document.getElementsByClassName('myInputs');
+    var inputs = $('.myInputs');
 
     for (var i = 0; i < inputs.length; ++i) {
         inputs[i].disabled = true;
     }
-
-    document.getElementById("saveButton").style.display = "none";
-    document.getElementById("cancelButton").style.display = "none";
-    document.getElementById("editButton").style.display = "inline-block";
+    $('#saveButton').css("display", "none");
+    $('#cancelButton').css("display", "none");
+    $('#editButton').css("display", "inline-block");
     clearValidationMarkers($('#myForm'));
 }
 
 function saveEditableDoctorInputs() {
-    //TODO
-    document.getElementById("specialization").disabled = true;
+    $('#specialization').prop('disabled', true);
     var editableInputs = $('.myInputs');
     for (var i = 0; i < editableInputs.length; ++i) {
         editableInputs[i].disabled = true;
     }
-    //TODO vymysliet funkciu
-    document.getElementById("saveButton").style.display = "none";
-    document.getElementById("cancelButton").style.display = "none";
-    document.getElementById("editButton").style.display = "inline-block";
+    $('#saveButton').css("display", "none");
+    $('#cancelButton').css("display", "none");
+    $('#editButton').css("display", "inline-block");
     clearValidationMarkers($('#myForm'));
 }
 
@@ -326,36 +309,28 @@ function saveEditableAdminInputs() {
     for (var i = 0; i < editableInputs.length; ++i) {
         editableInputs[i].disabled = true;
     }
-    //TODO vymysliet funkciu
-    document.getElementById("saveButton").style.display = "none";
-    document.getElementById("cancelButton").style.display = "none";
-    document.getElementById("editButton").style.display = "inline-block";
+    $('#saveButton').css("display", "none");
+    $('#cancelButton').css("display", "none");
+    $('#editButton').css("display", "inline-block");
     clearValidationMarkers($('#myForm'));
 }
 
 function loadSpecialization(specializationId) {
-    var ourRequest = new XMLHttpRequest();
-    ourRequest.open('GET', 'http://localhost:8076/heck/specializations');
-
-    ourRequest.onload = function () {
-        if (ourRequest.status == 200) {
-            var data = JSON.parse(ourRequest.responseText);
+    $.ajax ({
+        type: 'GET',
+        url: 'http://localhost:8076/heck/specializations',
+        dataType: 'json',
+        success: function (data,textStatus, jqXHR){
             createHTMLspecializationDropdown(data);
             if (specializationId != undefined) {
-                document.getElementById('specialization').value = specializationId;
+                $('#specialization').val(specializationId);
             }
             setUpValidation();
-
-        } else {
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
             console.log("We connected to the server, but it returned an error.");
         }
-    };
-
-    ourRequest.onerror = function () {
-        console.log("Connection error");
-    };
-
-    ourRequest.send();
+    });
 }
 
 function createHTMLspecializationDropdown(specializations) {
@@ -364,9 +339,8 @@ function createHTMLspecializationDropdown(specializations) {
     var compiledTemplate = Handlebars.compile(rawTemplate);
     var ourGeneratedHTML = compiledTemplate(specializations);
 
-    //TODO
-    var specContainer = document.getElementById("specializationContainer");
-    specContainer.innerHTML = ourGeneratedHTML;
+    var specContainer = $('#specializationContainer');
+    specContainer.html(ourGeneratedHTML);
 }
 
 function updateDoctor() {
@@ -378,28 +352,26 @@ function updateDoctor() {
         ids[$(this).attr('id')] = $(this).val();
     });
 
-    var ourRequest = new XMLHttpRequest();
-
-    ourRequest.open('PUT', 'http://localhost:8076/heck/doctors/' + JSON.parse(sessionStorage.getItem('user')).id);
-    ourRequest.setRequestHeader("Content-Type", "application/json");
-    ourRequest.setRequestHeader("Authorization", "Bearer " + JSON.parse(sessionStorage.getItem('user')).token);
-
-    ourRequest.onload = function () {
-        if (ourRequest.status == 200) {
+    $.ajax ({
+        type: 'PUT',
+        url: 'http://localhost:8076/heck/doctors/' + JSON.parse(sessionStorage.getItem('user')).id,
+        headers: {
+            "Content-Type": 'application/json',
+            "Authorization": 'Bearer ' + JSON.parse(sessionStorage.getItem('user')).token
+        },
+        data: JSON.stringify(ids),
+        success: function (data, textStatus, jqXHR) {
             console.log("Update successful.");
-        } else if (ourRequest.status == 401) {
-            var url = 'SignIn.html';
-            window.location.href = url;
-        } else {
-            console.log("We connected to the server, but it returned an error.");
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+            if (ourRequest.status == 401) {
+                var url = 'SignIn.html';
+                window.location.href = url;
+            } else {
+                console.log("We connected to the server, but it returned an error.");
+            }
         }
-    };
-
-    ourRequest.onerror = function () {
-        console.log("Connection error");
-    };
-
-    ourRequest.send(JSON.stringify(ids));
+    });
 }
 
 function updateAdmin() {
@@ -410,33 +382,30 @@ function updateAdmin() {
         ids[$(this).attr('id')] = $(this).val();
     });
 
-    var ourRequest = new XMLHttpRequest();
-
-    ourRequest.open('PUT', 'http://localhost:8076/heck/users/' + JSON.parse(sessionStorage.getItem('user')).id);
-    ourRequest.setRequestHeader("Content-Type", "application/json");
-    ourRequest.setRequestHeader("Authorization", "Bearer " + JSON.parse(sessionStorage.getItem('user')).token);
-
-    ourRequest.onload = function () {
-        if (ourRequest.status == 200) {
+    $.ajax ({
+        type: 'PUT',
+        url: 'http://localhost:8076/heck/users/' + JSON.parse(sessionStorage.getItem('user')).id,
+        headers: {
+            "Content-Type": 'application/json',
+            "Authorization": 'Bearer ' + JSON.parse(sessionStorage.getItem('user')).token
+        },
+        data: JSON.stringify(ids),
+        success: function (data, textStatus, jqXHR) {
             console.log("Update successful.");
-        } else if (ourRequest.status == 401) {
-            var url = 'SignIn.html';
-            window.location.href = url;
-        } else {
-            console.log("We connected to the server, but it returned an error.");
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+            if (ourRequest.status == 401) {
+                var url = 'SignIn.html';
+                window.location.href = url;
+            } else {
+                console.log("We connected to the server, but it returned an error.");
+            }
         }
-    };
-
-    ourRequest.onerror = function () {
-        console.log("Connection error");
-    };
-
-    ourRequest.send(JSON.stringify(ids));
+    });
 }
 
 function addButton(day) {
     var newTextBoxDiv = $(document.createElement('div'));
-    
 
     newTextBoxDiv.after().html(
         '<input class="text-field-from" type="text" placeholder="from">' +
@@ -446,7 +415,7 @@ function addButton(day) {
 }
 
 function removeButton(day) {
-    var node_list = document.getElementById("TextBoxesGroup" + day).children;
+    var node_list = $('#TextBoxesGroup' + day).children;
     if (node_list.length == 1) {
         alert("No more textbox to remove");
         return false;
@@ -454,30 +423,48 @@ function removeButton(day) {
     node_list[node_list.length - 1].remove();
 }
 
-function sendValues() {
+function validateAndSendWorkingDataValues() {
+    var wrongIntervalDataLabel = $('#wrongIntervalData');
+    var wrongWorkingHoursDataLabel = $('#wrongWorkingHoursData');
+    wrongIntervalDataLabel.css('visibility', 'hidden');
+    wrongWorkingHoursDataLabel.css('visibility', 'hidden');
     var data = getDaysValues();
 
-    var ourRequest = new XMLHttpRequest();
-    console.log(JSON.stringify(data));
 
-    ourRequest.open('POST', 'http://localhost:8076/heck/doctors/' + JSON.parse(sessionStorage.getItem('user')).id + '/workingTime');
-    ourRequest.setRequestHeader("Content-Type", "application/json");
-    ourRequest.setRequestHeader("Authorization", "Bearer " + JSON.parse(sessionStorage.getItem('user')).token);
+    var patt = /^[0-9]+$/;
+    if(!patt.test(data.interval)) {
+        wrongIntervalDataLabel.css('visibility', 'visible');
+    }
 
-    ourRequest.onload = function () {
-        if (ourRequest.status == 201) {
-            console.log("Success.");
-            disableAllButtonsAndTextFields();
-        } else {
-            console.log("We connected to the server, but it returned an error.");
+    patt = /^[0-9]{1,2}:[0-9]{2}$/;
+    data.workingTimes.forEach(function callback(workingTime, index, array) {
+        if (!patt.test(workingTime.start) || !patt.test(workingTime.end)) {
+            wrongWorkingHoursDataLabel.css('visibility', 'visible');
         }
-    };
+    });
 
-    ourRequest.onerror = function () {
-        console.log("Connection error");
-    };
-
-    ourRequest.send(JSON.stringify(data));
+    if(wrongIntervalDataLabel.css('visibility') == 'hidden' && wrongWorkingHoursDataLabel.css('visibility') == 'hidden') {
+        $.ajax ({
+            type: 'POST',
+            url: 'http://localhost:8076/heck/doctors/' + JSON.parse(sessionStorage.getItem('user')).id + '/workingTime',
+            headers: {
+                "Content-Type": 'application/json',
+                "Authorization": 'Bearer ' + JSON.parse(sessionStorage.getItem('user')).token
+            },
+            data: JSON.stringify(data),
+            success: function (data, textStatus, jqXHR) {
+                if (jqXHR.status == 201) {
+                    console.log("Success.");
+                    disableAllButtonsAndTextFields();
+                } else {
+                    console.log("Request was successful, but it should return HTTP 201 status.");
+                }
+            },
+            error: function (xhr, ajaxOptions, thrownError) {
+                console.log("We connected to the server, but it returned an error.");
+            }
+        });
+    }
 }
 
 function getDaysValues() {
@@ -570,32 +557,27 @@ function disableAllButtonsAndTextFields(data) {
 }
 
 function checkWorkingHoursAvailability() {
-    var ourRequest = new XMLHttpRequest();
-
-    ourRequest.open('GET', 'http://localhost:8076/heck/doctors/' + JSON.parse(sessionStorage.getItem('user')).id + '/workingTime');
-    ourRequest.setRequestHeader("Authorization", "Bearer " + JSON.parse(sessionStorage.getItem('user')).token);
-
-    ourRequest.onload = function () {
-        if (ourRequest.status == 200) {
-            var data = JSON.parse(ourRequest.responseText);
+    $.ajax ({
+        type: 'GET',
+        url: 'http://localhost:8076/heck/doctors/' + JSON.parse(sessionStorage.getItem('user')).id + '/workingTime',
+        dataType: 'json',
+        headers: {
+            "Authorization" : 'Bearer ' + JSON.parse(sessionStorage.getItem('user')).token
+        },
+        success: function (data,textStatus, jqXHR){
             console.log(data);
             if (data.interval > 0) {
                 disableAllButtonsAndTextFields(data);
             }
-        } else {
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
             console.log("We connected to the server, but it returned an error.");
         }
-    };
-
-    ourRequest.onerror = function () {
-        console.log("Connection error");
-    };
-
-    ourRequest.send();
+    });
 }
 
 function processDayValues(day, dayOfTheWeek) {
-    var node_list = document.getElementById("TextBoxesGroup" + day).children;
+    var node_list = $('#TextBoxesGroup' + day).children();
     var rowResult = [];
     for (i = 1; i < node_list.length; i++) {
         rowResult.push(
@@ -609,58 +591,43 @@ function processDayValues(day, dayOfTheWeek) {
 }
 
 function getDoctors() {
-
-    var ourRequest = new XMLHttpRequest();
-
-    ourRequest.open('GET', 'http://localhost:8076/heck/doctors');
-    ourRequest.setRequestHeader("Authorization", "Bearer " + JSON.parse(sessionStorage.getItem('user')).token);
-
-    ourRequest.onload = function () {
-        if (ourRequest.status == 200) {
-            var data = JSON.parse(ourRequest.responseText);
+    $.ajax ({
+        type: 'GET',
+        url: 'http://localhost:8076/heck/doctors',
+        dataType: 'json',
+        headers: {
+            "Authorization" : 'Bearer ' + JSON.parse(sessionStorage.getItem('user')).token
+        },
+        success: function (data,textStatus, jqXHR){
             console.log(data);
             fillTable(data);
             fillModalsDetails(data);
-
-
             $('#myTable').DataTable(); //vyhladavanie a strankovanie
-        } else {
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
             console.log("We connected to the server, but it returned an error.");
         }
-    };
-
-    ourRequest.onerror = function () {
-        console.log("Connection error");
-    };
-
-    ourRequest.send();
+    });
 }
 
 function getUsers() {
-
-    var ourRequest = new XMLHttpRequest();
-
-    ourRequest.open('GET', 'http://localhost:8076/heck/users');
-    ourRequest.setRequestHeader("Authorization", "Bearer " + JSON.parse(sessionStorage.getItem('user')).token);
-
-    ourRequest.onload = function () {
-        if (ourRequest.status == 200) {
-            var data = JSON.parse(ourRequest.responseText);
+    $.ajax ({
+        type: 'GET',
+        url: 'http://localhost:8076/heck/users',
+        dataType: 'json',
+        headers: {
+            "Authorization" : 'Bearer ' + JSON.parse(sessionStorage.getItem('user')).token
+        },
+        success: function (data,textStatus, jqXHR){
             console.log(data);
             fillTable(data);
-            fillModalsDetails(data)
-
+            fillModalsDetails(data);
             $('#myTable').DataTable(); //vyhladavanie a strankovanie
-        } else {
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
             console.log("We connected to the server, but it returned an error.");
         }
-    };
-
-    ourRequest.onerror = function () {
-        console.log("Connection error");
-    };
-
-    ourRequest.send();
+    });
 }
 
 function disableChangePasswordValidation(){
@@ -710,39 +677,39 @@ function hex(x) {
 
 function fillTable(rows){
 
-    var rawTemplate = document.getElementById("tableTemplate").innerHTML;
+    var rawTemplate = $('#tableTemplate').html();
     var compiledTemplate = Handlebars.compile(rawTemplate);
     var ourGeneratedHTML = compiledTemplate(rows);
 
-    var table = document.getElementById("tableContainer");
-    table.innerHTML = ourGeneratedHTML;
+    var table = $('#tableContainer');
+    table.html(ourGeneratedHTML);
 }
 
 function fillModalsDetails(data){
-    var rawTemplate = document.getElementById("detailTableTemplate").innerHTML;
+    var rawTemplate = $('#detailTableTemplate').html();
     var compiledTemplate = Handlebars.compile(rawTemplate);
     var ourGeneratedHTML = compiledTemplate(data);
 
-    var table = document.getElementById("detailTablesContainer");
-    table.innerHTML = ourGeneratedHTML;
+    var table = $('#detailTablesContainer');
+    table.html(ourGeneratedHTML);
 
-    rawTemplate = document.getElementById("modalWindowsTemplate").innerHTML;
+    rawTemplate = $('#modalWindowsTemplate').html();
     compiledTemplate = Handlebars.compile(rawTemplate);
     ourGeneratedHTML = compiledTemplate(data);
 
-    table = document.getElementById("modalWindowsContainer");
-    table.innerHTML = ourGeneratedHTML;
+    table = $('#modalWindowsContainer');
+    table.html(ourGeneratedHTML);
 }
 
 function fillCalendar(){
-    var ourRequest = new XMLHttpRequest();
-
-    ourRequest.open('GET', 'http://localhost:8076/heck/doctors/' + JSON.parse(sessionStorage.getItem('user')).id + '/appointments');
-    ourRequest.setRequestHeader("Authorization", "Bearer " + JSON.parse(sessionStorage.getItem('user')).token);
-
-    ourRequest.onload = function () {
-        if (ourRequest.status == 200) {
-            var data = JSON.parse(ourRequest.responseText);
+    $.ajax ({
+        type: 'GET',
+        url: 'http://localhost:8076/heck/doctors/' + JSON.parse(sessionStorage.getItem('user')).id + '/appointments',
+        dataType: 'json',
+        headers: {
+            "Authorization" : 'Bearer ' + JSON.parse(sessionStorage.getItem('user')).token
+        },
+        success: function (data,textStatus, jqXHR){
             console.log(data);
             fillCalendarModals(data);
             var e = [];
@@ -758,8 +725,9 @@ function fillCalendar(){
                     });
                 }
             });
-            $('#calendar').fullCalendar('destroy');
-            $('#calendar').fullCalendar({
+            var calendar = $('#calendar');
+            calendar.fullCalendar('destroy');
+            calendar.fullCalendar({
                 header: {
                     left: 'prev,next today',
                     center: 'title',
@@ -775,19 +743,16 @@ function fillCalendar(){
                 }
 
             });
-        } else if (ourRequest.status == 401) {
-            var url = 'SignIn.html';
-            window.location.href = url;
-        } else {
-            console.log("We connected to the server, but it returned an error.");
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+            if (xhr.status == 401) {
+                var url = 'SignIn.html';
+                window.location.href = url;
+            } else {
+                console.log("We connected to the server, but it returned an error.");
+            }
         }
-    };
-
-    ourRequest.onerror = function () {
-        console.log("Connection error");
-    };
-
-    ourRequest.send();
+    });
 }
 
 function fillCalendarModals(data){
@@ -795,82 +760,92 @@ function fillCalendarModals(data){
     var compiledTemplate = Handlebars.compile(rawTemplate);
     var ourGeneratedHTML = compiledTemplate(data);
 
-    //TODO prerobit na jquery
-    var table = document.getElementById("calendarModals");
-    table.innerHTML = ourGeneratedHTML;
+    var table = $('#calendarModals');
+    table.html(ourGeneratedHTML);
 }
 
 function setActive(type, id, value){
     var url = type == 'doctor' ? 'http://localhost:8076/heck/doctors/' : 'http://localhost:8076/heck/users/';
-    var ourRequest = new XMLHttpRequest();
-
-    ourRequest.open('PUT', url + id);
-    ourRequest.setRequestHeader("Content-Type", "application/json");
-    ourRequest.setRequestHeader("Authorization", "Bearer " + JSON.parse(sessionStorage.getItem('user')).token);
-
-    ourRequest.onload = function () {
-        if (ourRequest.status == 200) {
+    $.ajax ({
+        type: 'PUT',
+        url: url + id,
+        headers: {
+            "Content-Type": 'application/json',
+            "Authorization": 'Bearer ' + JSON.parse(sessionStorage.getItem('user')).token
+        },
+        data: JSON.stringify({
+            isActive: value,
+            active: value
+        }),
+        success: function (data, textStatus, jqXHR) {
             console.log("Update successful.");
+            var button;
             if(value) {
-                var button = $('#isActiveButton' + id);
+                button = $('#isActiveButton' + id);
                 button.removeClass('hiddenButton');
                 button.addClass('visibleButton');
                 button = $('#isDeactiveButton' + id);
                 button.removeClass('visibleButton');
                 button.addClass('hiddenButton');
             } else {
-                var button = $('#isDeactiveButton' + id);
+                button = $('#isDeactiveButton' + id);
                 button.removeClass('hiddenButton');
                 button.addClass('visibleButton');
                 button = $('#isActiveButton' + id);
                 button.removeClass('visibleButton');
                 button.addClass('hiddenButton');
             }
-        } else if (ourRequest.status == 401) {
-            var url = 'SignIn.html';
-            window.location.href = url;
-        } else {
-            console.log("We connected to the server, but it returned an error.");
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+            if (xhr.status == 401) {
+                var url = 'SignIn.html';
+                window.location.href = url;
+            } else {
+                console.log("We connected to the server, but it returned an error.");
+            }
         }
-    };
-
-    ourRequest.onerror = function () {
-        console.log("Connection error");
-    };
-
-    ourRequest.send(JSON.stringify({
-        isActive: value,
-        active: value
-    }));
+    });
 }
+
 function updateAppointment(id, isHoliday, isCanceled) {
-    var ourRequest = new XMLHttpRequest();
-
-    ourRequest.open('POST', 'http://localhost:8076/heck/appointments/update');
-    ourRequest.setRequestHeader("Content-Type", "application/json");
-    ourRequest.setRequestHeader("Authorization", "Bearer " + JSON.parse(sessionStorage.getItem('user')).token);
-
-    ourRequest.onload = function () {
-        if (ourRequest.status == 200) {
+    $.ajax({
+        type: 'POST',
+        url: 'http://localhost:8076/heck/appointments/update',
+        headers: {
+            "Content-Type": 'application/json',
+            "Authorization": 'Bearer ' + JSON.parse(sessionStorage.getItem('user')).token
+        },
+        data: JSON.stringify({
+            id: id,
+            canceled: isCanceled,
+            holiday: isHoliday
+        }),
+        success: function (data, textStatus, jqXHR) {
             console.log("Update successful.");
+            $('.modal-backdrop.fade.in').remove();
             fillCalendar();
-            //temporaryEvent.color = 'red';
-            //console.log(temporaryEvent);
-        } else if (ourRequest.status == 401) {
-            var url = 'SignIn.html';
-            window.location.href = url;
-        } else {
-            console.log("We connected to the server, but it returned an error.");
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+            if (xhr.status == 401) {
+                var url = 'SignIn.html';
+                window.location.href = url;
+            } else {
+                console.log("We connected to the server, but it returned an error.");
+            }
         }
-    };
+    });
+}
 
-    ourRequest.onerror = function () {
-        console.log("Connection error");
-    };
-
-    ourRequest.send(JSON.stringify({
-        id: id,
-        canceled: isCanceled,
-        holiday: isHoliday
-    }));
+function checkFormAndPreventFromSubmit() {
+    console.log($('.has-error').length);
+    if ($('.has-error').length > 0) {
+        var saveButton = $('#saveButton');
+        var signUpButton = $('#signUpButton');
+        if (saveButton) {
+            saveButton.prop('disabled', true);
+        }
+        if (signUpButton) {
+            signUpButton.prop('disabled', true);
+        }
+    }
 }
