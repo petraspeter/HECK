@@ -16,6 +16,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import sk.upjs.ics.pro1a.heck.db.core.Doctor;
 import sk.upjs.ics.pro1a.heck.services.DoctorService;
 import sk.upjs.ics.pro1a.heck.services.dto.*;
 
@@ -121,7 +122,7 @@ public class DoctorResources {
     public Response getDoctorsBySpecialization(
             @Auth AuthorizedUserDto user,
             @QueryParam("specialization") String specialization) {
-        List<DoctorDto> doctors = doctorService.getDoctorsBySpecialization(specialization);
+        List<DoctorDto> doctors = doctorService.getDoctorsBySpecializationToDoctorDTO(specialization);
         if (doctors == null) {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
@@ -140,7 +141,8 @@ public class DoctorResources {
             @QueryParam("from") String from,
             @QueryParam("to") String to) {
         SimpleDateFormat sdt = new SimpleDateFormat("yyyy-MM-dd");
-        List<DoctorDto> doctors = null;
+        List<DoctorDto> doctorsDto = null;
+        List<Doctor> doctors = null;
         Timestamp tsFrom = null;
         Timestamp tsTo = null;
         try {
@@ -153,39 +155,32 @@ public class DoctorResources {
         } catch (Exception e) {
             System.err.println("DateTo param is missing!");
         }
-        if (specialization != null && firstName != null && lastName !=  null && city != null && from != null && to != null) {
-            doctors = doctorService.getDoctorsBySpecializationAndFullNameAndCityAndDate(specialization, firstName,
-                    lastName, city, tsFrom, tsTo);
-        } else if(specialization != null && firstName == null && lastName !=  null && city == null && from != null && to != null)  {
-            doctors = doctorService.getDoctorsBySpecializationAndLastNameAndDate(specialization, lastName,
-                    tsFrom, tsTo);
-        } else if(specialization != null && firstName == null && lastName !=  null && city != null && from != null && to != null) {
-            doctors = doctorService.getDoctorsBySpecializationAndLastNameAndCityAndDate(specialization,
-                    lastName, city, tsFrom, tsTo);
-        } else if(specialization != null && firstName != null && lastName !=  null && city == null && from != null && to != null) {
-            doctors = doctorService.getDoctorsBySpecializationAndFullNameAndDate(specialization, firstName,
-                    lastName, tsFrom, tsTo);
-        } else if(specialization != null && firstName == null && lastName ==  null && city != null && from != null && to != null) {
-            doctors = doctorService.getDoctorsBySpecializationAndCityAndDate(specialization, city, tsFrom, tsTo);
-        } else if(specialization != null && firstName == null && lastName ==  null && city == null && from != null && to != null) {
-            doctors = doctorService.getDoctorsBySpecializationAndDate(specialization, tsFrom, tsTo);
-        } else if(specialization != null && firstName == null && lastName ==  null && city == null && from == null && to != null) {
-            doctors = doctorService.getDoctorsBySpecializationAndDate(specialization, tsTo, tsTo);
-        } else if(specialization != null && firstName == null && lastName ==  null && city == null && from != null && to == null) {
-            doctors = doctorService.getDoctorsBySpecializationAndDate(specialization, tsFrom, tsFrom);
-        } else if(specialization != null && firstName == null && lastName ==  null && city != null && from == null && to == null) {
+        if(firstName != null && lastName != null && city != null ) {
+            doctors = doctorService.getDoctorsBySpecializationAndFullNameAndCity(specialization, firstName, lastName, city);
+        } else if(firstName != null && lastName != null && city == null) {
+            doctors = doctorService.getDoctorsBySpecializationAndFullName(specialization, firstName, lastName);
+        } else if(firstName != null && lastName == null && city != null) {
+            doctors = doctorService.getDoctorsBySpecializationAndFullNameAndCity(specialization, firstName, "%", city);
+        } else if(firstName != null && lastName == null && city == null) {
+            doctors = doctorService.getDoctorsBySpecializationAndFullName(specialization, firstName, "%");
+        } else if(firstName == null && lastName != null && city != null) {
             doctors = doctorService.getDoctorsBySpecializationAndCity(specialization, city);
-        }  else if(specialization != null && firstName == null && lastName ==  null && city != null && from != null && to == null) {
-            doctors = doctorService.getDoctorsBySpecializationAndCityAndDate(specialization, city, tsFrom, tsFrom);
-        }  else if(specialization != null && firstName == null && lastName ==  null && city != null && from == null && to != null) {
-            doctors = doctorService.getDoctorsBySpecializationAndCityAndDate(specialization, city, tsTo, tsTo);
+        } else if(firstName == null && lastName != null && city == null) {
+            doctors = doctorService.getDoctorsBySpecializationAndLastName(specialization, lastName);
+        } else if(firstName == null && lastName == null && city != null) {
+            doctors = doctorService.getDoctorsBySpecializationAndCity(specialization, city);
         } else {
             doctors = doctorService.getDoctorsBySpecialization(specialization);
         }
-        if (doctors == null) {
+        if(tsFrom != null) {
+            doctorsDto = doctorService.getDoctorsByDateFromDoctors(doctors, tsFrom, tsTo);
+        } else {
+            doctorsDto = doctorService.makeDoctorsDtoFromDoctors(doctors);
+        }
+        if (doctorsDto == null) {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
-        return Response.ok(doctors).build();
+        return Response.ok(doctorsDto).build();
     }
     
     @POST
@@ -313,6 +308,22 @@ public class DoctorResources {
             return Response.status(Response.Status.EXPECTATION_FAILED).build();
         } else {
             return Response.status(Response.Status.CREATED).build();
+        }
+    }
+    
+    @GET
+    @Path("/users/checkFavourite")
+    @UnitOfWork
+    public Response checkFavourite(
+            @Auth AuthorizedUserDto user,
+            @QueryParam("idUser") Long idUser,
+            @QueryParam("idDoc") Long idDoc
+    ) {
+        try {
+            boolean isFavourite = doctorService.checkFavourite(idUser, idDoc);
+            return Response.ok(isFavourite).build();
+        } catch (Exception e) {
+            return Response.status(Response.Status.FORBIDDEN).build();
         }
     }
     

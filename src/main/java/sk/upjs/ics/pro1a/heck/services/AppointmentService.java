@@ -46,8 +46,10 @@ public class AppointmentService {
     public List<AppointmentDto> getFutureUserAppointment(Long id) {
         List<AppointmentDto> appointmentDtos = new ArrayList<>();
         for (Appointment appointment : appointmentDao.findFutureUserAppointment(id)) {
-            AppointmentDto appointmentDto = appointmentDao.createAppointmentDtoFromDao(appointment);
-            appointmentDtos.add(appointmentDto);
+            if(!appointment.getCanceledAppointment() && !appointment.getHolidayAppointment()) {
+                AppointmentDto appointmentDto = appointmentDao.createAppointmentDtoFromDao(appointment);
+                appointmentDtos.add(appointmentDto);
+            }
         }
         return appointmentDtos;
         

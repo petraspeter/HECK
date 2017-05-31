@@ -151,9 +151,6 @@ public class UserService {
     }
     
     /*
-    Private "query"methods
-    */
-    /*
     Methods for convertation between DTO and DAO
     */
     private User createUserDaoFromUserDto(UserDto userDto, String password, String salt) {
@@ -206,20 +203,17 @@ public class UserService {
                 user.getActiveUser(),
                 user.getAdmin());
     }
-
-    public IsValidDto checkUserPassword(Long id, String password) {
-            IsValidDto isValidDto = new IsValidDto();
-            User user = userDao.findById(id);
-            if (user != null) {
-                if (user.getPasswordUser().equals(PasswordManager.encryptPassword(user.getSaltUser(), password))) {
-                    isValidDto.setValid(true);
-                    return isValidDto;
-                }
+    
+    public Boolean checkUserPassword(Long id, String password) {
+        User user = userDao.findById(id);
+        if (user != null) {
+            if (user.getPasswordUser().equals(PasswordManager.encryptPassword(user.getSaltUser(), password))) {
+                return true;
             }
-            isValidDto.setValid(false);
-            return isValidDto;
+        }
+        return false;
     }
-
+    
     public void changeUserPassword(Long id, ChangePasswordDto changePasswordDto) {
         if (changePasswordDto.getNewPassword().equals(changePasswordDto.getConfirmPassword())) {
             User user = userDao.findById(id);
@@ -234,7 +228,7 @@ public class UserService {
         throw new IllegalStateException("Change password DTO is not valid.");
     }
     
-     public List<UserDto> getAllUsersForPage(int page, int pageSize) {
+    public List<UserDto> getAllUsersForPage(int page, int pageSize) {
         List<UserDto> usersDto = new ArrayList<>();
         for (User user : userDao.findForPage(page, pageSize)) {
             UserDto userDto = createUserDtoFromUserDaoWithoutPassword(user);
@@ -242,5 +236,13 @@ public class UserService {
         }
         return usersDto;
     }
-         
+    
+    public Boolean isLoginValid(String login) {
+        if (userDao.findByLogin(login) == null) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+    
 }

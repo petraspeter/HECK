@@ -153,6 +153,15 @@ public class DoctorDao extends AbstractDAO<Doctor> {
         return query.list();
     }
     
+    public Doctor checkFavourite(Long idUser, Long idDoctor) {
+        SQLQuery query = currentSession().createSQLQuery("SELECT * FROM doctor JOIN favourite_doctors "
+                + "ON favourite_doctors.id_doctor = :idDoctor AND favourite_doctors.id_user = :idUser WHERE doctor.id_doctor = :idDoctor")
+                .addEntity(Doctor.class);
+        query.setParameter("idUser", idUser);
+        query.setParameter("idDoctor", idDoctor);
+        return (Doctor) query.uniqueResult();
+    }
+    
     public Integer addFavourite(Long idUser, Long idDoc) {
         SQLQuery query = currentSession().createSQLQuery("INSERT INTO favourite_doctors (id_doctor, id_user) "
                 + "VALUES (:idDoc, :idUser)");

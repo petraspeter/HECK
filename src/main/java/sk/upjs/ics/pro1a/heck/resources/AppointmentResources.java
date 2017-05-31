@@ -70,7 +70,7 @@ public class AppointmentResources {
     @Consumes(MediaType.APPLICATION_JSON)
     @UnitOfWork
     public Response findAppointmenstByDoctorId(
-         //   @Auth AuthorizedUserDto user,
+            @Auth AuthorizedUserDto user,
             @QueryParam("idDoc") Long idDoc,
             @QueryParam("idUser") Long idUser,
             @QueryParam("dateFrom") String dateFrom,
@@ -160,7 +160,7 @@ public class AppointmentResources {
     public Response deleteAppointment(@Auth AuthorizedUserDto user, @PathParam("id") Long id) {
         appointmentService.deleteAppointment(id);
         Appointment appointment = appointmentService.getById(id);
-        if (appointment.getIdAppointment() == null) {
+        if (appointment.getCanceledAppointment()) {
             return Response.ok("Appointment deleted").build();
         }
         return Response.status(Response.Status.EXPECTATION_FAILED).build();
@@ -170,7 +170,7 @@ public class AppointmentResources {
     @Path("/users/appointments/{id}")
     @UnitOfWork
     public Response getUserAppointment(
-      //      @Auth AuthorizedUserDto user,
+            @Auth AuthorizedUserDto user,
             @PathParam("id") Long id) {
         List<AppointmentDto> appointments = appointmentService.getUserAppointment(id);
         if (appointments == null) {
